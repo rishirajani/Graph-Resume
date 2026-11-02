@@ -290,6 +290,10 @@ table.reqs td .chips { display: flex; flex-wrap: wrap; gap: 5px; }
   .paper { width: 100%; min-height: 0; padding: 22px 18px; }
 }
 .drawer .grab { display: none; }
+.owner-bar { margin: 0 0 10px; font-size: 13.5px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+.owner-bar .owner-err { color: #9b2c2c; }
+.linkish { border: 0; background: none; padding: 0; font: inherit; color: var(--ink); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.hidden-tag { border-style: dotted; }
 .read-foot { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--rule); }
 
 /* ---------- phones: header stacked above a full-height graph, details in a bottom sheet ---------- */

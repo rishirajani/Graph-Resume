@@ -85,6 +85,11 @@
     $("#show-drafts").checked = G.showDrafts();
     const priv = LS.get("private", {});
     $("#priv-phone").value = priv.phone || "";
+    const gh = LS.get("gh", {}) || {};
+    $("#gh-repo").value = gh.repo || ""; $("#gh-token").value = gh.token || "";
+    const O = window.GR_OWNER || {};
+    $("#gh-status").textContent = !O.configured ? "Not connected." : O.error ? O.error
+      : G.ownerView ? `Connected. Using your private master: ${G.allNodes.filter((n) => n.private).length} hidden from visitors.` : "Connected.";
     $("#priv-notes").value = priv.notes || "";
     syncProvider();
   }
@@ -122,6 +127,33 @@
     toast("Settings saved");
     $("#settings").hidden = true; $("#workspace").hidden = false; renderHistory();
   });
+  // private master on GitHub
+  $("#gh-connect").addEventListener("click", async () => {
+    const repo = $("#gh-repo").value.trim().replace(/^https?:\/\/github\.com\//, "").replace(/\.git$|\/$/g, "");
+    const token = $("#gh-token").value.trim();
+    if (!/^[\w.-]+\/[\w.-]+$/.test(repo) || !token) { $("#gh-status").textContent = "Enter the repository as owner/name and a token."; return; }
+    $("#gh-status").textContent = "Checking…";
+    try {
+      const r = await fetch(`https://api.github.com/repos/${repo}/contents/resume.js`, {
+        headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github.raw+json", "X-GitHub-Api-Version": "2022-11-28" }, cache: "no-store"
+      });
+      if (!r.ok) throw new Error(r.status === 401 ? "GitHub didn't accept the token." : r.status === 404 ? "Couldn't find resume.js there, or the token can't read that repository." : `GitHub answered ${r.status}.`);
+      const text = await r.text();
+      const w = {}; new Function("window", text)(w);
+      if (!w.RESUME?.nodes) throw new Error("That resume.js doesn't define window.RESUME.");
+      LS.set("gh", { repo, token }); LS.set("owner", true);
+      try { localStorage.setItem("gr.masterCache", text); } catch {}
+      $("#gh-status").textContent = `Loaded ${w.RESUME.nodes.length} items. Reloading…`;
+      setTimeout(() => location.reload(), 600);
+    } catch (e) { $("#gh-status").textContent = e.message; }
+  });
+  $("#gh-disconnect").addEventListener("click", () => {
+    LS.del("gh"); try { localStorage.removeItem("gr.masterCache"); } catch {}
+    $("#gh-repo").value = ""; $("#gh-token").value = "";
+    $("#gh-status").textContent = "Disconnected. This browser now sees what visitors see.";
+    setTimeout(() => location.reload(), 800);
+  });
+
   $("#settings-forget").addEventListener("click", () => {
     try { Object.keys(localStorage).filter((k) => k.startsWith("gr.key:")).forEach((k) => localStorage.removeItem(k)); } catch {}
     LS.del("apiKey"); $("#api-key").value = ""; toast("All keys removed from this browser");
@@ -163,7 +195,7 @@
       if (n.promotedFrom) o.promotedFrom = n.promotedFrom;
       if (n.via) o.via = n.via;
       if (n.partner) o.coRunBy = byId.get(n.partner)?.label;
-      if (n.private) o.privateNote = true;
+      if (n.private) o.hiddenFromVisitors = true;
       const pn = privateNotes()[n.id]; if (pn) o.notes = pn;
       return o;
     });
@@ -354,6 +386,9 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     (cv.languages || []).forEach((id) => used.add(id));
     const drafts = [...used].map((id) => byId.get(id)).filter((n) => n?.draft);
     if (drafts.length) warnings.push(`Uses nodes still marked draft, so their details may be incomplete: ${drafts.map((n) => n.label + (n.org ? ` (${byId.get(n.org)?.label})` : "")).join(", ")}.`);
+    // items you've hidden on the public site: fine on a CV, but worth knowing
+    const hidden = [...used].map((id) => byId.get(id)).filter((n) => n?.private);
+    if (hidden.length) warnings.push(`Includes items hidden from visitors on your site: ${hidden.map((n) => n.label).join(", ")}. Keep them if they help this application; a reader who opens your site won't find them there.`);
     const undated = (cv.experience || []).map((x) => byId.get(x.id)).filter((n) => !n.start);
     if (undated.length) warnings.push(`No dates in the graph for: ${undated.map((n) => `${n.label}, ${byId.get(n.org)?.label || ""}`).join("; ")}.`);
     return warnings;

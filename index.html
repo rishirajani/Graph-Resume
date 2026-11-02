@@ -20,6 +20,7 @@
   <div id="cy" role="img" aria-label="Interactive graph of experience, education, projects and skills. A text version is available."></div>
 
   <header class="intro">
+    <p id="owner-bar" class="owner-bar" hidden></p>
     <h1 id="name"></h1>
     <p id="headline" class="headline"></p>
     <div class="legend" id="legend" role="group" aria-label="Show or hide kinds of nodes"></div>
@@ -138,6 +139,19 @@
       </div>
       <code id="pass-hash-out" class="hash"></code>
     </details>
+    <details class="field" id="master-details">
+      <summary>Private master on GitHub</summary>
+      <p class="help">Connect this browser to your private repository so the graph, text view and studio here use your full data, hidden items included. Visitors never get it. Use a fine-grained token limited to that one repository, with Contents set to read and write.</p>
+      <label for="gh-repo">Repository</label>
+      <input id="gh-repo" type="text" placeholder="owner/repository" spellcheck="false" autocomplete="off">
+      <label for="gh-token" style="margin-top:10px">Token</label>
+      <input id="gh-token" type="password" spellcheck="false" autocomplete="off">
+      <div class="row" style="margin-top:10px">
+        <button class="btn ghost small" id="gh-connect" type="button">Connect and load</button>
+        <button class="btn ghost small" id="gh-disconnect" type="button">Disconnect this browser</button>
+      </div>
+      <p class="help" id="gh-status"></p>
+    </details>
     <details class="field" id="private-details">
       <summary>Private details (phone, GPA…)</summary>
       <p class="help">Kept only in this browser and used only on CVs and cover letters you export. They are never part of the site's files, so visitors can't see them.</p>
@@ -248,6 +262,7 @@
 <div id="print-root" aria-hidden="true"></div>
 
 <script src="resume.js"></script>
+<script src="owner.js"></script>
 <script src="lib/cytoscape.min.js"></script>
 <script src="app.js"></script>
 <script src="studio.js"></script>

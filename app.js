@@ -88,9 +88,29 @@
   const isPlaceholder = (t) => /^replace with/i.test(String(t || "").trim()) || /^add one line/i.test(String(t || "").trim());
   const clean = (arr) => (arr || []).filter((t) => t && !isPlaceholder(t));
 
-  const publicNodes = allNodes.filter((n) => !n.private);
+  // What visitors get: no private nodes, and no organisations, schools or skills that only
+  // private nodes used (the same rule tools/publish.mjs applies to the public file).
+  const publicNodes = (() => {
+    const REF = ["org", "school", "skills", "group", "partOf", "promotedFrom", "via", "partner", "includes"];
+    const refs = (n) => REF.flatMap((f) => [].concat(n[f] ?? []));
+    const out = new Set(allNodes.filter((n) => n.private).map((n) => n.id));
+    for (let changed = true; changed; ) {
+      changed = false;
+      const kept = allNodes.filter((n) => !out.has(n.id)), used = new Set(kept.flatMap(refs));
+      const cand = new Set(allNodes.filter((n) => out.has(n.id)).flatMap(refs));
+      for (const n of kept) if (["Organization", "School", "Skill"].includes(n.type) && cand.has(n.id) && !used.has(n.id)) { out.add(n.id); changed = true; }
+    }
+    return allNodes.filter((n) => !out.has(n.id));
+  })();
   const publicEdges = deriveEdges(publicNodes);
   const fullEdges = deriveEdges(allNodes);
+  // On your own devices (private master loaded) the graph and text view also show hidden
+  // items, marked as such. Downloads always use the public set.
+  const owner = window.GR_OWNER || { source: "public" };
+  const ownerView = owner.source === "master";
+  const hiddenCount = allNodes.filter((n) => n.private).length;
+  const shownNodes = ownerView ? allNodes : publicNodes;
+  const shownEdges = ownerView ? fullEdges : publicEdges;
 
   const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   function fmtDate(d) {
@@ -178,7 +198,7 @@
   function renderLegend() {
     $("#legend").innerHTML = FILTERS.map((f) => {
       const isSkill = f.key === "skill";
-      const count = publicNodes.filter((n) => (isSkill ? n.type === "Skill" : f.types.includes(n.type))).length;
+      const count = shownNodes.filter((n) => (isSkill ? n.type === "Skill" : f.types.includes(n.type))).length;
       if (!count) return "";
       const pressed = isSkill ? showSkills : true;
       const title = isSkill ? ' title="Show every skill, not just skill areas"' : "";
@@ -226,6 +246,8 @@
         { selector: 'node[type="SkillGroup"]', style: { "background-color": paper, "border-width": 3, "border-color": "data(color)", "font-size": 11.5, "font-weight": 600 } },
         { selector: 'node[type="Organization"], node[type="School"]', style: { shape: "round-rectangle" } },
         { selector: "node.show-draft[draft = 1]", style: { "border-width": 2, "border-style": "dashed", "border-color": muted } },
+        // hidden from visitors: hollow with a dotted ring, so you can tell at a glance
+        { selector: "node.hidden-item", style: { "background-opacity": 0.35, "border-width": 2.5, "border-style": "dotted", "border-color": ink } },
         { selector: "edge", style: {
           width: 1.1, "line-color": rule, "curve-style": "bezier", "target-arrow-shape": "triangle",
           "target-arrow-color": rule, "arrow-scale": 0.6, opacity: 0.9,
@@ -253,8 +275,8 @@
     ]);
   }
   function areaEdges() {
-    const ids = new Set(publicNodes.map((n) => n.id)), out = [];
-    for (const n of publicNodes) {
+    const ids = new Set(shownNodes.map((n) => n.id)), out = [];
+    for (const n of shownNodes) {
       const areas = new Set((n.skills || []).map((s) => byId.get(s)?.group).filter((g) => g && ids.has(g)));
       areas.forEach((g) => out.push({ id: `${n.id}__area__${g}`, source: n.id, target: g, pred: "area" }));
     }
@@ -262,14 +284,14 @@
   }
   function initGraph() {
     const deg = {};
-    publicEdges.forEach((e) => { deg[e.source] = (deg[e.source] || 0) + 1; deg[e.target] = (deg[e.target] || 0) + 1; });
+    shownEdges.forEach((e) => { deg[e.source] = (deg[e.source] || 0) + 1; deg[e.target] = (deg[e.target] || 0) + 1; });
     const elements = [
-      ...publicNodes.map((n) => {
+      ...shownNodes.map((n) => {
         const base = TYPE[n.type]?.size || 18;
         const size = n.type === "Skill" ? base + Math.min(14, (deg[n.id] || 1) * 2.2) : base;
-        return { data: { id: n.id, label: displayLabel(n), type: n.type, color: colorOf(n), size, draft: n.draft ? 1 : 0 } };
+        return { data: { id: n.id, label: displayLabel(n), type: n.type, color: colorOf(n), size, draft: n.draft ? 1 : 0 }, classes: n.private ? "hidden-item" : "" };
       }),
-      ...publicEdges.map((e) => ({ data: { ...e, label: PRED[e.pred][0] } })),
+      ...shownEdges.map((e) => ({ data: { ...e, label: PRED[e.pred][0] } })),
       ...areaEdges().map((e) => ({ data: { ...e, label: "draws on" }, classes: "agg" }))
     ];
     cy = cytoscape({
@@ -298,9 +320,9 @@
     const R1 = 150 * k, RS = [300 * k, 370 * k], R2 = (withSkills ? 540 : 315) * k, R3 = (withSkills ? 690 : 460) * k;
     const visible = new Set(vis.nodes().map((n) => n.id()));
     const pos = { me: { x: 0, y: 0 } };
-    const areas = publicNodes.filter((n) => n.type === "SkillGroup" && visible.has(n.id));
+    const areas = shownNodes.filter((n) => n.type === "SkillGroup" && visible.has(n.id));
     const aAng = {};
-    const skillsOf = (a) => publicNodes.filter((s) => s.type === "Skill" && s.group === a.id && visible.has(s.id));
+    const skillsOf = (a) => shownNodes.filter((s) => s.type === "Skill" && s.group === a.id && visible.has(s.id));
     if (withSkills) {
       // each area gets a sector sized by how many skills it holds; its skills fan out inside it
       const total = areas.reduce((t, a) => t + Math.max(1, skillsOf(a).length), 0);
@@ -322,7 +344,7 @@
       return Math.hypot(x, y) < 1e-6 ? angles[0] : Math.atan2(y, x);
     };
     const ITEM = ["Role", "Break", "Education", "Project", "Award", "Certification", "Publication", "Language"];
-    const items = publicNodes.filter((n) => ITEM.includes(n.type) && visible.has(n.id));
+    const items = shownNodes.filter((n) => ITEM.includes(n.type) && visible.has(n.id));
     const want = {};
     items.forEach((n) => { want[n.id] = mean((n.skills || []).map((s) => aAng[byId.get(s)?.group]).filter((a) => a != null)); });
     for (let pass = 0; pass < 2; pass++) items.forEach((n) => {
@@ -366,7 +388,7 @@
     });
     areas.forEach((a) => { pos[a.id] = { x: R1 * Math.cos(aAng[a.id]), y: R1 * Math.sin(aAng[a.id]) }; });
     // organisations and schools sit outside the items that point to them
-    const outer = publicNodes.filter((n) => (n.type === "Organization" || n.type === "School") && visible.has(n.id)).map((o) => {
+    const outer = shownNodes.filter((n) => (n.type === "Organization" || n.type === "School") && visible.has(n.id)).map((o) => {
       const refs = items.filter((n) => (n.org === o.id || n.school === o.id) && itemAng[n.id] != null);
       return { id: o.id, a: norm(mean(refs.map((n) => itemAng[n.id])) ?? 0) };
     });
@@ -477,15 +499,15 @@
 
   function renderDrawer(id) {
     const n = byId.get(id);
-    if (!n || n.private) return closeDrawer();
+    if (!n || (n.private && !ownerView)) return closeDrawer();
     const drafts = showDrafts() || runtime.isOwner;
     const kind = n.type === "Person" ? "Person" : TYPE[n.type]?.kind || n.type;
     const m = meta(n);
     const summary = n.type === "Person" ? n.summary : (isPlaceholder(n.summary) || isPlaceholder(n.description) ? "" : n.summary || n.description);
     const hls = drafts ? n.highlights || [] : clean(n.highlights);
-    const triples = triplesFor(id, publicEdges);
+    const triples = triplesFor(id, shownEdges);
     $("#drawer-body").innerHTML = `
-      <div class="kind" style="--c:${colorOf(n)}"><span class="dot"></span>${esc(kind)}${n.draft && drafts ? '<span class="draft-tag">draft</span>' : ""}</div>
+      <div class="kind" style="--c:${colorOf(n)}"><span class="dot"></span>${esc(kind)}${n.draft && drafts ? '<span class="draft-tag">draft</span>' : ""}${n.private ? '<span class="draft-tag hidden-tag">hidden from visitors</span>' : ""}</div>
       <h2 id="drawer-title">${esc(n.label || n.name)}</h2>
       ${m.length ? `<p class="meta">${m.map(esc).join(", ")}</p>` : ""}
       ${n.type === "Person" && n.headline ? `<p class="summary">${esc(n.headline)}</p>` : ""}
@@ -549,7 +571,7 @@
   searchInput.addEventListener("input", () => {
     const q = searchInput.value.trim().toLowerCase();
     if (!q) { results.hidden = true; return; }
-    const hits = publicNodes.filter((n) => [n.label, n.name, n.summary, ...(n.highlights || [])].join(" ").toLowerCase().includes(q)).slice(0, 8);
+    const hits = shownNodes.filter((n) => [n.label, n.name, n.summary, ...(n.highlights || [])].join(" ").toLowerCase().includes(q)).slice(0, 8);
     results.innerHTML = hits.length
       ? hits.map((n) => `<li><button type="button" data-id="${esc(n.id)}" style="--c:${colorOf(n)}"><span class="dot"></span>${esc(n.label || n.name)}</button></li>`).join("")
       : `<li class="muted" style="padding:7px 8px">No match. Try a skill like “SPARQL”.</li>`;
@@ -560,18 +582,18 @@
 
   /* ---------------- read view ---------------- */
   function chip(id, hlIds) {
-    const n = byId.get(id); if (!n || n.private) return "";
+    const n = byId.get(id); if (!n || (n.private && !ownerView)) return "";
     return `<button type="button" class="chip${hlIds?.has(id) ? " hl" : ""}" data-goto="${esc(id)}" style="--c:${colorOf(n)}"><span class="dot"></span>${esc(n.label)}</button>`;
   }
   function renderRead() {
     const drafts = showDrafts() || runtime.isOwner;
-    const nodesOf = (t) => publicNodes.filter((n) => n.type === t);
+    const nodesOf = (t) => shownNodes.filter((n) => n.type === t);
     const byDateDesc = (a, b) => String(b.end || "9999").localeCompare(String(a.end || "9999")) || String(b.start || "").localeCompare(String(a.start || ""));
     const item = (n, sub) => {
       const hls = drafts ? n.highlights || [] : clean(n.highlights);
       const summary = isPlaceholder(n.summary) ? "" : n.summary;
       return `<div class="item" id="read-${esc(n.id)}">
-        <h3>${esc(n.label)}${n.draft && drafts ? '<span class="draft-tag">draft</span>' : ""}</h3>
+        <h3>${esc(n.label)}${n.draft && drafts ? '<span class="draft-tag">draft</span>' : ""}${n.private ? '<span class="draft-tag hidden-tag">hidden from visitors</span>' : ""}</h3>
         ${sub ? `<p class="meta">${esc(sub)}</p>` : ""}
         ${summary ? `<p>${esc(summary)}</p>` : ""}
         ${hls.length ? `<ul>${hls.map((h) => `<li>${esc(h)}</li>`).join("")}</ul>` : ""}
@@ -583,10 +605,10 @@
     const edu = nodesOf("Education").sort(byDateDesc).map((n) => item(n, meta(n).join(", "))).join("");
     const proj = nodesOf("Project").map((n) => item(n, meta(n).join(", "))).join("");
     const groups = nodesOf("SkillGroup").map((g) => {
-      const skills = publicNodes.filter((s) => s.type === "Skill" && s.group === g.id);
+      const skills = shownNodes.filter((s) => s.type === "Skill" && s.group === g.id);
       return `<div><h3>${esc(g.label)}</h3><div class="links">${skills.map((s) => chip(s.id)).join("")}</div></div>`;
     }).join("");
-    const ungrouped = publicNodes.filter((s) => s.type === "Skill" && !s.group);
+    const ungrouped = shownNodes.filter((s) => s.type === "Skill" && !s.group);
     const more = ["Certification", "Award", "Publication", "Language"].flatMap(nodesOf)
       .map((n) => `<div class="item"><h3>${esc(n.label)}${n.draft && drafts ? '<span class="draft-tag">draft</span>' : ""}</h3>${meta(n).length ? `<p class="meta">${esc(meta(n).join(", "))}</p>` : ""}</div>`).join("");
 
@@ -720,7 +742,7 @@
   function gcInit() {
     const code = String(R.site?.goatcounter || "").trim();
     if (!code || runtime.inArtifact) return;            // not configured, or inside claude.ai
-    let owner = false; try { owner = localStorage.getItem("gr.owner") === "true"; } catch {}
+    let owner = !!window.GR_OWNER?.configured; try { owner = owner || localStorage.getItem("gr.owner") === "true"; } catch {}
     if (owner) return;                                    // never count the owner's own browser
     window.goatcounter = { no_onload: true };
     gc.ready = new Promise((resolve) => {
@@ -770,6 +792,24 @@
   window.addEventListener("hashchange", route);
   $("#studio-btn").addEventListener("click", () => (location.hash = "studio"));
 
+  /* ---------------- owner bar ---------------- */
+  function renderOwnerBar() {
+    const bar = $("#owner-bar");
+    if (!bar || runtime.inArtifact) return;
+    if (!(ownerView || owner.asVisitor || owner.error)) { if (owner.refreshed && !renderOwnerBar.waited) { renderOwnerBar.waited = true; owner.refreshed.then(() => owner.error && renderOwnerBar()); } return; }
+    const label = owner.asVisitor ? "You're seeing what visitors see."
+      : ownerView ? `Your full view: ${hiddenCount} ${hiddenCount === 1 ? "item" : "items"} hidden from visitors.`
+      : "";
+    bar.innerHTML = `${esc(label)}${owner.error ? ` <span class="owner-err">Private master: ${esc(owner.error)}</span>` : ""}
+      ${owner.configured ? `<button type="button" class="linkish" id="owner-toggle">${owner.asVisitor ? "Back to your view" : "See it as a visitor"}</button>` : ""}`;
+    bar.hidden = false;
+    if (owner.refreshed && !renderOwnerBar.waited) { renderOwnerBar.waited = true; owner.refreshed.then(() => owner.error && renderOwnerBar()); }
+    $("#owner-toggle")?.addEventListener("click", () => {
+      try { owner.asVisitor ? sessionStorage.removeItem("gr.asVisitor") : sessionStorage.setItem("gr.asVisitor", "1"); } catch {}
+      location.reload();
+    });
+  }
+
   /* ---------------- boot ---------------- */
   renderLegend();
   if (R.site?.allowPublicGraphExport !== false) $("#export-graph-btn").hidden = false;
@@ -781,6 +821,7 @@
     gcInit();
     if (runtime.isOwner) { $("#studio-btn").hidden = false; applyDraftMarks(); }
     if (runtime.inArtifact) $("#share-btn").textContent = "Share";
+    renderOwnerBar();
     window.dispatchEvent(new CustomEvent("gr:ready"));
   });
   let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => cy && cy.resize(), 150); });
@@ -791,10 +832,10 @@
   });
 
   window.GR = {
-    R, me, allNodes, publicNodes, byId, fullEdges, PRED, TYPE,
+    R, me, allNodes, publicNodes, byId, fullEdges, PRED, TYPE, ownerView,
     fmtDate, dateRange, meta, isPlaceholder, clean, esc, $, $$,
     runtime, ready, toast, modal, saveFile, copyText, setLens, clearLens,
     toJsonLd, toTurtle, applyDraftMarks, renderRead,
-    showDrafts
+    showDrafts, cy: () => cy
   };
 })();
