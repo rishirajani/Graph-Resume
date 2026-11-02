@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rishi Rajani · Resume graph</title>
+<meta name="description" content="Rishi Rajani's resume as an explorable knowledge graph: experience, education, projects and skills, and how they connect.">
+<meta property="og:title" content="Rishi Rajani · Resume graph">
+<meta property="og:description" content="An explorable knowledge graph of experience, education, projects and skills.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400..800;1,400..600&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip" href="#read">Skip to the text version</a>
+
+<!-- ================= Graph view ================= -->
+<main id="view-graph" class="view" aria-label="Resume graph">
+  <div id="cy" role="img" aria-label="Interactive graph of experience, education, projects and skills. A text version is available."></div>
+
+  <header class="intro">
+    <h1 id="name"></h1>
+    <p id="headline" class="headline"></p>
+    <div class="legend" id="legend" role="group" aria-label="Show or hide kinds of nodes"></div>
+    <label class="search">
+      <span class="visually-hidden">Find a node</span>
+      <input id="search" type="search" placeholder="Find a skill, role or project" autocomplete="off">
+    </label>
+    <ul id="search-results" class="search-results" hidden></ul>
+  </header>
+
+  <nav class="toolbar" aria-label="Views and actions">
+    <div class="seg" role="tablist" aria-label="View">
+      <button role="tab" aria-selected="true" data-view="graph">Graph</button>
+      <button role="tab" aria-selected="false" data-view="read">Read as text</button>
+    </div>
+    <button class="btn ghost" id="share-btn">Copy link</button>
+    <button class="btn ghost wide-only" id="export-graph-btn" hidden>Download graph</button>
+    <button class="btn ink" id="studio-btn" hidden>Open studio</button>
+  </nav>
+
+  <div id="lens-banner" class="lens-banner" hidden>
+    <span class="swatch hl"></span>
+    <p id="lens-text"></p>
+    <button class="btn ghost small" id="lens-clear">Clear highlight</button>
+  </div>
+
+  <aside id="drawer" class="drawer" aria-live="polite" hidden>
+    <button class="grab" id="drawer-grab" type="button" aria-label="Show more" aria-expanded="false"></button>
+    <button class="close" id="drawer-close" aria-label="Close details">×</button>
+    <div id="drawer-body"></div>
+  </aside>
+
+  <p class="hint" id="hint">Drag to pan, scroll to zoom, select a node to see how it connects.</p>
+</main>
+
+<!-- ================= Read view ================= -->
+<main id="view-read" class="view" hidden aria-label="Resume as text">
+  <nav class="toolbar static" aria-label="Views">
+    <div class="seg" role="tablist" aria-label="View">
+      <button role="tab" aria-selected="false" data-view="graph">Graph</button>
+      <button role="tab" aria-selected="true" data-view="read">Read as text</button>
+    </div>
+  </nav>
+  <article id="read-body" class="read"></article>
+</main>
+
+<!-- ================= Owner studio ================= -->
+<main id="view-studio" class="view" hidden aria-label="Studio">
+  <header class="studio-top">
+    <div>
+      <h1>Studio</h1>
+      <p class="sub">Paste a job description. The CV and cover letter are written only from what's in your graph.</p>
+    </div>
+    <div class="studio-top-actions">
+      <button class="btn ghost" id="studio-settings-btn">Model settings</button>
+      <button class="btn ghost" data-view="graph">Back to graph</button>
+    </div>
+  </header>
+
+  <!-- gate -->
+  <section id="gate" class="gate" hidden>
+    <h2>Owner access</h2>
+    <p>Enter your passphrase to use the studio on this device.</p>
+    <form id="gate-form">
+      <input id="gate-pass" type="password" autocomplete="current-password" required aria-label="Passphrase">
+      <button class="btn ink">Unlock</button>
+    </form>
+    <p id="gate-error" class="error" hidden>That passphrase doesn't match. Try again.</p>
+  </section>
+
+  <!-- settings -->
+  <section id="settings" class="settings" hidden>
+    <h2>Model settings</h2>
+    <p id="settings-claude-note" class="note" hidden>You're viewing this as its owner on claude.ai, so the studio writes with Claude and needs no key. The settings below apply when the site runs on your own domain.</p>
+    <div class="field">
+      <label for="preset">Preset</label>
+      <select id="preset">
+        <option value="">Custom</option>
+        <option value="claude-sonnet">Claude Sonnet 5.5: best writing, about $0.06 per application</option>
+        <option value="claude-haiku">Claude Haiku 5.5: cheapest Claude, well under $0.01</option>
+        <option value="or-free">OpenRouter: free models, tried in turn</option>
+        <option value="or-kimi">OpenRouter: Kimi K2.6, about $0.01</option>
+        <option value="gemini-flash">Google Gemini 2.5 Flash</option>
+      </select>
+      <p class="help">Fills in the provider, address and model below. Each provider needs its own key, and the studio remembers one key per provider.</p>
+    </div>
+    <div class="field">
+      <label for="provider">Provider</label>
+      <select id="provider">
+        <option value="anthropic">Anthropic Claude</option>
+        <option value="openai-compatible">OpenRouter / Groq / OpenAI (OpenAI-compatible)</option>
+        <option value="gemini">Google Gemini</option>
+      </select>
+    </div>
+    <div class="field" id="base-url-field" hidden>
+      <label for="base-url">API base URL</label>
+      <input id="base-url" type="url" placeholder="https://openrouter.ai/api/v1">
+      <p class="help">For OpenRouter use https://openrouter.ai/api/v1, for Groq https://api.groq.com/openai/v1, for OpenAI https://api.openai.com/v1.</p>
+    </div>
+    <div class="field">
+      <label for="model">Model</label>
+      <input id="model" type="text" spellcheck="false">
+      <p class="help">List several models separated by commas to try them in order when one is busy, rate-limited or gone. On OpenRouter the switch happens on their side.</p>
+    </div>
+    <div class="field">
+      <label for="api-key">API key</label>
+      <input id="api-key" type="password" autocomplete="off" spellcheck="false">
+      <p class="help">Saved only in this browser. It is never part of the site's code, so visitors can't see or use it.</p>
+    </div>
+    <details class="field">
+      <summary>Passphrase for the public site (optional)</summary>
+      <p class="help">Adds a lock in front of the studio on your deployed site. Type a passphrase, then copy the hash into <code>ownerPassphraseSha256</code> in resume.js.</p>
+      <div class="row">
+        <input id="pass-new" type="password" aria-label="New passphrase">
+        <button class="btn ghost small" id="pass-hash-btn" type="button">Make hash</button>
+      </div>
+      <code id="pass-hash-out" class="hash"></code>
+    </details>
+    <details class="field" id="private-details">
+      <summary>Private details (phone, GPA…)</summary>
+      <p class="help">Kept only in this browser and used only on CVs and cover letters you export. They are never part of the site's files, so visitors can't see them.</p>
+      <label for="priv-phone">Phone</label>
+      <input id="priv-phone" type="text" autocomplete="tel">
+      <label for="priv-notes" style="margin-top:10px">Private notes</label>
+      <textarea id="priv-notes" rows="4" spellcheck="false" placeholder="One per line as  node-id: note&#10;e.g.  e-be: GPA …"></textarea>
+    </details>
+    <label class="check"><input type="checkbox" id="show-drafts"> Mark draft nodes on the graph (only on this device)</label>
+    <div class="row end">
+      <button class="btn ghost" id="settings-forget" type="button">Remove keys from this browser</button>
+      <button class="btn ink" id="settings-save" type="button">Save settings</button>
+    </div>
+  </section>
+
+  <!-- workspace -->
+  <section id="workspace" class="workspace" hidden>
+    <form id="jd-form" class="jd">
+      <div class="field">
+        <label for="jd">Job description</label>
+        <textarea id="jd" rows="14" required placeholder="Paste the full job description, including requirements and responsibilities."></textarea>
+      </div>
+      <div class="field two">
+        <div>
+          <label for="company">Company <span class="opt">optional</span></label>
+          <input id="company" type="text">
+        </div>
+        <div>
+          <label for="contact">Hiring contact <span class="opt">optional</span></label>
+          <input id="contact" type="text" placeholder="e.g. Ms. Weber">
+        </div>
+      </div>
+      <div class="field two">
+        <div>
+          <label for="lang">Language</label>
+          <select id="lang">
+            <option value="auto">Same as the job description</option>
+            <option value="English">English</option>
+            <option value="German">German</option>
+          </select>
+        </div>
+        <div>
+          <label for="length">CV length</label>
+          <select id="length">
+            <option value="1">1 page</option>
+            <option value="2">2 pages</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="notes">Anything to emphasise <span class="opt">optional</span></label>
+        <input id="notes" type="text" placeholder="e.g. lead with ontology work, mention relocation is not needed">
+      </div>
+      <label class="check"><input type="checkbox" id="want-letter" checked> Also write a cover letter</label>
+      <button class="btn ink wide" id="generate-btn">Write tailored CV</button>
+      <p id="gen-status" class="status" role="status"></p>
+      <div id="history" class="history"></div>
+    </form>
+
+    <div class="results" id="results" hidden>
+      <div class="seg" role="tablist" aria-label="Result">
+        <button role="tab" aria-selected="true" data-tab="fit">Fit</button>
+        <button role="tab" aria-selected="false" data-tab="cv">CV</button>
+        <button role="tab" aria-selected="false" data-tab="letter">Cover letter</button>
+      </div>
+
+      <div class="tab" id="tab-fit"></div>
+
+      <div class="tab" id="tab-cv" hidden>
+        <div class="export-bar">
+          <span class="muted">Click any text to edit before exporting.</span>
+          <div class="row">
+            <button class="btn ghost small" data-export="cv-pdf">PDF</button>
+            <button class="btn ghost small" data-export="cv-docx">Word</button>
+            <button class="btn ghost small" data-export="cv-md">Markdown</button>
+            <button class="btn ghost small" data-export="cv-copy">Copy text</button>
+          </div>
+        </div>
+        <div class="paper-wrap"><div id="cv-paper" class="paper cv" contenteditable="true" spellcheck="true"></div></div>
+      </div>
+
+      <div class="tab" id="tab-letter" hidden>
+        <div class="export-bar">
+          <span class="muted">Click any text to edit before exporting.</span>
+          <div class="row">
+            <button class="btn ghost small" data-export="cl-pdf">PDF</button>
+            <button class="btn ghost small" data-export="cl-docx">Word</button>
+            <button class="btn ghost small" data-export="cl-md">Markdown</button>
+            <button class="btn ghost small" data-export="cl-copy">Copy text</button>
+          </div>
+        </div>
+        <div class="paper-wrap"><div id="cl-paper" class="paper letter" contenteditable="true" spellcheck="true"></div></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- dialog used instead of alert/prompt -->
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<div id="modal" class="modal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <h2 id="modal-title"></h2>
+    <div id="modal-body"></div>
+    <div class="row end"><button class="btn ink" id="modal-close">Done</button></div>
+  </div>
+</div>
+
+<div id="print-root" aria-hidden="true"></div>
+
+<script src="resume.js"></script>
+<script src="lib/cytoscape.min.js"></script>
+<script src="app.js"></script>
+<script src="studio.js"></script>
+</body>
+</html>

@@ -1,0 +1,969 @@
+/* resume.js: the public part of Rishi Rajani's resume graph.
+   Generated from a private master on every change. Don't edit it here: changes are overwritten. */
+
+window.RESUME = {
+  "site": {
+    "title": "Rishi Rajani · Resume graph",
+    "allowPublicGraphExport": true,
+    "baseIri": "https://rishirajani.github.io/Graph-Resume/",
+    "goatcounter": "rishirajani",
+    "ownerPassphraseSha256": ""
+  },
+  "person": {
+    "id": "me",
+    "type": "Person",
+    "name": "Rishi Rajani",
+    "headline": "Data and knowledge engineer working on semantics, ontologies, data governance and quality",
+    "location": "Stuttgart, Germany (open to relocation)",
+    "email": "rishirajani078@gmail.com",
+    "links": [
+      {
+        "label": "LinkedIn",
+        "url": "https://linkedin.com/in/rishi-rajani-076794109/"
+      },
+      {
+        "label": "GitHub",
+        "url": "https://github.com/rishirajani"
+      }
+    ],
+    "summary": "Data and knowledge engineer with approximately three years of experience in fintech and enterprise data, connecting business meaning with reliable data systems. Experienced in defining and documenting shared business metrics, standardizing data models, reconciling heterogeneous sources, and establishing data-quality practices and reporting adopted across business functions. Currently completing an M.Sc. in Computer Science at Universität Stuttgart, specializing in ontology engineering, knowledge graphs, description logics, and machine learning."
+  },
+  "nodes": [
+    {
+      "id": "o-nobel",
+      "type": "Organization",
+      "label": "Nobel Hygiene Pvt. Ltd.",
+      "short": "Nobel Hygiene",
+      "description": "Manufacturer of adult and baby hygiene products such as diapers and sanitary pads."
+    },
+    {
+      "id": "r-nobel",
+      "type": "Role",
+      "label": "Data Engineering Consultant",
+      "short": "Data Engineering\nConsultant",
+      "org": "o-nobel",
+      "start": "2023-10",
+      "end": "2024-03",
+      "location": "Mumbai, India",
+      "highlights": [
+        "Built a data integration and reporting proof of concept around existing SAP HANA and API services, implementing Python extraction, logging and transformation workflows, PostgreSQL storage, and Docker-hosted Apache Superset dashboards for sales leaders, the CFO and CMO.",
+        "Standardized source-to-target field mappings and definitions, corrected duplicate API records, and reconciled delayed secondary-sales figures with manual sales-team reporting alongside primary- and secondary-sales stakeholders.",
+        "Automated recurring data extraction and reporting, reducing manual reporting time by approximately 40%; coordinated access to on-premises virtual machines, APIs and data infrastructure.",
+        "Developed an Amazon marketplace price tracker comparing company and competitor product listings to support commercial analysis: integrated the Amazon Selling Partner API to record competitor prices daily and the company's own product offers every four hours (buy-box eligibility, fulfilment-channel offer counts, landed prices, seller shipping times), batching requests within API rate limits.",
+        "Automated daily ingestion of secondary-sales orders from the sales-force-automation platform's API into the analytics database, with retries, timeouts, saved fetch state for incremental loads, and a request/response log table for auditability.",
+        "Packaged these scheduled Python jobs with Poetry and deployed them in a Docker container with cron, writing to Microsoft SQL Server through SQLAlchemy ORM models.",
+        "Deployed the company's business-intelligence platform, NHPL BizIntel, on Apache Superset 3.0 with Docker Compose: company branding, a PostgreSQL metadata store with Redis, and database drivers for SAP HANA, SQL Server, MySQL and PostgreSQL.",
+        "Built a custom Superset image with Firefox and GeckoDriver so scheduled email reports and alerts could render dashboard screenshots, delivered via Office 365 SMTP; added Prophet for forecasting and enabled native filters, Jinja templating and full CSV export."
+      ],
+      "skills": [
+        "s-python",
+        "s-sap",
+        "s-postgres",
+        "s-docker",
+        "s-superset",
+        "s-etl",
+        "s-integration",
+        "s-s2t",
+        "s-metricstd",
+        "s-reconcile",
+        "s-dq",
+        "s-stakeholders",
+        "s-rest",
+        "s-mssql",
+        "s-sqlalchemy",
+        "s-pandas",
+        "s-cron",
+        "s-alerting"
+      ]
+    },
+    {
+      "id": "o-flexmoney",
+      "type": "Organization",
+      "label": "Flexmoney Technologies Pvt. Ltd.",
+      "short": "Flexmoney",
+      "description": "Consumer lending / fintech."
+    },
+    {
+      "id": "r-flexmoney",
+      "type": "Role",
+      "label": "Executive – Marketing Analytics (data & analytics engineering)",
+      "short": "Executive,\nMarketing Analytics",
+      "org": "o-flexmoney",
+      "start": "2021-03",
+      "end": "2023-03",
+      "location": "Mumbai, India",
+      "highlights": [
+        "Co-defined and documented transaction metrics with merchant-, lender- and product-facing stakeholders, reconciling competing interpretations of customer activity and implementing distinct business perspectives through SQL reporting.",
+        "Owned launch-critical analytics for a new lending approval journey, defining multi-stage conversion funnels, writing SQL models and delivering dashboards required for product go-live.",
+        "Converted manual Excel-based reporting into scalable Apache Superset dashboards and reusable queries; delivered analytics for six clients across two projects and ran demonstrations to support daily adoption by business and marketing teams.",
+        "Built Python ELT pipelines connecting Google and Meta advertising data with website engagement and transaction activity via UTM parameters and session identifiers; analyzed high-volume merchant/product click funnels using CleverTap.",
+        "Investigated suspicious transaction patterns associated with inactive merchant storefronts; screened merchant URLs programmatically, coordinated removal of confirmed defunct merchants, and identified duplicates and invalid URLs for master-data cleanup.",
+        "Partnered with product and lending stakeholders on funnel improvements contributing to a reported 14–16% reduction in drop-offs; developed operational monitoring and anomaly alerts and briefed senior stakeholders regularly.",
+        "Built 20+ dashboards and 20+ automated alert and reporting jobs, including a tracking system for lender API conversions shared in weekly lender calls, hourly business-performance monitoring for the festive season and daily automated MIS for top lenders; merchant, lender and engineering teams relied on them, including for network hygiene.",
+        "Built a real-time tracker for lender transaction-API downtime; ahead of the 2022 festive sale, tightened alert definitions and shortened check intervals, and worked with Engineering to route Superset alerts into OpsGenie for on-call engineers.",
+        "Created a Lender Report Card comparing lender performance across the network on key metrics, used by the business team in lender conversations.",
+        "Optimized data-heavy Superset dashboards to a load success rate above 90% and removed inaccuracies; built trackers for No-Cost EMI offer spend, SMS campaign spend and digital-marketing performance, plus dashboards and MIS reports for new-to-bank lenders.",
+        "Made the case, with supporting proof points, for a lending partner to restructure a policy that was rejecting repeat transactions; the change raised repeat rates by 100–150 basis points.",
+        "Showed how lowering a lender's minimum transaction amount could grow its share on other merchants and reduce its dependence on its largest marketplace partner, and identified top-performing merchants to target.",
+        "Pushed a lender to launch Cardless EMI beyond its largest marketplace partner, cutting one category of rejects from 20% to 5% and lifting success rates by about 10% on average; later encouraged it to restart the programme on other merchants, raising its success rate there by about 5%.",
+        "Supplied data that led a lender to loosen its velocity-reject policy, and compared marketplace performance at a lender after a new marketplace launch to help scale it across the network.",
+        "Studied users frequently rejected by top-performing lenders and identified segments for whom lender discovery could be disabled, improving API success rates.",
+        "Helped create a standard operating process for tracking campaigns across the network, compared Facebook, CleverTap and database data as tracking sources, and tracked festive-season campaigns with CleverTap dashboards.",
+        "Generated proof points from the December 2021 digital campaigns that helped improve the growth-hacking campaigns, contributing to over 2.5x growth in campaign activations; set up automated CleverTap journeys for users activating through lender campaigns, converting at about 4% for one lender.",
+        "Built customer segments in CleverTap and the database for re-engagement, sale-event and new-to-bank drop-off campaigns, kept CleverTap user-profile data current so segments stayed accurate, and uncovered a backend bug that caused campaigns to reach unintended customers.",
+        "Identified gaps in the data and flagged personal information exposed in datasets where it should not have been available.",
+        "Analyzed surveys of transacting and ineligible customers to validate the new-to-bank business case and build user personas.",
+        "Onboarded new colleagues on the database schema, Athena, Redshift, CleverTap and Superset.",
+        "Led a team at the Flexathon 1.0 hackathon pitching Transactions as a Service, letting customers order with Cardless EMI directly from product-page widgets; the team received recognition."
+      ],
+      "skills": [
+        "s-kpi",
+        "s-metricstd",
+        "s-docs",
+        "s-sql",
+        "s-python",
+        "s-etl",
+        "s-superset",
+        "s-clevertap",
+        "s-funnel",
+        "s-attribution",
+        "s-kpifw",
+        "s-mdm",
+        "s-reconcile",
+        "s-dq",
+        "s-stakeholders",
+        "s-requirements",
+        "s-enablement",
+        "s-athena",
+        "s-redshift",
+        "s-alerting",
+        "s-segment",
+        "s-survey",
+        "s-privacy"
+      ]
+    },
+    {
+      "id": "r-flexmoney-am",
+      "type": "Role",
+      "label": "Assistant Manager – Marketing Analytics (data & analytics engineering)",
+      "short": "Assistant Manager,\nMarketing Analytics",
+      "org": "o-flexmoney",
+      "promotedFrom": "r-flexmoney",
+      "start": "2023-04",
+      "end": "2023-08",
+      "location": "Mumbai, India",
+      "summary": "Promoted from Executive – Marketing Analytics in April 2023, following the FY 2022-23 performance review."
+    },
+    {
+      "id": "o-vmlyr",
+      "type": "Organization",
+      "label": "VMLY&R (QAIS Consulting Pvt. Ltd.)",
+      "short": "VMLY&R"
+    },
+    {
+      "id": "r-vmlyr",
+      "type": "Role",
+      "label": "Freelance Consultant, Product Outreach",
+      "short": "Freelance,\nProduct Outreach",
+      "org": "o-vmlyr",
+      "start": "2020-08",
+      "end": "2020-09",
+      "employment": "Freelance, remote",
+      "location": "Mumbai, India",
+      "highlights": [
+        "Researched outreach solutions for a client's product aimed at adult gamers in Japan and Indonesia, working within constraints such as age restrictions and avoiding any association with violence.",
+        "Identified prospect needs and developed responses with information on suitable services."
+      ],
+      "skills": [
+        "s-market"
+      ]
+    },
+    {
+      "id": "o-ubisoft",
+      "type": "Organization",
+      "label": "Ubisoft Entertainment India Pvt. Ltd.",
+      "short": "Ubisoft India",
+      "description": "Ubisoft's Pune studio, mainly testing games for other Ubisoft studios and beginning to take on game design."
+    },
+    {
+      "id": "r-ubisoft",
+      "type": "Role",
+      "label": "Intern Game Tester",
+      "org": "o-ubisoft",
+      "via": "e-rubika",
+      "start": "2019-12",
+      "end": "2020-02",
+      "location": "Pune, India",
+      "highlights": [
+        "Tested the gameplay functionality and integrity of a AAA title and reported bugs in JIRA.",
+        "Prepared reports on the testing team's work, tracked player responses to the game on social media, and kept the team updated on company news.",
+        "Received a full-time Junior Game Tester offer at the end of the internship."
+      ],
+      "skills": [
+        "s-gameqa",
+        "s-jira"
+      ]
+    },
+    {
+      "id": "o-hog",
+      "type": "Organization",
+      "label": "House of Gaming Pvt. Ltd.",
+      "short": "House of Gaming",
+      "description": "Esports company behind the Indian Gaming League brand."
+    },
+    {
+      "id": "r-hog",
+      "type": "Role",
+      "label": "Operations Management Intern",
+      "short": "Operations Mgmt Intern,\nIndian Gaming League",
+      "org": "o-hog",
+      "start": "2019-01",
+      "end": "2019-07",
+      "location": "Mumbai, India",
+      "summary": "Worked on the company's esports brand, Indian Gaming League.",
+      "highlights": [
+        "Set up operations for the company's esports brand, Indian Gaming League.",
+        "Took part in decisions on the development of the website and mobile applications together with the development team.",
+        "Continuously researched the gaming industry for the latest news and upcoming tournaments and events."
+      ],
+      "skills": [
+        "s-esports",
+        "s-requirements"
+      ]
+    },
+    {
+      "id": "o-oracle",
+      "type": "Organization",
+      "label": "Oracle Financial Services Software Ltd.",
+      "short": "Oracle FSS",
+      "description": "Oracle subsidiary building software for banks and other financial institutions."
+    },
+    {
+      "id": "r-oracle",
+      "type": "Role",
+      "label": "Project Intern",
+      "org": "o-oracle",
+      "start": "2017-12",
+      "end": "2018-01",
+      "location": "Mumbai, India",
+      "highlights": [
+        "Developed REST web services for model uploading in Oracle Financial Services Analytical Applications (OFSAA) and performed unit testing.",
+        "Worked on the development of a Data Quality Framework.",
+        "Built a Java web application with Servlets, JSP and JDBC on an Oracle database, then re-implemented its operations as a JSON REST service with JAX-RS (Jersey) and a client to exercise every endpoint."
+      ],
+      "skills": [
+        "s-java",
+        "s-rest",
+        "s-servlets",
+        "s-jdbc",
+        "s-oracledb",
+        "s-sql",
+        "s-unittest",
+        "s-dq"
+      ]
+    },
+    {
+      "id": "a-ironman",
+      "type": "Award",
+      "label": "“Iron Man” Award",
+      "org": "o-flexmoney",
+      "date": "2023-02",
+      "location": "Mumbai, India",
+      "summary": "Recognized for driving innovation in analytics, introducing new automated insights workflows, and supporting company-wide growth initiatives."
+    },
+    {
+      "id": "sch-stuttgart",
+      "type": "School",
+      "label": "Universität Stuttgart"
+    },
+    {
+      "id": "e-msc",
+      "type": "Education",
+      "label": "Master's, Computer Science",
+      "short": "M.Sc. Computer Science",
+      "school": "sch-stuttgart",
+      "start": "2024-04",
+      "end": "2026-12",
+      "location": "Stuttgart, Germany",
+      "summary": "Focus: knowledge graphs, semantic web, ontology engineering, machine learning.",
+      "skills": [
+        "s-ontology",
+        "s-dl",
+        "s-kge"
+      ]
+    },
+    {
+      "id": "sch-tsec",
+      "type": "School",
+      "label": "Thadomal Shahani Engineering College",
+      "short": "Thadomal Shahani\nEngineering College"
+    },
+    {
+      "id": "e-be",
+      "type": "Education",
+      "label": "Bachelor's, Computer Engineering",
+      "school": "sch-tsec",
+      "start": "2015-08",
+      "end": "2019-07"
+    },
+    {
+      "id": "sch-rubika",
+      "type": "School",
+      "label": "Rubika Supinfogame India",
+      "short": "Rubika, Pune"
+    },
+    {
+      "id": "e-rubika",
+      "type": "Education",
+      "label": "Certificate, Game Testing in Quality Control",
+      "short": "Game Testing (QC)\nCertificate",
+      "school": "sch-rubika",
+      "partner": "o-ubisoft",
+      "start": "2019-08",
+      "end": "2020-02",
+      "location": "Pune, India",
+      "summary": "Six-month programme in game testing jointly conducted by Ubisoft Pune and Rubika: four months of coursework at Rubika followed by the Ubisoft internship. Coursework covered industry research, the video-game development life cycle, game art and design concepts, frameworks for testing video games, bug-reporting tools, and project and team management.",
+      "skills": [
+        "s-gamedesign",
+        "s-gameqa"
+      ]
+    },
+    {
+      "id": "c-udemy-python",
+      "type": "Certification",
+      "label": "Complete Python Bootcamp: From Zero to Hero in Python",
+      "short": "Python Bootcamp\n(Udemy)",
+      "issuer": "Udemy",
+      "date": "2020-09",
+      "url": "http://ude.my/UC-544d7ee3-b558-46b0-941e-bc03ef3603c8",
+      "summary": "Credential ID UC-544d7ee3-b558-46b0-941e-bc03ef3603c8",
+      "skills": [
+        "s-python"
+      ]
+    },
+    {
+      "id": "c-hackerrank-python",
+      "type": "Certification",
+      "label": "Python (Basic) Certificate",
+      "short": "Python (Basic)\n(HackerRank)",
+      "issuer": "HackerRank",
+      "date": "2020-09",
+      "summary": "Credential ID 9394CF9CC5B4",
+      "skills": [
+        "s-python"
+      ]
+    },
+    {
+      "id": "p-thesis",
+      "type": "Project",
+      "label": "Semantic Concept Learning in EL++ Knowledge Graphs using Box Embeddings",
+      "short": "Master's thesis:\nEL++ box embeddings",
+      "partOf": "e-msc",
+      "status": "Master's thesis, ongoing",
+      "start": "2026-03",
+      "location": "Stuttgart, Germany",
+      "highlights": [
+        "Investigating concept learning with description logics and geometric box embeddings, evaluating semantic similarity and concept prediction in knowledge graphs."
+      ],
+      "skills": [
+        "s-dl",
+        "s-kge",
+        "s-owl"
+      ]
+    },
+    {
+      "id": "p-loom",
+      "type": "Project",
+      "label": "Loom: open-source CSV-to-RDF ontology mapping tool",
+      "short": "Loom",
+      "start": "2026-06",
+      "url": "https://github.com/rishirajani/loom",
+      "highlights": [
+        "Built a locally running TypeScript/React application using N3.js to map spreadsheet columns to RDF vocabularies and generate structured semantic representations.",
+        "Implemented mapping suggestions, datatype matching and integrity checks for duplicate records and unmapped columns; integrated CI checks and 41 Vitest regression tests.",
+        "Runs entirely in the browser with no server or upload; bundles Schema.org and DCAT ontology subsets, offers tiered mapping suggestions, detects duplicate identifiers and IRI collisions, validates the base IRI and exports Turtle. Released under the MIT licence."
+      ],
+      "skills": [
+        "s-ts",
+        "s-react",
+        "s-n3",
+        "s-rdf",
+        "s-turtle",
+        "s-semmodel",
+        "s-s2t",
+        "s-dq",
+        "s-cicd"
+      ]
+    },
+    {
+      "id": "p-heat",
+      "type": "Project",
+      "label": "Urban Heat Risk Knowledge Graph",
+      "short": "Urban Heat Risk KG",
+      "start": "2026-05",
+      "end": "2026-09",
+      "url": "https://github.com/rishirajani/UrbanHeatRiskReasoning",
+      "highlights": [
+        "Integrated CityGML, OpenStreetMap, climate, vegetation and building data into RDF representations; applied SPARQL and semantic reasoning to assess urban heat risk and identify vulnerable buildings."
+      ],
+      "skills": [
+        "s-rdf",
+        "s-sparql",
+        "s-integration",
+        "s-semmodel"
+      ]
+    },
+    {
+      "id": "p-arch",
+      "type": "Project",
+      "label": "Knowledge Graph Applications in Architecture",
+      "short": "KGs in Architecture",
+      "start": "2026-04",
+      "end": "2026-09",
+      "highlights": [
+        "Designed Turtle ontologies for crane navigation and urban landscape analysis; loaded RDF into Neo4j with neosemantics for Cypher-based querying of spatial relationships and constraints."
+      ],
+      "skills": [
+        "s-turtle",
+        "s-ontology",
+        "s-rdf",
+        "s-neo4j",
+        "s-n10s",
+        "s-cypher"
+      ]
+    },
+    {
+      "id": "p-rossmann",
+      "type": "Project",
+      "label": "Rossmann Store Sales Prediction",
+      "short": "Rossmann Sales\nPrediction",
+      "partOf": "e-be",
+      "status": "Bachelor's final-year project, team of three",
+      "start": "2018",
+      "end": "2019-04",
+      "summary": "Final-year Computer Engineering project comparing machine learning models for retail sales forecasting, plus a web application that uses them to predict daily or weekly sales for any of the 1,115 stores of the Dirk Rossmann GmbH chain.",
+      "highlights": [
+        "Performed a comparative analysis of Linear Regression, K-Nearest Neighbors and XGBoost regression on the Kaggle Rossmann Store Sales dataset to determine the merits and drawbacks of each model.",
+        "Cleaned the data and selected 11 features using correlation heatmaps, Variance Inflation Factors and chi-square tests, discarding highly collinear features such as Promo2.",
+        "Evaluated the models on an 80/20 split with RMSE and adjusted R²: XGBoost reached an RMSE of 457 and adjusted R² of 97.8%, against 1,015 and 89.3% for KNN and 1,545 and 75.2% for Linear Regression.",
+        "Developed a Django web application with employee login that loads the serialized models and predicts a store's sales for a day or a chosen week with all three models, comparing results with promotions on and off.",
+        "In hindsight, these scores overstate real forecasting accuracy: same-day customer counts, unknown at prediction time, were used as a feature, and the test set was a random rather than time-based split. A leakage-free evaluation would drop Customers, hold out the final weeks, and tune on a separate validation set."
+      ],
+      "skills": [
+        "s-python",
+        "s-sklearn",
+        "s-xgboost",
+        "s-regression",
+        "s-featsel",
+        "s-django",
+        "s-sqlite",
+        "s-web"
+      ]
+    },
+    {
+      "id": "g-gov",
+      "type": "SkillGroup",
+      "label": "Business semantics & data governance",
+      "short": "Data governance"
+    },
+    {
+      "id": "s-kpi",
+      "type": "Skill",
+      "label": "Business-term & KPI definitions",
+      "group": "g-gov"
+    },
+    {
+      "id": "s-metricstd",
+      "type": "Skill",
+      "label": "Metric standardization",
+      "group": "g-gov"
+    },
+    {
+      "id": "s-s2t",
+      "type": "Skill",
+      "label": "Source-to-target mapping",
+      "group": "g-gov"
+    },
+    {
+      "id": "s-dq",
+      "type": "Skill",
+      "label": "Data-quality rules",
+      "group": "g-gov"
+    },
+    {
+      "id": "s-mdm",
+      "type": "Skill",
+      "label": "Master-data validation",
+      "group": "g-gov"
+    },
+    {
+      "id": "s-reconcile",
+      "type": "Skill",
+      "label": "Data reconciliation",
+      "group": "g-gov"
+    },
+    {
+      "id": "s-docs",
+      "type": "Skill",
+      "label": "Technical documentation",
+      "group": "g-gov"
+    },
+    {
+      "id": "s-privacy",
+      "type": "Skill",
+      "label": "Data privacy (PII handling)",
+      "group": "g-gov"
+    },
+    {
+      "id": "g-kr",
+      "type": "SkillGroup",
+      "label": "Knowledge representation & ontologies",
+      "short": "Knowledge representation"
+    },
+    {
+      "id": "s-rdf",
+      "type": "Skill",
+      "label": "RDF",
+      "group": "g-kr"
+    },
+    {
+      "id": "s-rdfs",
+      "type": "Skill",
+      "label": "RDFS",
+      "group": "g-kr"
+    },
+    {
+      "id": "s-owl",
+      "type": "Skill",
+      "label": "OWL",
+      "group": "g-kr"
+    },
+    {
+      "id": "s-sparql",
+      "type": "Skill",
+      "label": "SPARQL",
+      "group": "g-kr"
+    },
+    {
+      "id": "s-shacl",
+      "type": "Skill",
+      "label": "SHACL",
+      "group": "g-kr"
+    },
+    {
+      "id": "s-turtle",
+      "type": "Skill",
+      "label": "Turtle",
+      "group": "g-kr"
+    },
+    {
+      "id": "s-ontology",
+      "type": "Skill",
+      "label": "Ontology engineering",
+      "group": "g-kr"
+    },
+    {
+      "id": "s-dl",
+      "type": "Skill",
+      "label": "Description logics",
+      "group": "g-kr"
+    },
+    {
+      "id": "s-semmodel",
+      "type": "Skill",
+      "label": "Semantic modeling",
+      "group": "g-kr"
+    },
+    {
+      "id": "s-neo4j",
+      "type": "Skill",
+      "label": "Neo4j",
+      "group": "g-kr"
+    },
+    {
+      "id": "s-cypher",
+      "type": "Skill",
+      "label": "Cypher",
+      "group": "g-kr"
+    },
+    {
+      "id": "s-n10s",
+      "type": "Skill",
+      "label": "neosemantics",
+      "group": "g-kr"
+    },
+    {
+      "id": "g-de",
+      "type": "SkillGroup",
+      "label": "Enterprise data engineering",
+      "short": "Data engineering"
+    },
+    {
+      "id": "s-python",
+      "type": "Skill",
+      "label": "Python",
+      "group": "g-de"
+    },
+    {
+      "id": "s-sql",
+      "type": "Skill",
+      "label": "SQL",
+      "group": "g-de"
+    },
+    {
+      "id": "s-etl",
+      "type": "Skill",
+      "label": "ETL / ELT",
+      "group": "g-de"
+    },
+    {
+      "id": "s-integration",
+      "type": "Skill",
+      "label": "Data integration",
+      "group": "g-de"
+    },
+    {
+      "id": "s-postgres",
+      "type": "Skill",
+      "label": "PostgreSQL",
+      "group": "g-de"
+    },
+    {
+      "id": "s-sap",
+      "type": "Skill",
+      "label": "SAP HANA integration",
+      "group": "g-de"
+    },
+    {
+      "id": "s-redshift",
+      "type": "Skill",
+      "label": "Redshift",
+      "group": "g-de"
+    },
+    {
+      "id": "s-dbt",
+      "type": "Skill",
+      "label": "dbt",
+      "group": "g-de"
+    },
+    {
+      "id": "s-docker",
+      "type": "Skill",
+      "label": "Docker",
+      "group": "g-de"
+    },
+    {
+      "id": "s-sqlite",
+      "type": "Skill",
+      "label": "SQLite",
+      "group": "g-de"
+    },
+    {
+      "id": "s-athena",
+      "type": "Skill",
+      "label": "AWS Athena",
+      "group": "g-de"
+    },
+    {
+      "id": "s-jdbc",
+      "type": "Skill",
+      "label": "JDBC",
+      "group": "g-de"
+    },
+    {
+      "id": "s-oracledb",
+      "type": "Skill",
+      "label": "Oracle Database",
+      "group": "g-de"
+    },
+    {
+      "id": "s-mssql",
+      "type": "Skill",
+      "label": "Microsoft SQL Server",
+      "group": "g-de"
+    },
+    {
+      "id": "s-sqlalchemy",
+      "type": "Skill",
+      "label": "SQLAlchemy",
+      "group": "g-de"
+    },
+    {
+      "id": "s-pandas",
+      "type": "Skill",
+      "label": "pandas",
+      "group": "g-de"
+    },
+    {
+      "id": "s-cron",
+      "type": "Skill",
+      "label": "Job scheduling (cron)",
+      "group": "g-de"
+    },
+    {
+      "id": "g-an",
+      "type": "SkillGroup",
+      "label": "Analytics & platforms",
+      "short": "Analytics"
+    },
+    {
+      "id": "s-superset",
+      "type": "Skill",
+      "label": "Apache Superset",
+      "group": "g-an"
+    },
+    {
+      "id": "s-powerbi",
+      "type": "Skill",
+      "label": "Power BI",
+      "group": "g-an"
+    },
+    {
+      "id": "s-clevertap",
+      "type": "Skill",
+      "label": "CleverTap",
+      "group": "g-an"
+    },
+    {
+      "id": "s-funnel",
+      "type": "Skill",
+      "label": "Funnel analytics",
+      "group": "g-an"
+    },
+    {
+      "id": "s-attribution",
+      "type": "Skill",
+      "label": "Campaign attribution",
+      "group": "g-an"
+    },
+    {
+      "id": "s-kpifw",
+      "type": "Skill",
+      "label": "KPI frameworks",
+      "group": "g-an"
+    },
+    {
+      "id": "s-alerting",
+      "type": "Skill",
+      "label": "Monitoring & alerting (OpsGenie)",
+      "short": "Monitoring & alerting",
+      "group": "g-an"
+    },
+    {
+      "id": "s-segment",
+      "type": "Skill",
+      "label": "Customer segmentation",
+      "group": "g-an"
+    },
+    {
+      "id": "s-survey",
+      "type": "Skill",
+      "label": "Survey analysis & user personas",
+      "group": "g-an"
+    },
+    {
+      "id": "s-market",
+      "type": "Skill",
+      "label": "Market research",
+      "group": "g-an"
+    },
+    {
+      "id": "g-sw",
+      "type": "SkillGroup",
+      "label": "Software engineering & AI",
+      "short": "Software & AI"
+    },
+    {
+      "id": "s-ts",
+      "type": "Skill",
+      "label": "TypeScript",
+      "group": "g-sw"
+    },
+    {
+      "id": "s-react",
+      "type": "Skill",
+      "label": "React",
+      "group": "g-sw"
+    },
+    {
+      "id": "s-n3",
+      "type": "Skill",
+      "label": "N3.js",
+      "group": "g-sw"
+    },
+    {
+      "id": "s-java",
+      "type": "Skill",
+      "label": "Java",
+      "group": "g-sw"
+    },
+    {
+      "id": "s-git",
+      "type": "Skill",
+      "label": "Git",
+      "group": "g-sw"
+    },
+    {
+      "id": "s-cicd",
+      "type": "Skill",
+      "label": "CI / CD",
+      "group": "g-sw"
+    },
+    {
+      "id": "s-pytorch",
+      "type": "Skill",
+      "label": "PyTorch",
+      "group": "g-sw"
+    },
+    {
+      "id": "s-sklearn",
+      "type": "Skill",
+      "label": "scikit-learn",
+      "group": "g-sw"
+    },
+    {
+      "id": "s-kge",
+      "type": "Skill",
+      "label": "Knowledge graph embeddings",
+      "group": "g-sw"
+    },
+    {
+      "id": "s-xgboost",
+      "type": "Skill",
+      "label": "XGBoost",
+      "group": "g-sw"
+    },
+    {
+      "id": "s-regression",
+      "type": "Skill",
+      "label": "Regression modelling",
+      "group": "g-sw"
+    },
+    {
+      "id": "s-featsel",
+      "type": "Skill",
+      "label": "Feature selection",
+      "group": "g-sw"
+    },
+    {
+      "id": "s-django",
+      "type": "Skill",
+      "label": "Django",
+      "group": "g-sw"
+    },
+    {
+      "id": "s-web",
+      "type": "Skill",
+      "label": "HTML / CSS / JavaScript",
+      "group": "g-sw"
+    },
+    {
+      "id": "s-rest",
+      "type": "Skill",
+      "label": "REST APIs",
+      "group": "g-sw"
+    },
+    {
+      "id": "s-servlets",
+      "type": "Skill",
+      "label": "Java Servlets & JSP",
+      "group": "g-sw"
+    },
+    {
+      "id": "s-unittest",
+      "type": "Skill",
+      "label": "Unit testing",
+      "group": "g-sw"
+    },
+    {
+      "id": "s-jira",
+      "type": "Skill",
+      "label": "JIRA",
+      "group": "g-sw"
+    },
+    {
+      "id": "g-games",
+      "type": "SkillGroup",
+      "label": "Games & esports"
+    },
+    {
+      "id": "s-gameqa",
+      "type": "Skill",
+      "label": "Game QA testing",
+      "group": "g-games"
+    },
+    {
+      "id": "s-gamedesign",
+      "type": "Skill",
+      "label": "Game design fundamentals",
+      "group": "g-games"
+    },
+    {
+      "id": "s-esports",
+      "type": "Skill",
+      "label": "Esports operations",
+      "group": "g-games"
+    },
+    {
+      "id": "g-collab",
+      "type": "SkillGroup",
+      "label": "Collaboration"
+    },
+    {
+      "id": "s-stakeholders",
+      "type": "Skill",
+      "label": "Cross-functional stakeholder alignment",
+      "short": "Stakeholder alignment",
+      "group": "g-collab"
+    },
+    {
+      "id": "s-requirements",
+      "type": "Skill",
+      "label": "Business requirements analysis",
+      "short": "Requirements analysis",
+      "group": "g-collab"
+    },
+    {
+      "id": "s-enablement",
+      "type": "Skill",
+      "label": "User enablement",
+      "group": "g-collab"
+    },
+    {
+      "id": "s-agile",
+      "type": "Skill",
+      "label": "Agile / Scrum",
+      "group": "g-collab"
+    },
+    {
+      "id": "l-en",
+      "type": "Language",
+      "label": "English",
+      "level": "Fluent"
+    },
+    {
+      "id": "l-de",
+      "type": "Language",
+      "label": "German",
+      "level": "B1"
+    },
+    {
+      "id": "l-hi",
+      "type": "Language",
+      "label": "Hindi",
+      "level": "Native"
+    },
+    {
+      "id": "l-mr",
+      "type": "Language",
+      "label": "Marathi",
+      "level": "Basic"
+    },
+    {
+      "id": "l-sd",
+      "type": "Language",
+      "label": "Sindhi",
+      "level": "Basic"
+    }
+  ]
+};
