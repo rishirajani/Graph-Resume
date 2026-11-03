@@ -106,6 +106,7 @@
     $("#show-drafts").checked = G.showDrafts();
     const priv = LS.get("private", {});
     $("#priv-phone").value = priv.phone || "";
+    $("#priv-availability").value = priv.availability || "";
     const gh = LS.get("gh", {}) || {};
     $("#gh-repo").value = gh.repo || ""; $("#gh-token").value = gh.token || "";
     const O = window.GR_OWNER || {};
@@ -530,7 +531,7 @@
     LS.set("preset", $("#preset").value);
     LS.set(keySlot(p, $("#base-url").value), $("#api-key").value.trim());
     LS.set("owner", true);
-    LS.set("private", { phone: $("#priv-phone").value.trim(), notes: $("#priv-notes").value });
+    LS.set("private", { phone: $("#priv-phone").value.trim(), availability: $("#priv-availability").value.trim(), notes: $("#priv-notes").value });
     try { localStorage.setItem("gr.showDrafts", $("#show-drafts").checked ? "1" : "0"); } catch {}
     G.applyDraftMarks();
     if (!usingClaude() && !$("#api-key").value.trim()) { toast("Add an API key for this provider to start writing."); return; }
@@ -584,6 +585,12 @@
     });
     return out;
   }
+  // a skill whose only evidence is a degree: listed as coursework, not as practical experience
+  function courseworkOnly(id) {
+    const users = allNodes.filter((n) => (n.skills || []).includes(id));
+    return users.length > 0 && users.every((n) => n.type === "Education");
+  }
+  const availability = () => String(LS.get("private", {}).availability || "").trim();
   function factsForModel() {
     const people = {
       id: "me", name: me.name, headline: me.headline, location: me.location, email: me.email,
@@ -606,6 +613,7 @@
       if (n.via) o.via = n.via;
       if (n.partner) o.coRunBy = byId.get(n.partner)?.label;
       if (n.private) o.hiddenFromVisitors = true;
+      if (n.type === "Skill" && courseworkOnly(n.id)) o.evidence = "coursework only";
       const pn = privateNotes()[n.id]; if (pn) o.notes = pn;
       return o;
     });
@@ -623,13 +631,16 @@
 Hard rules
 1. Never invent employers, job titles, dates, degrees, tools, numbers, metrics or achievements. Every claim must be traceable to graph nodes. If a number is not in the graph, do not write it.
 2. You may select, reorder, merge, shorten and rephrase graph facts, and you may use the job's vocabulary when it truthfully describes a graph fact.
-3. When the job asks for something the graph does not support, record it as a "gap" in fit. Do not imply that experience in the CV. In the cover letter you may show genuine interest in learning it, never claim it.
+3. When the job asks for something the graph does not support, record it as a "gap" in fit. Do not imply that experience in the CV. In the cover letter, write at most one sentence about gaps, framed as what the candidate wants to learn next; never claim the experience, never open a paragraph with a gap or an apology ("To be candid", "Although I have not"), and never compare the candidate's years of experience with the job's.
 4. Refer to roles, projects, education, skills and languages by their exact node "id". The app fills in titles, organisations and dates from the graph, so do not repeat them in bullets.
 5. Bullets start with a strong past-tense verb (present tense for current work), are concrete, at most 28 words. ${limits}
-6. Order experience and projects by relevance to this job, most relevant first. Leave out nodes that do not help this application, with one exception: always include current roles (no end date), even unrelated ones, with at least one short bullet, so the timeline has no apparent gap. Likewise include a "Break" node in experience (using its id, with its summary condensed into one bullet) whenever omitting it would leave an unexplained gap of six months or more between the roles you list.
-7. The cover letter is 230 to 340 words, 3 or 4 paragraphs, specific to this company and role. No clichés such as "I am writing to express my interest". Do not include the address block, date or signature; the app adds them.
-8. Write everything in ${lang}. Return section titles in that language too.
-9. Respond with one JSON object only, no markdown, matching this shape:
+6. Order projects by relevance to this job, most relevant first. The app lists experience newest first and combines a role with the role it was promoted from (promotedFrom), so list experience in any order and do not write a bullet that only states a promotion. Leave out nodes that do not help this application, with one exception: always include current roles (no end date), even unrelated ones, with at least one short bullet, so the timeline has no apparent gap. Likewise include a "Break" node in experience (using its id, with its summary condensed into one bullet) whenever omitting it would leave an unexplained gap of six months or more between the roles you list.
+7. Keep the graph's limiting words when you rephrase a fact: "proof of concept", "prototype", "pilot", "co-defined", "together with", "supported", "part-time", "coursework" and the like stay attached to that fact in the CV and the letter. Never turn a proof of concept into a production system or a shared result into a solo one.
+8. Skills with "evidence": "coursework only" were learned in a degree, not used in work or projects. Include one only if the job asks for it, and then only in a skill group named for coursework (in ${lang}, e.g. "Coursework"), never in bullets or the profile as practical experience.
+9. If the candidate's availability is given, state it once, in the cover letter's last paragraph, in your own words. Otherwise say nothing about start dates.
+10. The cover letter is 230 to 340 words, 3 or 4 paragraphs, specific to this company and role. No clichés such as "I am writing to express my interest". Do not include the address block, date or signature; the app adds them.
+11. Write everything in ${lang}. Return section titles in that language too.
+12. Respond with one JSON object only, no markdown, matching this shape:
 {
   "job": { "title": "", "company": "", "languageCode": "en" },
   "fit": {
@@ -658,7 +669,7 @@ ${JSON.stringify(factsForModel())}
 JOB DESCRIPTION
 ${input.jd}
 
-${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring contact: ${input.contact}\n` : ""}${input.notes ? `Candidate's note on emphasis: ${input.notes}\n` : ""}CV length: ${pages} page${pages > 1 ? "s" : ""}.`;
+${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring contact: ${input.contact}\n` : ""}${input.notes ? `Candidate's note on emphasis: ${input.notes}\n` : ""}${availability() ? `Candidate's availability: ${availability()}\n` : ""}CV length: ${pages} page${pages > 1 ? "s" : ""}.`;
     return { system, user };
   }
 
@@ -799,6 +810,37 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     // items you've hidden on the public site: fine on a CV, but worth knowing
     const hidden = [...used].map((id) => byId.get(id)).filter((n) => n?.private);
     if (hidden.length) warnings.push(`Includes items hidden from visitors on your site: ${hidden.map((n) => n.label).join(", ")}. Keep them if they help this application; a reader who opens your site won't find them there.`);
+    // coursework-only skills shown as practical skills
+    const courseGroup = /course|studi|kurs|academ|degree|uni/i;
+    const asPractice = (cv.skills || []).filter((g) => !courseGroup.test(g.group || "")).flatMap((g) => g.ids).filter(courseworkOnly);
+    if (asPractice.length) warnings.push(`Listed as practical skills, but your graph has them only from a degree: ${asPractice.map((id) => byId.get(id).label).join(", ")}. Move them to a coursework group or remove them.`);
+    // limiting words ("proof of concept"…) that got lost when a fact was rephrased
+    const QUAL = ["proof of concept", "proof-of-concept", "prototype", "pilot", "co-defined", "co-founded", "coursework"];
+    const textOf = (n) => [n.summary, n.description, ...(G.clean(n.highlights) || [])].filter(Boolean);
+    const nodesMentioning = (term) => allNodes.filter((n) => n.type !== "Skill" && textOf(n).some((t) => t.includes(term))).length;
+    const letter = result.coverLetter?.paragraphs || [];
+    // a tool that several of your roles or projects use (e.g. PostgreSQL) isn't tied to one proof of concept
+    const commonSkill = (w) => allNodes.some((k) => k.type === "Skill" && k.label.includes(w) && allNodes.filter((n) => (n.skills || []).includes(k.id)).length >= 2);
+    [...(cv.experience || []), ...(cv.projects || [])].forEach((x) => {
+      const n = byId.get(x.id);
+      textOf(n).forEach((t) => QUAL.filter((q) => t.toLowerCase().includes(q)).forEach((q) => {
+        // distinctive names in that line (e.g. "SAP HANA"), not tools used everywhere
+        const names = [...new Set((t.match(/\b[A-Z][A-Za-z0-9]*[A-Z0-9][A-Za-z0-9]*(?:\s[A-Z][A-Za-z0-9]+)*\b/g) || []))].filter((w) => nodesMentioning(w) <= 1 && !commonSkill(w));
+        const inCv = (x.bullets || []).filter((b) => names.some((w) => b.includes(w)));
+        if (inCv.length && !inCv.some((b) => b.toLowerCase().includes(q.replace("-", " ")) || b.toLowerCase().includes(q))) warnings.push(`${n.label}: your graph calls the ${names.join(", ")} work a ${q}; the CV bullet doesn't say so.`);
+        letter.forEach((p, i) => {
+          const hit = names.filter((w) => p.includes(w));
+          if (hit.length && !p.toLowerCase().includes(q.replace("-", " ")) && !p.toLowerCase().includes(q)) warnings.push(`Cover letter, paragraph ${i + 1}, mentions ${hit.join(", ")}, which your graph describes as a ${q}. Make sure the letter says so.`);
+        });
+      }));
+    });
+    // a letter paragraph that opens with a gap or an apology
+    const opensWeak = /^(to be (candid|honest|frank)|admittedly|honestly|unfortunately|although i (have not|haven't|lack)|while i (have not|haven't|lack)|i have not yet|i do not (yet )?have|i don't (yet )?have)\b/i;
+    letter.forEach((p, i) => { if (opensWeak.test(String(p).trim())) warnings.push(`Cover letter, paragraph ${i + 1}, opens with a gap. Lead with what you bring and keep the gap to one forward-looking sentence.`); });
+    const words = /\b(one|two|three|four|five|six|seven|eight|nine|ten)\s+years?\b/gi;
+    const wordYears = new Set();
+    texts.forEach((t) => (String(t).match(words) || []).forEach((m) => { if (!lowerCorpus.includes(m.toLowerCase())) wordYears.add(m); }));
+    if (wordYears.size) warnings.push(`Years-of-experience wording your graph doesn't state: ${[...wordYears].join(", ")}.`);
     const undated = (cv.experience || []).map((x) => byId.get(x.id)).filter((n) => !n.start);
     if (undated.length) warnings.push(`No dates in the graph for: ${undated.map((n) => `${n.label}, ${byId.get(n.org)?.label || ""}`).join("; ")}.`);
     return warnings;
@@ -939,6 +981,26 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     if (current?.link?.inCv && current.link.url) parts.push(`<a href="${esc(current.link.url)}">${esc(CVUI().linkLabel || "Portfolio")}</a>`);
     return parts.join("  |  ");
   }
+  // Experience as shown on a CV: newest first, and a role combined with the roles it was promoted from
+  function experienceView(list) {
+    const items = (list || []).filter((x) => byId.has(x.id));
+    const inList = new Map(items.map((x) => [x.id, x]));
+    const absorbed = new Set();
+    const view = items.map((x) => {
+      const n = byId.get(x.id), earlier = [];
+      let bul = [...(x.bullets || [])], start = n.start, p = n.promotedFrom;
+      while (p && inList.has(p) && !absorbed.has(p)) {
+        const e = byId.get(p); absorbed.add(p); earlier.push(e);
+        bul = bul.concat(inList.get(p).bullets || []);
+        if (e.start && (!start || e.start < start)) start = e.start;
+        p = e.promotedFrom;
+      }
+      if (earlier.length) bul = bul.filter((b) => !/^(promoted|befördert)\b/i.test(String(b).trim()));
+      return { id: x.id, node: n, earlier, bullets: bul, start };
+    }).filter((e) => !absorbed.has(e.id));
+    const key = (e) => String(e.start || "0000");
+    return view.sort((a, b) => key(b).localeCompare(key(a)) || String(b.node.end || "9999").localeCompare(String(a.node.end || "9999")));
+  }
   function renderCv(result, cvui = CVUI()) {
     const cv = result.cv || {};
     // your own section titles apply to English CVs; for other languages the model's titles win
@@ -948,10 +1010,13 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     const row = (left, right) => `<div class="p-row"><span class="p-title">${left}</span><span class="p-dates">${esc(right || "")}</span></div>`;
     const bullets = (b) => ((b || []).length ? `<ul>${b.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : "");
 
-    const exp = (cv.experience || []).map((x) => {
-      const n = byId.get(x.id), org = byId.get(n.org);
-      const sub = [n.location, n.employment].filter(Boolean).join(", ");
-      return `<div class="p-item">${row(esc(n.label) + (org ? `, ${esc(org.label)}` : ""), G.dateRange(n))}${sub ? `<div class="p-sub">${esc(sub)}</div>` : ""}${bullets(x.bullets)}</div>`;
+    const english_ = english;
+    const exp = experienceView(cv.experience).map((e) => {
+      const n = e.node, org = byId.get(n.org);
+      const promo = e.earlier.length ? (english_ ? "Promoted from " : "Befördert von ") + e.earlier.map((r) => `${r.label}, ${G.dateRange(r)}`).join("; ") : "";
+      const sub = [[n.location, n.employment].filter(Boolean).join(", "), promo].filter(Boolean).join(" · ");
+      const dates = G.dateRange({ start: e.start, end: n.end });
+      return `<div class="p-item">${row(esc(n.label) + (org ? `, ${esc(org.label)}` : ""), dates)}${sub ? `<div class="p-sub">${esc(sub)}</div>` : ""}${bullets(e.bullets)}</div>`;
     }).join("");
     const proj = (cv.projects || []).map((x) => {
       const n = byId.get(x.id);

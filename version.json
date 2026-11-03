@@ -1,8 +1,12 @@
 {
-  "version": "1.4.1",
+  "version": "1.5.0",
   "date": "2026-11-03",
   "notes": [
-    "A tailored link on a CV now reads “Portfolio” instead of “Interactive version”; change the wording under Customize → CV and letter."
+    "CVs list experience newest first, and a role combined with the one it was promoted from.",
+    "Skills you have only from a degree are treated as coursework: listed only when a job asks, under a coursework heading.",
+    "Limiting words such as “proof of concept” must survive rewording; the studio warns when a letter drops one.",
+    "Cover letters keep gaps to one forward-looking sentence and no longer compare years of experience.",
+    "New optional Availability field under Model settings → Private details; letters mention it when set."
   ],
   "files": [
     "index.html",

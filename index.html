@@ -162,10 +162,13 @@
       <p class="help" id="gh-status"></p>
     </details>
     <details class="field" id="private-details">
-      <summary>Private details (phone, GPA…)</summary>
+      <summary>Private details (phone, availability, GPA…)</summary>
       <p class="help">Kept only in this browser and used only on CVs and cover letters you export. They are never part of the site's files, so visitors can't see them.</p>
       <label for="priv-phone">Phone</label>
       <input id="priv-phone" type="text" autocomplete="tel">
+      <label for="priv-availability" style="margin-top:10px">Availability</label>
+      <input id="priv-availability" type="text" placeholder="e.g. From January 2027; part-time possible before then">
+      <p class="help">Optional. When set, cover letters mention it once; when empty, they say nothing about start dates.</p>
       <label for="priv-notes" style="margin-top:10px">Private notes</label>
       <textarea id="priv-notes" rows="4" spellcheck="false" placeholder="One per line as  node-id: note&#10;e.g.  e-be: GPA …"></textarea>
     </details>
