@@ -169,6 +169,33 @@ a { color: var(--c-role); }
 /* ---------- read view ---------- */
 #view-read { min-height: 100%; }
 .read { max-width: 760px; margin: 0 auto; padding: 8px 28px 80px; }
+/* section navigation: a sticky column beside the text on wide screens, a sticky bar on narrow ones */
+.read-wrap { display: grid; grid-template-columns: minmax(0, 1fr); }
+.read-nav ol { list-style: none; margin: 0; padding: 0; }
+.read-nav button { display: flex; align-items: center; gap: 8px; width: 100%; border: 0; background: none; cursor: pointer; text-align: left;
+  font: 500 14.5px/1.3 var(--sans); color: var(--muted); padding: 7px 10px; border-radius: 8px; }
+.read-nav button:hover { color: var(--ink); background: var(--surface); }
+.read-nav button.on { color: var(--ink); background: var(--surface); box-shadow: inset 3px 0 0 var(--c); font-weight: 650; }
+.read-nav .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c); flex: none; }
+.read-nav .lbl { flex: 1; min-width: 0; }
+.read-nav .n { font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.read h1, .read h2 { scroll-margin-top: 92px; }   /* clear of the sticky Graph / Read as text bar */
+@media (min-width: 1100px) {
+  .read-wrap { grid-template-columns: 200px minmax(0, 760px) 200px; justify-content: center; gap: 0 32px; }
+  .read-nav { position: sticky; top: 92px; align-self: start; margin-top: 18px; max-height: calc(100vh - 110px); overflow: auto; }
+  .read-wrap .read { margin: 0; }
+}
+@media (max-width: 1099px) {
+  /* narrow screens: the section bar takes the top; the Graph / Read as text switch scrolls away with the page */
+  #view-read > .toolbar.static { position: static; }
+  .read-nav { position: sticky; top: 0; z-index: 15; background: var(--paper); border-bottom: 1px solid var(--rule); margin: 0 0 4px; }
+  .read-nav ol { display: flex; gap: 4px; overflow-x: auto; padding: 8px 16px; scrollbar-width: none; max-width: 820px; margin: 0 auto; }
+  .read-nav ol::-webkit-scrollbar { display: none; }
+  .read-nav button { width: auto; white-space: nowrap; padding: 6px 11px; border-radius: 999px; }
+  .read-nav button.on { box-shadow: inset 0 0 0 1px var(--rule); }
+  .read h1, .read h2 { scroll-margin-top: 66px; }
+}
+@media print { .read-nav { display: none; } }
 .read h1 { font-size: clamp(36px, 6vw, 56px); line-height: 1; letter-spacing: -0.025em; margin: 10px 0 12px; font-weight: 750; }
 .read .lede { font: 400 21px/1.4 var(--serif); color: var(--ink-2); margin: 0 0 10px; max-width: 34em; }
 .read .contact { color: var(--muted); margin: 0 0 8px; }

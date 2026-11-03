@@ -572,7 +572,13 @@
       </div>`;
     };
     const forTop = forOK && (forLink.company || forLink.note) ? `<div class="for-card for-read">${forLink.company ? `<p class="for-kicker">Prepared for ${esc(forLink.company)}</p>` : ""}${forLink.role ? `<p class="for-role">${esc(forLink.role)}</p>` : ""}${forLink.note ? `<p class="for-note">${esc(forLink.note).replace(/\n/g, "<br>")}</p>` : ""}</div>` : "";
-    const section = (title, color, html) => (html ? `<h2 style="--c:var(${color})"><span class="dot"></span>${title}</h2>${html}` : "");
+    // each section gets an anchor for the side navigation (sec-*, never a node id)
+    const navItems = [];
+    const section = (key, title, color, html, count) => {
+      if (!html) return "";
+      navItems.push({ key, title, color, count });
+      return `<h2 id="sec-${key}" style="--c:var(${color})"><span class="dot"></span>${title}</h2>${html}`;
+    };
     const roles = [...nodesOf("Role"), ...nodesOf("Break")].sort(byDateDesc).map((n) => item(n, meta(n).join(", "))).join("");
     const edu = nodesOf("Education").sort(byDateDesc).map((n) => item(n, meta(n).join(", "))).join("");
     const proj = nodesOf("Project").map((n) => item(n, meta(n).join(", "))).join("");
@@ -585,21 +591,75 @@
       .map((n) => `<div class="item"><h3>${esc(n.label)}${n.draft && drafts ? '<span class="draft-tag">draft</span>' : ""}</h3>${meta(n).length ? `<p class="meta">${esc(meta(n).join(", "))}</p>` : ""}</div>`).join("");
 
     $("#read-body").innerHTML = `
-      <h1>${esc(me.name)}</h1>
+      <h1 id="sec-top">${esc(me.name)}</h1>
       <p class="lede">${esc(me.headline || "")}</p>
       <p class="contact">${[me.location, me.email].filter(Boolean).map(esc).join(", ")}${(me.links || []).map((l) => `, <a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join("")}</p>
       ${me.summary ? `<p class="about">${esc(me.summary)}</p>` : ""}
       ${forTop}
-      ${section("Experience", "--c-role", roles)}
-      ${section("Projects", "--c-project", proj)}
-      ${section("Education", "--c-edu", edu)}
-      ${section("Skills", "--c-skill", groups || ungrouped.length ? `<div class="skills-grid">${groups}${ungrouped.length ? `<div><h3>Other</h3><div class="links">${ungrouped.map((s) => chip(s.id)).join("")}</div></div>` : ""}</div>` : "")}
-      ${section("Languages and more", "--c-other", more)}
+      ${section("experience", "Experience", "--c-role", roles, nodesOf("Role").length + nodesOf("Break").length)}
+      ${section("projects", "Projects", "--c-project", proj, nodesOf("Project").length)}
+      ${section("education", "Education", "--c-edu", edu, nodesOf("Education").length)}
+      ${section("skills", "Skills", "--c-skill", groups || ungrouped.length ? `<div class="skills-grid">${groups}${ungrouped.length ? `<div><h3>Other</h3><div class="links">${ungrouped.map((s) => chip(s.id)).join("")}</div></div>` : ""}</div>` : "", shownNodes.filter((n) => n.type === "Skill").length)}
+      ${section("more", "Languages and more", "--c-other", more, ["Certification", "Award", "Publication", "Language"].flatMap(nodesOf).length)}
       ${R.site?.allowPublicGraphExport !== false && UI.features.download ? `<p class="read-foot"><button class="btn ghost small" type="button" id="read-download">Download this graph as JSON-LD or Turtle</button> <a class="read-vocab" href="${esc(window.GRCORE.GR_NS.replace(/#$/, ""))}">How the graph is described: the gr: vocabulary</a></p>` : ""}
     `;
     $("#read-download")?.addEventListener("click", () => $("#export-graph-btn").click());
     $$("#read-body [data-goto]").forEach((b) => b.addEventListener("click", () => go(b.dataset.goto)));
+    renderReadNav([{ key: "top", title: me.name, color: "--c-person" }, ...navItems]);
   }
+
+  /* ---------------- text view: section navigation ---------------- */
+  // Buttons, not links: the address bar's #… is used for routing, so jumping to a
+  // section scrolls without touching it.
+  let readNavItems = [];
+  function renderReadNav(items) {
+    readNavItems = items;
+    $("#read-nav").innerHTML = `<ol>${items.map((it) => `<li><button type="button" data-sec="${it.key}" style="--c:var(${it.color})">
+        ${it.key === "top" ? "" : '<span class="dot"></span>'}<span class="lbl">${esc(it.key === "top" ? "Overview" : it.title)}</span>${it.count ? `<span class="n">${it.count}</span>` : ""}</button></li>`).join("")}</ol>`;
+    $$("#read-nav button").forEach((b) => b.addEventListener("click", () => {
+      const target = $("#sec-" + b.dataset.sec);
+      if (!target) return;
+      const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      readNavLock = Date.now() + 1800;   // keep the clicked section marked while the page scrolls there
+      target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+      target.setAttribute("tabindex", "-1"); target.focus({ preventScroll: true });
+      markReadNav(b.dataset.sec);
+    }));
+    markReadNav("top");
+    padReadEnd();
+  }
+  // room after the last section, so even it can scroll up to the top of the screen
+  function padReadEnd() {
+    const last = readNavItems[readNavItems.length - 1], h = last && $("#sec-" + last.key);
+    if (!h || $("#view-read").hidden) return;
+    const body = $("#read-body");
+    body.style.paddingBottom = "";
+    const below = body.getBoundingClientRect().bottom - h.getBoundingClientRect().top;
+    body.style.paddingBottom = Math.max(80, window.innerHeight - below - 40) + "px";
+  }
+  window.addEventListener("resize", () => { if (!$("#view-read").hidden) padReadEnd(); });
+  window.addEventListener("gr:view", (e) => { if (e.detail === "read") requestAnimationFrame(padReadEnd); });
+  let readNavLock = 0;
+  function markReadNav(key) {
+    $$("#read-nav button").forEach((b) => {
+      const on = b.dataset.sec === key;
+      b.classList.toggle("on", on);
+      if (on) { b.setAttribute("aria-current", "true"); b.scrollIntoView?.({ block: "nearest", inline: "nearest" }); } else b.removeAttribute("aria-current");
+    });
+  }
+  // the section whose heading was last passed while scrolling is the current one
+  let readNavRaf = 0;
+  window.addEventListener("scroll", () => {
+    if ($("#view-read").hidden || !readNavItems.length || readNavRaf || Date.now() < readNavLock) return;
+    readNavRaf = requestAnimationFrame(() => {
+      readNavRaf = 0;
+      const offset = window.innerWidth < 1100 ? 120 : 140;
+      let cur = "top";
+      for (const it of readNavItems) { const h = $("#sec-" + it.key); if (h && h.getBoundingClientRect().top - offset <= 0) cur = it.key; }
+      const was = $("#read-nav button.on")?.dataset.sec;
+      if (was !== cur) markReadNav(cur);
+    });
+  }, { passive: true });
 
   /* ---------------- highlight lens (used by the studio) ---------------- */
   const lens = { active: false, ids: new Set() };
