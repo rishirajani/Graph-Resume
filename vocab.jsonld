@@ -1,5 +1,317 @@
 [
  {
+  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#highlight",
+  "@type": [
+   "http://www.w3.org/2002/07/owl#DatatypeProperty"
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#comment": [
+   {
+    "@language": "en",
+    "@value": "One achievement or responsibility in a role, degree or project, written as a CV bullet point. Order is not significant."
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#label": [
+   {
+    "@language": "en",
+    "@value": "highlight"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#range": [
+   {
+    "@id": "http://www.w3.org/2001/XMLSchema#string"
+   }
+  ]
+ },
+ {
+  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#studied",
+  "@type": [
+   "http://www.w3.org/2002/07/owl#ObjectProperty"
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#comment": [
+   {
+    "@language": "en",
+    "@value": "The person studied for this degree or certificate, finished or still in progress. (schema:hasCredential would claim the credential is already held.)"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#domain": [
+   {
+    "@id": "https://schema.org/Person"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#label": [
+   {
+    "@language": "en",
+    "@value": "studied"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#range": [
+   {
+    "@id": "https://schema.org/EducationalOccupationalCredential"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#seeAlso": [
+   {
+    "@id": "https://schema.org/hasCredential"
+   },
+   {
+    "@id": "https://schema.org/alumniOf"
+   }
+  ]
+ },
+ {
+  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#received",
+  "@type": [
+   "http://www.w3.org/2002/07/owl#ObjectProperty"
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#comment": [
+   {
+    "@language": "en",
+    "@value": "The person received this award."
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#domain": [
+   {
+    "@id": "https://schema.org/Person"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#label": [
+   {
+    "@language": "en",
+    "@value": "received"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#range": [
+   {
+    "@id": "https://rishirajani.github.io/Graph-Resume/vocab#Award"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#seeAlso": [
+   {
+    "@id": "https://schema.org/award"
+   }
+  ]
+ },
+ {
+  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#ledTo",
+  "@type": [
+   "http://www.w3.org/2002/07/owl#ObjectProperty"
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#comment": [
+   {
+    "@language": "en",
+    "@value": "A programme of study that led directly to this role, for example a certificate run with an employer."
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#domain": [
+   {
+    "@id": "https://schema.org/EducationalOccupationalCredential"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#label": [
+   {
+    "@language": "en",
+    "@value": "led to"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#range": [
+   {
+    "@id": "https://schema.org/OrganizationRole"
+   }
+  ]
+ },
+ {
+  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#speaks",
+  "@type": [
+   "http://www.w3.org/2002/07/owl#ObjectProperty"
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#comment": [
+   {
+    "@language": "en",
+    "@value": "The person speaks this language; how well is given by proficiency on the language."
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#domain": [
+   {
+    "@id": "https://schema.org/Person"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#label": [
+   {
+    "@language": "en",
+    "@value": "speaks"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#range": [
+   {
+    "@id": "https://schema.org/Language"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
+   {
+    "@id": "https://schema.org/knowsLanguage"
+   }
+  ]
+ },
+ {
+  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#Award",
+  "@type": [
+   "http://www.w3.org/2002/07/owl#Class"
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#comment": [
+   {
+    "@language": "en",
+    "@value": "A recognition given to the person, for example by an employer. schema.org only has award as a text property, so this makes awards nodes that can be linked to who gave them."
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#label": [
+   {
+    "@language": "en",
+    "@value": "Award"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#seeAlso": [
+   {
+    "@id": "https://schema.org/award"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
+   {
+    "@id": "https://schema.org/Thing"
+   }
+  ]
+ },
+ {
+  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#used",
+  "@type": [
+   "http://www.w3.org/2002/07/owl#ObjectProperty"
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#comment": [
+   {
+    "@language": "en",
+    "@value": "A skill put to use in this role, project or career break, including a language used at work. Together with trained in and shows, it ties each skill to the work behind it."
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#domain": [
+   {
+    "@id": "_:ne1b029e837234fe2a43aacfd334e95cbb11"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#label": [
+   {
+    "@language": "en",
+    "@value": "used"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#range": [
+   {
+    "@id": "_:ne1b029e837234fe2a43aacfd334e95cbb16"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#seeAlso": [
+   {
+    "@id": "https://schema.org/skills"
+   }
+  ]
+ },
+ {
+  "@id": "_:ne1b029e837234fe2a43aacfd334e95cbb11",
+  "@type": [
+   "http://www.w3.org/2002/07/owl#Class"
+  ],
+  "http://www.w3.org/2002/07/owl#unionOf": [
+   {
+    "@list": [
+     {
+      "@id": "https://schema.org/OrganizationRole"
+     },
+     {
+      "@id": "https://schema.org/CreativeWork"
+     },
+     {
+      "@id": "https://rishirajani.github.io/Graph-Resume/vocab#CareerBreak"
+     },
+     {
+      "@id": "https://rishirajani.github.io/Graph-Resume/vocab#Award"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "@id": "_:ne1b029e837234fe2a43aacfd334e95cbb16",
+  "@type": [
+   "http://www.w3.org/2002/07/owl#Class"
+  ],
+  "http://www.w3.org/2002/07/owl#unionOf": [
+   {
+    "@list": [
+     {
+      "@id": "https://schema.org/DefinedTerm"
+     },
+     {
+      "@id": "https://schema.org/Language"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#CareerBreak",
+  "@type": [
+   "http://www.w3.org/2002/07/owl#Class"
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#comment": [
+   {
+    "@language": "en",
+    "@value": "A period between roles, with what happened during it. Lets a gap be described honestly instead of left blank."
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#label": [
+   {
+    "@language": "en",
+    "@value": "Career break"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
+   {
+    "@id": "https://schema.org/Thing"
+   }
+  ]
+ },
+ {
+  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#heldRole",
+  "@type": [
+   "http://www.w3.org/2002/07/owl#ObjectProperty"
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#comment": [
+   {
+    "@language": "en",
+    "@value": "The person held this role. Use the more specific worked as (finished) or works as (current)."
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#domain": [
+   {
+    "@id": "https://schema.org/Person"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#label": [
+   {
+    "@language": "en",
+    "@value": "held role"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#range": [
+   {
+    "@id": "https://schema.org/OrganizationRole"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#seeAlso": [
+   {
+    "@id": "https://schema.org/hasOccupation"
+   }
+  ]
+ },
+ {
   "@id": "https://rishirajani.github.io/Graph-Resume/vocab#location",
   "@type": [
    "http://www.w3.org/2002/07/owl#DatatypeProperty"
@@ -28,14 +340,14 @@
   ]
  },
  {
-  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#wrote",
+  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#workedAs",
   "@type": [
    "http://www.w3.org/2002/07/owl#ObjectProperty"
   ],
   "http://www.w3.org/2000/01/rdf-schema#comment": [
    {
     "@language": "en",
-    "@value": "The person is an author of this publication."
+    "@value": "The person held this role in the past; the role has an end date."
    }
   ],
   "http://www.w3.org/2000/01/rdf-schema#domain": [
@@ -46,17 +358,99 @@
   "http://www.w3.org/2000/01/rdf-schema#label": [
    {
     "@language": "en",
-    "@value": "wrote"
+    "@value": "worked as"
    }
   ],
   "http://www.w3.org/2000/01/rdf-schema#range": [
    {
-    "@id": "https://schema.org/ScholarlyArticle"
+    "@id": "https://schema.org/OrganizationRole"
    }
   ],
-  "http://www.w3.org/2002/07/owl#inverseOf": [
+  "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
    {
-    "@id": "https://schema.org/author"
+    "@id": "https://rishirajani.github.io/Graph-Resume/vocab#heldRole"
+   }
+  ]
+ },
+ {
+  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#included",
+  "@type": [
+   "http://www.w3.org/2002/07/owl#ObjectProperty"
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#comment": [
+   {
+    "@language": "en",
+    "@value": "Something done during a career break, such as freelance work or a certification."
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#domain": [
+   {
+    "@id": "https://rishirajani.github.io/Graph-Resume/vocab#CareerBreak"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#label": [
+   {
+    "@language": "en",
+    "@value": "included"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#range": [
+   {
+    "@id": "_:ne1b029e837234fe2a43aacfd334e95cbb7"
+   }
+  ]
+ },
+ {
+  "@id": "_:ne1b029e837234fe2a43aacfd334e95cbb7",
+  "@type": [
+   "http://www.w3.org/2002/07/owl#Class"
+  ],
+  "http://www.w3.org/2002/07/owl#unionOf": [
+   {
+    "@list": [
+     {
+      "@id": "https://schema.org/OrganizationRole"
+     },
+     {
+      "@id": "https://schema.org/EducationalOccupationalCredential"
+     },
+     {
+      "@id": "https://schema.org/CreativeWork"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#shows",
+  "@type": [
+   "http://www.w3.org/2002/07/owl#ObjectProperty"
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#comment": [
+   {
+    "@language": "en",
+    "@value": "A skill this certification is evidence of."
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#domain": [
+   {
+    "@id": "https://schema.org/EducationalOccupationalCredential"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#label": [
+   {
+    "@language": "en",
+    "@value": "shows"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#range": [
+   {
+    "@id": "https://schema.org/DefinedTerm"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#seeAlso": [
+   {
+    "@id": "https://schema.org/competencyRequired"
    }
   ]
  },
@@ -129,241 +523,63 @@
   ]
  },
  {
-  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#proficiency",
-  "@type": [
-   "http://www.w3.org/2002/07/owl#DatatypeProperty"
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#comment": [
-   {
-    "@language": "en",
-    "@value": "How well a language is spoken: a CEFR level (A1 to C2) or Native, Fluent or Basic."
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#domain": [
-   {
-    "@id": "https://schema.org/Language"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#label": [
-   {
-    "@language": "en",
-    "@value": "proficiency"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#range": [
-   {
-    "@id": "http://www.w3.org/2001/XMLSchema#string"
-   }
-  ]
- },
- {
-  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#runWith",
+  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#holds",
   "@type": [
    "http://www.w3.org/2002/07/owl#ObjectProperty"
   ],
   "http://www.w3.org/2000/01/rdf-schema#comment": [
    {
     "@language": "en",
-    "@value": "An organisation that co-ran this programme with the school."
+    "@value": "The person holds this certification."
    }
   ],
   "http://www.w3.org/2000/01/rdf-schema#domain": [
+   {
+    "@id": "https://schema.org/Person"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#label": [
+   {
+    "@language": "en",
+    "@value": "holds"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#range": [
    {
     "@id": "https://schema.org/EducationalOccupationalCredential"
    }
   ],
-  "http://www.w3.org/2000/01/rdf-schema#label": [
+  "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
    {
-    "@language": "en",
-    "@value": "run with"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#range": [
-   {
-    "@id": "https://schema.org/Organization"
+    "@id": "https://schema.org/hasCredential"
    }
   ]
  },
  {
-  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#built",
+  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#promotedFrom",
   "@type": [
    "http://www.w3.org/2002/07/owl#ObjectProperty"
   ],
   "http://www.w3.org/2000/01/rdf-schema#comment": [
    {
     "@language": "en",
-    "@value": "The person built or authored this project."
+    "@value": "This role followed the earlier role through a promotion at the same organisation."
    }
   ],
   "http://www.w3.org/2000/01/rdf-schema#domain": [
    {
-    "@id": "https://schema.org/Person"
+    "@id": "https://schema.org/OrganizationRole"
    }
   ],
   "http://www.w3.org/2000/01/rdf-schema#label": [
    {
     "@language": "en",
-    "@value": "built"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#range": [
-   {
-    "@id": "https://schema.org/CreativeWork"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#seeAlso": [
-   {
-    "@id": "https://schema.org/creator"
-   }
-  ]
- },
- {
-  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#received",
-  "@type": [
-   "http://www.w3.org/2002/07/owl#ObjectProperty"
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#comment": [
-   {
-    "@language": "en",
-    "@value": "The person received this award."
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#domain": [
-   {
-    "@id": "https://schema.org/Person"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#label": [
-   {
-    "@language": "en",
-    "@value": "received"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#range": [
-   {
-    "@id": "https://rishirajani.github.io/Graph-Resume/vocab#Award"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#seeAlso": [
-   {
-    "@id": "https://schema.org/award"
-   }
-  ]
- },
- {
-  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#took",
-  "@type": [
-   "http://www.w3.org/2002/07/owl#ObjectProperty"
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#comment": [
-   {
-    "@language": "en",
-    "@value": "The person took this career break."
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#domain": [
-   {
-    "@id": "https://schema.org/Person"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#label": [
-   {
-    "@language": "en",
-    "@value": "took"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#range": [
-   {
-    "@id": "https://rishirajani.github.io/Graph-Resume/vocab#CareerBreak"
-   }
-  ]
- },
- {
-  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#worksAs",
-  "@type": [
-   "http://www.w3.org/2002/07/owl#ObjectProperty"
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#comment": [
-   {
-    "@language": "en",
-    "@value": "The person holds this role now; the role has no end date."
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#domain": [
-   {
-    "@id": "https://schema.org/Person"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#label": [
-   {
-    "@language": "en",
-    "@value": "works as"
+    "@value": "promoted from"
    }
   ],
   "http://www.w3.org/2000/01/rdf-schema#range": [
    {
     "@id": "https://schema.org/OrganizationRole"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
-   {
-    "@id": "https://rishirajani.github.io/Graph-Resume/vocab#heldRole"
-   }
-  ]
- },
- {
-  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#CareerBreak",
-  "@type": [
-   "http://www.w3.org/2002/07/owl#Class"
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#comment": [
-   {
-    "@language": "en",
-    "@value": "A period between roles, with what happened during it. Lets a gap be described honestly instead of left blank."
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#label": [
-   {
-    "@language": "en",
-    "@value": "Career break"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-   {
-    "@id": "https://schema.org/Thing"
-   }
-  ]
- },
- {
-  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#inGroup",
-  "@type": [
-   "http://www.w3.org/2002/07/owl#ObjectProperty"
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#comment": [
-   {
-    "@language": "en",
-    "@value": "The skill area this skill is grouped under. Each skill belongs to exactly one."
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#domain": [
-   {
-    "@id": "https://schema.org/DefinedTerm"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#label": [
-   {
-    "@language": "en",
-    "@value": "belongs to"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#range": [
-   {
-    "@id": "https://schema.org/DefinedTermSet"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
-   {
-    "@id": "https://schema.org/inDefinedTermSet"
    }
   ]
  },
@@ -401,60 +617,14 @@
   ]
  },
  {
-  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#highlight",
-  "@type": [
-   "http://www.w3.org/2002/07/owl#DatatypeProperty"
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#comment": [
-   {
-    "@language": "en",
-    "@value": "One achievement or responsibility in a role, degree or project, written as a CV bullet point. Order is not significant."
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#label": [
-   {
-    "@language": "en",
-    "@value": "highlight"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#range": [
-   {
-    "@id": "http://www.w3.org/2001/XMLSchema#string"
-   }
-  ]
- },
- {
-  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#kind",
-  "@type": [
-   "http://www.w3.org/2002/07/owl#DatatypeProperty"
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#comment": [
-   {
-    "@language": "en",
-    "@value": "What kind of item this is in the resume's own terms (Role, Education, Project, Skill, …). Several kinds share a schema.org type, for example Education and Certification are both schema:EducationalOccupationalCredential; kind keeps them apart."
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#label": [
-   {
-    "@language": "en",
-    "@value": "kind"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#range": [
-   {
-    "@id": "http://www.w3.org/2001/XMLSchema#string"
-   }
-  ]
- },
- {
-  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#heldRole",
+  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#worksAs",
   "@type": [
    "http://www.w3.org/2002/07/owl#ObjectProperty"
   ],
   "http://www.w3.org/2000/01/rdf-schema#comment": [
    {
     "@language": "en",
-    "@value": "The person held this role. Use the more specific worked as (finished) or works as (current)."
+    "@value": "The person holds this role now; the role has no end date."
    }
   ],
   "http://www.w3.org/2000/01/rdf-schema#domain": [
@@ -465,115 +635,7 @@
   "http://www.w3.org/2000/01/rdf-schema#label": [
    {
     "@language": "en",
-    "@value": "held role"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#range": [
-   {
-    "@id": "https://schema.org/OrganizationRole"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#seeAlso": [
-   {
-    "@id": "https://schema.org/hasOccupation"
-   }
-  ]
- },
- {
-  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#used",
-  "@type": [
-   "http://www.w3.org/2002/07/owl#ObjectProperty"
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#comment": [
-   {
-    "@language": "en",
-    "@value": "A skill put to use in this role, project or career break, including a language used at work. Together with trained in and shows, it ties each skill to the work behind it."
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#domain": [
-   {
-    "@id": "_:nc4dcd845f8724a81a385eb379aaf2653b11"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#label": [
-   {
-    "@language": "en",
-    "@value": "used"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#range": [
-   {
-    "@id": "_:nc4dcd845f8724a81a385eb379aaf2653b16"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#seeAlso": [
-   {
-    "@id": "https://schema.org/skills"
-   }
-  ]
- },
- {
-  "@id": "_:nc4dcd845f8724a81a385eb379aaf2653b11",
-  "@type": [
-   "http://www.w3.org/2002/07/owl#Class"
-  ],
-  "http://www.w3.org/2002/07/owl#unionOf": [
-   {
-    "@list": [
-     {
-      "@id": "https://schema.org/OrganizationRole"
-     },
-     {
-      "@id": "https://schema.org/CreativeWork"
-     },
-     {
-      "@id": "https://rishirajani.github.io/Graph-Resume/vocab#CareerBreak"
-     },
-     {
-      "@id": "https://rishirajani.github.io/Graph-Resume/vocab#Award"
-     }
-    ]
-   }
-  ]
- },
- {
-  "@id": "_:nc4dcd845f8724a81a385eb379aaf2653b16",
-  "@type": [
-   "http://www.w3.org/2002/07/owl#Class"
-  ],
-  "http://www.w3.org/2002/07/owl#unionOf": [
-   {
-    "@list": [
-     {
-      "@id": "https://schema.org/DefinedTerm"
-     },
-     {
-      "@id": "https://schema.org/Language"
-     }
-    ]
-   }
-  ]
- },
- {
-  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#workedAs",
-  "@type": [
-   "http://www.w3.org/2002/07/owl#ObjectProperty"
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#comment": [
-   {
-    "@language": "en",
-    "@value": "The person held this role in the past; the role has an end date."
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#domain": [
-   {
-    "@id": "https://schema.org/Person"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#label": [
-   {
-    "@language": "en",
-    "@value": "worked as"
+    "@value": "works as"
    }
   ],
   "http://www.w3.org/2000/01/rdf-schema#range": [
@@ -588,96 +650,86 @@
   ]
  },
  {
-  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#shows",
+  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#partOf",
   "@type": [
    "http://www.w3.org/2002/07/owl#ObjectProperty"
   ],
   "http://www.w3.org/2000/01/rdf-schema#comment": [
    {
     "@language": "en",
-    "@value": "A skill this certification is evidence of."
+    "@value": "This project was done as part of a degree or a larger work, for example a thesis within a master's."
    }
   ],
   "http://www.w3.org/2000/01/rdf-schema#domain": [
    {
-    "@id": "https://schema.org/EducationalOccupationalCredential"
+    "@id": "https://schema.org/CreativeWork"
    }
   ],
   "http://www.w3.org/2000/01/rdf-schema#label": [
    {
     "@language": "en",
-    "@value": "shows"
+    "@value": "part of"
    }
   ],
   "http://www.w3.org/2000/01/rdf-schema#range": [
    {
-    "@id": "https://schema.org/DefinedTerm"
+    "@id": "_:ne1b029e837234fe2a43aacfd334e95cbb4"
    }
   ],
   "http://www.w3.org/2000/01/rdf-schema#seeAlso": [
    {
-    "@id": "https://schema.org/competencyRequired"
+    "@id": "https://schema.org/isPartOf"
    }
   ]
  },
  {
-  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#promotedFrom",
+  "@id": "_:ne1b029e837234fe2a43aacfd334e95cbb4",
+  "@type": [
+   "http://www.w3.org/2002/07/owl#Class"
+  ],
+  "http://www.w3.org/2002/07/owl#unionOf": [
+   {
+    "@list": [
+     {
+      "@id": "https://schema.org/EducationalOccupationalCredential"
+     },
+     {
+      "@id": "https://schema.org/CreativeWork"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#at",
   "@type": [
    "http://www.w3.org/2002/07/owl#ObjectProperty"
   ],
   "http://www.w3.org/2000/01/rdf-schema#comment": [
    {
     "@language": "en",
-    "@value": "This role followed the earlier role through a promotion at the same organisation."
+    "@value": "Where a role was held (the employer) or where a degree or certificate was studied (the school)."
    }
   ],
   "http://www.w3.org/2000/01/rdf-schema#domain": [
    {
-    "@id": "https://schema.org/OrganizationRole"
+    "@id": "_:ne1b029e837234fe2a43aacfd334e95cbb1"
    }
   ],
   "http://www.w3.org/2000/01/rdf-schema#label": [
    {
     "@language": "en",
-    "@value": "promoted from"
+    "@value": "at"
    }
   ],
   "http://www.w3.org/2000/01/rdf-schema#range": [
    {
-    "@id": "https://schema.org/OrganizationRole"
-   }
-  ]
- },
- {
-  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#studied",
-  "@type": [
-   "http://www.w3.org/2002/07/owl#ObjectProperty"
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#comment": [
-   {
-    "@language": "en",
-    "@value": "The person studied for this degree or certificate, finished or still in progress. (schema:hasCredential would claim the credential is already held.)"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#domain": [
-   {
-    "@id": "https://schema.org/Person"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#label": [
-   {
-    "@language": "en",
-    "@value": "studied"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#range": [
-   {
-    "@id": "https://schema.org/EducationalOccupationalCredential"
+    "@id": "https://schema.org/Organization"
    }
   ],
   "http://www.w3.org/2000/01/rdf-schema#seeAlso": [
    {
-    "@id": "https://schema.org/hasCredential"
+    "@id": "https://schema.org/worksFor"
    },
    {
     "@id": "https://schema.org/alumniOf"
@@ -685,124 +737,81 @@
   ]
  },
  {
-  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#holds",
+  "@id": "_:ne1b029e837234fe2a43aacfd334e95cbb1",
   "@type": [
-   "http://www.w3.org/2002/07/owl#ObjectProperty"
+   "http://www.w3.org/2002/07/owl#Class"
   ],
-  "http://www.w3.org/2000/01/rdf-schema#comment": [
+  "http://www.w3.org/2002/07/owl#unionOf": [
    {
-    "@language": "en",
-    "@value": "The person holds this certification."
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#domain": [
-   {
-    "@id": "https://schema.org/Person"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#label": [
-   {
-    "@language": "en",
-    "@value": "holds"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#range": [
-   {
-    "@id": "https://schema.org/EducationalOccupationalCredential"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
-   {
-    "@id": "https://schema.org/hasCredential"
+    "@list": [
+     {
+      "@id": "https://schema.org/OrganizationRole"
+     },
+     {
+      "@id": "https://schema.org/EducationalOccupationalCredential"
+     }
+    ]
    }
   ]
  },
  {
-  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#focusOn",
+  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#runWith",
   "@type": [
    "http://www.w3.org/2002/07/owl#ObjectProperty"
   ],
   "http://www.w3.org/2000/01/rdf-schema#comment": [
    {
     "@language": "en",
-    "@value": "One of the person's skill areas."
+    "@value": "An organisation that co-ran this programme with the school."
    }
   ],
   "http://www.w3.org/2000/01/rdf-schema#domain": [
    {
-    "@id": "https://schema.org/Person"
+    "@id": "https://schema.org/EducationalOccupationalCredential"
    }
   ],
   "http://www.w3.org/2000/01/rdf-schema#label": [
    {
     "@language": "en",
-    "@value": "specialises in"
+    "@value": "run with"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#range": [
+   {
+    "@id": "https://schema.org/Organization"
+   }
+  ]
+ },
+ {
+  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#inGroup",
+  "@type": [
+   "http://www.w3.org/2002/07/owl#ObjectProperty"
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#comment": [
+   {
+    "@language": "en",
+    "@value": "The skill area this skill is grouped under. Each skill belongs to exactly one."
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#domain": [
+   {
+    "@id": "https://schema.org/DefinedTerm"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#label": [
+   {
+    "@language": "en",
+    "@value": "belongs to"
    }
   ],
   "http://www.w3.org/2000/01/rdf-schema#range": [
    {
     "@id": "https://schema.org/DefinedTermSet"
    }
-  ]
- },
- {
-  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#Award",
-  "@type": [
-   "http://www.w3.org/2002/07/owl#Class"
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#comment": [
-   {
-    "@language": "en",
-    "@value": "A recognition given to the person, for example by an employer. schema.org only has award as a text property, so this makes awards nodes that can be linked to who gave them."
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#label": [
-   {
-    "@language": "en",
-    "@value": "Award"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#seeAlso": [
-   {
-    "@id": "https://schema.org/award"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-   {
-    "@id": "https://schema.org/Thing"
-   }
-  ]
- },
- {
-  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#speaks",
-  "@type": [
-   "http://www.w3.org/2002/07/owl#ObjectProperty"
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#comment": [
-   {
-    "@language": "en",
-    "@value": "The person speaks this language; how well is given by proficiency on the language."
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#domain": [
-   {
-    "@id": "https://schema.org/Person"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#label": [
-   {
-    "@language": "en",
-    "@value": "speaks"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#range": [
-   {
-    "@id": "https://schema.org/Language"
-   }
   ],
   "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
    {
-    "@id": "https://schema.org/knowsLanguage"
+    "@id": "https://schema.org/inDefinedTermSet"
    }
   ]
  },
@@ -840,184 +849,175 @@
   ]
  },
  {
-  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#included",
+  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#focusOn",
   "@type": [
    "http://www.w3.org/2002/07/owl#ObjectProperty"
   ],
   "http://www.w3.org/2000/01/rdf-schema#comment": [
    {
     "@language": "en",
-    "@value": "Something done during a career break, such as freelance work or a certification."
+    "@value": "One of the person's skill areas."
    }
   ],
   "http://www.w3.org/2000/01/rdf-schema#domain": [
+   {
+    "@id": "https://schema.org/Person"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#label": [
+   {
+    "@language": "en",
+    "@value": "specialises in"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#range": [
+   {
+    "@id": "https://schema.org/DefinedTermSet"
+   }
+  ]
+ },
+ {
+  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#took",
+  "@type": [
+   "http://www.w3.org/2002/07/owl#ObjectProperty"
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#comment": [
+   {
+    "@language": "en",
+    "@value": "The person took this career break."
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#domain": [
+   {
+    "@id": "https://schema.org/Person"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#label": [
+   {
+    "@language": "en",
+    "@value": "took"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#range": [
    {
     "@id": "https://rishirajani.github.io/Graph-Resume/vocab#CareerBreak"
    }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#label": [
-   {
-    "@language": "en",
-    "@value": "included"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#range": [
-   {
-    "@id": "_:nc4dcd845f8724a81a385eb379aaf2653b7"
-   }
   ]
  },
  {
-  "@id": "_:nc4dcd845f8724a81a385eb379aaf2653b7",
-  "@type": [
-   "http://www.w3.org/2002/07/owl#Class"
-  ],
-  "http://www.w3.org/2002/07/owl#unionOf": [
-   {
-    "@list": [
-     {
-      "@id": "https://schema.org/OrganizationRole"
-     },
-     {
-      "@id": "https://schema.org/EducationalOccupationalCredential"
-     },
-     {
-      "@id": "https://schema.org/CreativeWork"
-     }
-    ]
-   }
-  ]
- },
- {
-  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#ledTo",
+  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#built",
   "@type": [
    "http://www.w3.org/2002/07/owl#ObjectProperty"
   ],
   "http://www.w3.org/2000/01/rdf-schema#comment": [
    {
     "@language": "en",
-    "@value": "A programme of study that led directly to this role, for example a certificate run with an employer."
+    "@value": "The person built or authored this project."
    }
   ],
   "http://www.w3.org/2000/01/rdf-schema#domain": [
    {
-    "@id": "https://schema.org/EducationalOccupationalCredential"
+    "@id": "https://schema.org/Person"
    }
   ],
   "http://www.w3.org/2000/01/rdf-schema#label": [
    {
     "@language": "en",
-    "@value": "led to"
+    "@value": "built"
    }
   ],
   "http://www.w3.org/2000/01/rdf-schema#range": [
-   {
-    "@id": "https://schema.org/OrganizationRole"
-   }
-  ]
- },
- {
-  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#partOf",
-  "@type": [
-   "http://www.w3.org/2002/07/owl#ObjectProperty"
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#comment": [
-   {
-    "@language": "en",
-    "@value": "This project was done as part of a degree or a larger work, for example a thesis within a master's."
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#domain": [
    {
     "@id": "https://schema.org/CreativeWork"
    }
   ],
+  "http://www.w3.org/2000/01/rdf-schema#seeAlso": [
+   {
+    "@id": "https://schema.org/creator"
+   }
+  ]
+ },
+ {
+  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#proficiency",
+  "@type": [
+   "http://www.w3.org/2002/07/owl#DatatypeProperty"
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#comment": [
+   {
+    "@language": "en",
+    "@value": "How well a language is spoken: a CEFR level (A1 to C2) or Native, Fluent or Basic."
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#domain": [
+   {
+    "@id": "https://schema.org/Language"
+   }
+  ],
   "http://www.w3.org/2000/01/rdf-schema#label": [
    {
     "@language": "en",
-    "@value": "part of"
+    "@value": "proficiency"
    }
   ],
   "http://www.w3.org/2000/01/rdf-schema#range": [
    {
-    "@id": "_:nc4dcd845f8724a81a385eb379aaf2653b4"
-   }
-  ],
-  "http://www.w3.org/2000/01/rdf-schema#seeAlso": [
-   {
-    "@id": "https://schema.org/isPartOf"
+    "@id": "http://www.w3.org/2001/XMLSchema#string"
    }
   ]
  },
  {
-  "@id": "_:nc4dcd845f8724a81a385eb379aaf2653b4",
+  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#kind",
   "@type": [
-   "http://www.w3.org/2002/07/owl#Class"
+   "http://www.w3.org/2002/07/owl#DatatypeProperty"
   ],
-  "http://www.w3.org/2002/07/owl#unionOf": [
+  "http://www.w3.org/2000/01/rdf-schema#comment": [
    {
-    "@list": [
-     {
-      "@id": "https://schema.org/EducationalOccupationalCredential"
-     },
-     {
-      "@id": "https://schema.org/CreativeWork"
-     }
-    ]
+    "@language": "en",
+    "@value": "What kind of item this is in the resume's own terms (Role, Education, Project, Skill, …). Several kinds share a schema.org type, for example Education and Certification are both schema:EducationalOccupationalCredential; kind keeps them apart."
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#label": [
+   {
+    "@language": "en",
+    "@value": "kind"
+   }
+  ],
+  "http://www.w3.org/2000/01/rdf-schema#range": [
+   {
+    "@id": "http://www.w3.org/2001/XMLSchema#string"
    }
   ]
  },
  {
-  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#at",
+  "@id": "https://rishirajani.github.io/Graph-Resume/vocab#wrote",
   "@type": [
    "http://www.w3.org/2002/07/owl#ObjectProperty"
   ],
   "http://www.w3.org/2000/01/rdf-schema#comment": [
    {
     "@language": "en",
-    "@value": "Where a role was held (the employer) or where a degree or certificate was studied (the school)."
+    "@value": "The person is an author of this publication."
    }
   ],
   "http://www.w3.org/2000/01/rdf-schema#domain": [
    {
-    "@id": "_:nc4dcd845f8724a81a385eb379aaf2653b1"
+    "@id": "https://schema.org/Person"
    }
   ],
   "http://www.w3.org/2000/01/rdf-schema#label": [
    {
     "@language": "en",
-    "@value": "at"
+    "@value": "wrote"
    }
   ],
   "http://www.w3.org/2000/01/rdf-schema#range": [
    {
-    "@id": "https://schema.org/Organization"
+    "@id": "https://schema.org/ScholarlyArticle"
    }
   ],
-  "http://www.w3.org/2000/01/rdf-schema#seeAlso": [
+  "http://www.w3.org/2002/07/owl#inverseOf": [
    {
-    "@id": "https://schema.org/worksFor"
-   },
-   {
-    "@id": "https://schema.org/alumniOf"
-   }
-  ]
- },
- {
-  "@id": "_:nc4dcd845f8724a81a385eb379aaf2653b1",
-  "@type": [
-   "http://www.w3.org/2002/07/owl#Class"
-  ],
-  "http://www.w3.org/2002/07/owl#unionOf": [
-   {
-    "@list": [
-     {
-      "@id": "https://schema.org/OrganizationRole"
-     },
-     {
-      "@id": "https://schema.org/EducationalOccupationalCredential"
-     }
-    ]
+    "@id": "https://schema.org/author"
    }
   ]
  }
