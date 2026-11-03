@@ -535,6 +535,15 @@
         },
         {
           "@id": "cv:s-kge"
+        },
+        {
+          "@id": "cv:s-rdfs"
+        },
+        {
+          "@id": "cv:s-shacl"
+        },
+        {
+          "@id": "cv:s-pytorch"
         }
       ]
     },
@@ -646,6 +655,9 @@
         },
         {
           "@id": "cv:s-owl"
+        },
+        {
+          "@id": "cv:s-git"
         }
       ]
     },
@@ -688,6 +700,9 @@
         },
         {
           "@id": "cv:s-cicd"
+        },
+        {
+          "@id": "cv:s-git"
         }
       ]
     },
@@ -714,6 +729,9 @@
         },
         {
           "@id": "cv:s-semmodel"
+        },
+        {
+          "@id": "cv:s-git"
         }
       ]
     },
@@ -1294,22 +1312,6 @@
       ]
     },
     {
-      "@id": "cv:s-dbt",
-      "@type": "DefinedTerm",
-      "name": "dbt",
-      "gr:kind": "Skill",
-      "skos:exactMatch": [
-        {
-          "@id": "http://www.wikidata.org/entity/Q107610347"
-        }
-      ],
-      "gr:inGroup": [
-        {
-          "@id": "cv:g-de"
-        }
-      ]
-    },
-    {
       "@id": "cv:s-docker",
       "@type": "DefinedTerm",
       "name": "Docker",
@@ -1473,22 +1475,6 @@
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q68705831"
-        }
-      ],
-      "gr:inGroup": [
-        {
-          "@id": "cv:g-an"
-        }
-      ]
-    },
-    {
-      "@id": "cv:s-powerbi",
-      "@type": "DefinedTerm",
-      "name": "Power BI",
-      "gr:kind": "Skill",
-      "skos:exactMatch": [
-        {
-          "@id": "http://www.wikidata.org/entity/Q23542287"
         }
       ],
       "gr:inGroup": [

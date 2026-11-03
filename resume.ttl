@@ -139,7 +139,7 @@ cv:e-msc a schema:EducationalOccupationalCredential ;
     schema:endDate "2026-12" ;
     gr:location "Stuttgart, Germany" ;
     gr:at cv:sch-stuttgart ;
-    gr:trainedIn cv:s-ontology, cv:s-dl, cv:s-kge .
+    gr:trainedIn cv:s-ontology, cv:s-dl, cv:s-kge, cv:s-rdfs, cv:s-shacl, cv:s-pytorch .
 
 cv:sch-tsec a schema:CollegeOrUniversity ;
     schema:name "Thadomal Shahani Engineering College" ;
@@ -189,7 +189,7 @@ cv:p-thesis a schema:CreativeWork ;
     schema:creativeWorkStatus "Master's thesis, ongoing" ;
     gr:highlight "Investigating concept learning with description logics and geometric box embeddings, evaluating semantic similarity and concept prediction in knowledge graphs." ;
     gr:partOf cv:e-msc ;
-    gr:used cv:s-dl, cv:s-kge, cv:s-owl .
+    gr:used cv:s-dl, cv:s-kge, cv:s-owl, cv:s-git .
 
 cv:p-loom a schema:CreativeWork ;
     schema:name "Loom: open-source CSV-to-RDF ontology mapping tool" ;
@@ -197,7 +197,7 @@ cv:p-loom a schema:CreativeWork ;
     schema:startDate "2026-06" ;
     schema:url "https://github.com/rishirajani/loom" ;
     gr:highlight "Built a locally running TypeScript/React application using N3.js to map spreadsheet columns to RDF vocabularies and generate structured semantic representations.", "Implemented mapping suggestions, datatype matching and integrity checks for duplicate records and unmapped columns; integrated CI checks and 41 Vitest regression tests.", "Runs entirely in the browser with no server or upload; bundles Schema.org and DCAT ontology subsets, offers tiered mapping suggestions, detects duplicate identifiers and IRI collisions, validates the base IRI and exports Turtle. Released under the MIT licence." ;
-    gr:used cv:s-ts, cv:s-react, cv:s-n3, cv:s-rdf, cv:s-turtle, cv:s-semmodel, cv:s-s2t, cv:s-dq, cv:s-cicd .
+    gr:used cv:s-ts, cv:s-react, cv:s-n3, cv:s-rdf, cv:s-turtle, cv:s-semmodel, cv:s-s2t, cv:s-dq, cv:s-cicd, cv:s-git .
 
 cv:p-heat a schema:CreativeWork ;
     schema:name "Urban Heat Risk Knowledge Graph" ;
@@ -206,7 +206,7 @@ cv:p-heat a schema:CreativeWork ;
     schema:endDate "2026-09" ;
     schema:url "https://github.com/rishirajani/UrbanHeatRiskReasoning" ;
     gr:highlight "Integrated CityGML, OpenStreetMap, climate, vegetation and building data into RDF representations; applied SPARQL and semantic reasoning to assess urban heat risk and identify vulnerable buildings." ;
-    gr:used cv:s-rdf, cv:s-sparql, cv:s-integration, cv:s-semmodel .
+    gr:used cv:s-rdf, cv:s-sparql, cv:s-integration, cv:s-semmodel, cv:s-git .
 
 cv:p-arch a schema:CreativeWork ;
     schema:name "Knowledge Graph Applications in Architecture" ;
@@ -405,12 +405,6 @@ cv:s-redshift a schema:DefinedTerm ;
     skos:exactMatch wd:Q17012109 ;
     gr:inGroup cv:g-de .
 
-cv:s-dbt a schema:DefinedTerm ;
-    schema:name "dbt" ;
-    gr:kind "Skill" ;
-    skos:exactMatch wd:Q107610347 ;
-    gr:inGroup cv:g-de .
-
 cv:s-docker a schema:DefinedTerm ;
     schema:name "Docker" ;
     gr:kind "Skill" ;
@@ -473,12 +467,6 @@ cv:s-superset a schema:DefinedTerm ;
     schema:name "Apache Superset" ;
     gr:kind "Skill" ;
     skos:exactMatch wd:Q68705831 ;
-    gr:inGroup cv:g-an .
-
-cv:s-powerbi a schema:DefinedTerm ;
-    schema:name "Power BI" ;
-    gr:kind "Skill" ;
-    skos:exactMatch wd:Q23542287 ;
     gr:inGroup cv:g-an .
 
 cv:s-clevertap a schema:DefinedTerm ;

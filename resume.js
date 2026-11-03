@@ -289,7 +289,10 @@ window.RESUME = {
       "skills": [
         "s-ontology",
         "s-dl",
-        "s-kge"
+        "s-kge",
+        "s-rdfs",
+        "s-shacl",
+        "s-pytorch"
       ]
     },
     {
@@ -368,7 +371,8 @@ window.RESUME = {
       "skills": [
         "s-dl",
         "s-kge",
-        "s-owl"
+        "s-owl",
+        "s-git"
       ]
     },
     {
@@ -392,7 +396,8 @@ window.RESUME = {
         "s-semmodel",
         "s-s2t",
         "s-dq",
-        "s-cicd"
+        "s-cicd",
+        "s-git"
       ]
     },
     {
@@ -410,7 +415,8 @@ window.RESUME = {
         "s-rdf",
         "s-sparql",
         "s-integration",
-        "s-semmodel"
+        "s-semmodel",
+        "s-git"
       ]
     },
     {
@@ -743,15 +749,6 @@ window.RESUME = {
       ]
     },
     {
-      "id": "s-dbt",
-      "type": "Skill",
-      "label": "dbt",
-      "group": "g-de",
-      "exactMatch": [
-        "wd:Q107610347"
-      ]
-    },
-    {
       "id": "s-docker",
       "type": "Skill",
       "label": "Docker",
@@ -847,15 +844,6 @@ window.RESUME = {
       "group": "g-an",
       "exactMatch": [
         "wd:Q68705831"
-      ]
-    },
-    {
-      "id": "s-powerbi",
-      "type": "Skill",
-      "label": "Power BI",
-      "group": "g-an",
-      "exactMatch": [
-        "wd:Q23542287"
       ]
     },
     {
