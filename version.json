@@ -1,9 +1,8 @@
 {
-  "version": "1.5.2",
+  "version": "1.5.3",
   "date": "2026-11-03",
   "notes": [
-    "The CV and Cover letter tabs show how many pages each will print to, in red when it's more than you asked for.",
-    "Page buttons above the CV and letter jump to each page."
+    "Sections… on a CV moves sections up or down, or hides one, for that CV only. Your text edits stay; new CVs start from your order in Customize."
   ],
   "files": [
     "index.html",

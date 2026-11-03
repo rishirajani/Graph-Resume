@@ -1051,8 +1051,81 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     let t; el.addEventListener("input", () => { clearTimeout(t); t = setTimeout(() => markPages(el), 250); });
   });
   window.addEventListener("resize", () => ["#cv-paper", "#cl-paper"].forEach((sel) => $(sel) && markPages($(sel))));
+  /* ----- this CV's section order (starts from your Customize order) ----- */
+  const sectionStash = new Map(); // hidden sections' nodes, kept with your edits until shown again
+  function cvSections() {
+    const base = CVUI().order;
+    const own = current?.sections;
+    const order = own?.order ? [...own.order.filter((k) => base.includes(k)), ...base.filter((k) => !own.order.includes(k))] : [...base];
+    return { order, hidden: (own?.hidden || []).filter((k) => order.includes(k)), custom: !!own };
+  }
+  function cvLook() { const c = cvSections(); return Object.assign({}, CVUI(), { order: c.order, hidden: c.hidden }); }
+  // which sections this CV has content for, with their titles as shown
+  function cvSectionList() {
+    const probe = document.createElement("div");
+    probe.innerHTML = renderCv(current.result, Object.assign({}, CVUI(), { order: cvSections().order, hidden: [] }));
+    const paper = $("#cv-paper");
+    return [...probe.querySelectorAll("h2[data-sec]")].map((h) => ({ key: h.dataset.sec, title: (paper.querySelector(`h2[data-sec="${h.dataset.sec}"]`) || h).textContent.trim() }));
+  }
+  // the nodes of one section in the page: its heading and everything up to the next section
+  function sectionNodes(paper, key) {
+    const h = paper.querySelector(`h2[data-sec="${key}"]`); if (!h) return sectionStash.get(key) || null;
+    const nodes = [h]; let n = h.nextSibling;
+    while (n && !(n.nodeType === 1 && n.matches?.("h2[data-sec]"))) { nodes.push(n); n = n.nextSibling; }
+    return nodes;
+  }
+  function applySections() {
+    const paper = $("#cv-paper"), { order, hidden } = cvSections();
+    const groups = new Map(order.map((k) => [k, sectionNodes(paper, k)]).filter(([, v]) => v));
+    groups.forEach((nodes) => nodes.forEach((n) => n.remove()));
+    order.forEach((k) => {
+      const nodes = groups.get(k); if (!nodes) return;
+      if (hidden.includes(k)) sectionStash.set(k, nodes);
+      else { sectionStash.delete(k); nodes.forEach((n) => paper.appendChild(n)); }
+    });
+    markPages(paper);
+  }
+  function setSections(order, hidden) {
+    current.sections = order ? { order, hidden } : undefined;
+    updateHistoryItem(); applySections(); renderSectionPanel();
+  }
+  function renderSectionPanel() {
+    const box = $("#cv-sections"); if (!box || !current?.result) return;
+    const { order, hidden, custom } = cvSections();
+    const list = cvSectionList(), keys = list.map((x) => x.key);
+    $("#cv-sections-btn").textContent = custom ? "Sections (this CV)…" : "Sections…";
+    box.innerHTML = `<p class="help">Order and show sections for this CV only. New CVs start from your order in Customize.</p>
+      <ol class="sec-list">${list.map(({ key, title }, i) => `<li data-key="${key}" class="${hidden.includes(key) ? "off" : ""}">
+        <label class="check"><input type="checkbox" data-act="show" ${hidden.includes(key) ? "" : "checked"}> <span>${esc(title)}</span></label>
+        <span class="sec-move"><button type="button" class="btn ghost small" data-act="up" aria-label="Move ${esc(title)} up" ${i === 0 ? "disabled" : ""}>↑</button><button type="button" class="btn ghost small" data-act="down" aria-label="Move ${esc(title)} down" ${i === list.length - 1 ? "disabled" : ""}>↓</button></span></li>`).join("")}</ol>
+      <div class="row end"><button type="button" class="btn ghost small" data-act="reset" ${custom ? "" : "disabled"}>Use my default order</button><button type="button" class="btn ink small" data-act="done">Done</button></div>`;
+    box.onclick = (e) => {
+      const b = e.target.closest("[data-act]"); if (!b || b.dataset.act === "show") return;
+      if (b.dataset.act === "done") { box.hidden = true; $("#cv-sections-btn").setAttribute("aria-expanded", "false"); return; }
+      if (b.dataset.act === "reset") { setSections(null); return; }
+      const key = b.closest("li").dataset.key, i = keys.indexOf(key), j = b.dataset.act === "up" ? i - 1 : i + 1;
+      if (j < 0 || j >= keys.length) return;
+      const shown = [...keys]; [shown[i], shown[j]] = [shown[j], shown[i]];
+      // sections without content keep their place at the end
+      setSections([...shown, ...order.filter((k) => !shown.includes(k))], hidden);
+      $(`#cv-sections li[data-key="${key}"] [data-act="${b.dataset.act}"]`)?.focus();
+    };
+    box.onchange = (e) => {
+      const c = e.target.closest('[data-act="show"]'); if (!c) return;
+      const key = c.closest("li").dataset.key;
+      const h = new Set(hidden); c.checked ? h.delete(key) : h.add(key);
+      setSections(order, [...h]);
+    };
+  }
+  $("#cv-sections-btn").addEventListener("click", () => {
+    const box = $("#cv-sections"); box.hidden = !box.hidden;
+    $("#cv-sections-btn").setAttribute("aria-expanded", String(!box.hidden));
+    if (!box.hidden) renderSectionPanel();
+  });
   function paintDocs(result, input) {
-    $("#cv-paper").innerHTML = renderCv(result); styleCv($("#cv-paper"));
+    // every section is drawn, then this CV's hidden ones are set aside, so they can be shown again
+    $("#cv-paper").innerHTML = renderCv(result, Object.assign(cvLook(), { hidden: [] })); styleCv($("#cv-paper"));
+    sectionStash.clear(); applySections(); renderSectionPanel();
     if (result.coverLetter) { $("#cl-paper").innerHTML = renderLetter(result, input); styleCv($("#cl-paper")); }
     (document.fonts?.ready || Promise.resolve()).then(() => { markPages($("#cv-paper")); markPages($("#cl-paper")); });
   }
@@ -1138,7 +1211,7 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
       <h1>${esc(me.name)}</h1>
       <p class="p-headline">${esc(cv.headline || me.headline || "")}</p>
       <p class="p-contact">${contactLine()}</p>
-      ${cvui.order.map((k) => (SECTIONS[k] ? SECTIONS[k]() : "")).join("\n")}`;
+      ${cvui.order.filter((k) => !(cvui.hidden || []).includes(k)).map((k) => (SECTIONS[k] ? SECTIONS[k]().replace("<h2>", `<h2 data-sec="${k}">`) : "")).join("\n")}`;
   }
 
   function renderLetter(result, input) {

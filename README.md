@@ -25,7 +25,7 @@ It's a static site: no server, no database, no build step. Hosting is free.
 
 ## Make it yours
 
-The studio's **Customize** panel sets `site.ui` in `resume.js` with a live preview of the site (desktop and phone) and of a CV built from the graph: theme (Ink, Paper, Forest, Slate dark, or Auto), font pair, a colour per kind of item, graph label size; whether the site opens on the graph or the text, whether skills start folded, which groups show at first; search, text view, download, copy link and visit counting on or off; and the CV and letter layout (Classic, Modern, Compact), accent colour, section order and titles. With the private master connected it saves directly; otherwise it gives the `ui: { … }` block to paste into `site`. `ui.js` documents every setting.
+The studio's **Customize** panel sets `site.ui` in `resume.js` with a live preview of the site (desktop and phone) and of a CV built from the graph: theme (Ink, Paper, Forest, Slate dark, or Auto), font pair, a colour per kind of item, graph label size; whether the site opens on the graph or the text, whether skills start folded, which groups show at first; search, text view, download, copy link and visit counting on or off; and the CV and letter layout (Classic, Modern, Compact), accent colour, section order and titles. To change the order for one CV only, use *Sections…* next to the CV's export buttons. With the private master connected it saves directly; otherwise it gives the `ui: { … }` block to paste into `site`. `ui.js` documents every setting.
 
 ### Releasing a version (for copies on other sites)
 
