@@ -21,6 +21,8 @@ the pieces connect. It builds on schema.org for the kinds of things (people, org
 credentials, creative works, defined terms) and adds the relations between them that
 schema.org doesn't have, or only has as plain text."""@en ;
   dcterms:creator "Rishi Rajani" ;
+  dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
+  dcterms:rights "© 2026 Rishi Rajani. This vocabulary and its documentation are licensed under CC BY 4.0. The resume data described with it is not."@en ;
   dcterms:created "2026-11-03"^^xsd:date ;
   owl:versionInfo "1.0" ;
   owl:versionIRI <https://rishirajani.github.io/Graph-Resume/vocab/1.0> ;
