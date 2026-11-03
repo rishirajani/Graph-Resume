@@ -1,12 +1,10 @@
 {
-  "version": "1.5.0",
+  "version": "1.5.1",
   "date": "2026-11-03",
   "notes": [
-    "CVs list experience newest first, and a role combined with the one it was promoted from.",
-    "Skills you have only from a degree are treated as coursework: listed only when a job asks, under a coursework heading.",
-    "Limiting words such as “proof of concept” must survive rewording; the studio warns when a letter drops one.",
-    "Cover letters keep gaps to one forward-looking sentence and no longer compare years of experience.",
-    "New optional Availability field under Model settings → Private details; letters mention it when set."
+    "Email, phone, LinkedIn, GitHub and the tailored link are clickable on CVs and cover letters, in PDF and Word too.",
+    "The CV and letter preview shows a dashed line where each printed page ends.",
+    "Printed pages after the first now get a top margin, and an entry or heading isn't split from what follows it (PDF and Word)."
   ],
   "files": [
     "index.html",

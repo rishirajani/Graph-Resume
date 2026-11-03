@@ -277,7 +277,10 @@ table.reqs td .chips { display: flex; flex-wrap: wrap; gap: 5px; }
 .checks.ok { border-color: #A9D8C9; }
 
 /* paper (CV + letter preview, also used for print) */
-.paper-wrap { background: var(--paper-2); border-radius: 14px; padding: 28px; overflow: auto; }
+.paper-wrap { position: relative; background: var(--paper-2); border-radius: 14px; padding: 28px; overflow: auto; }
+.paper a { color: inherit; text-decoration: underline; text-decoration-color: rgba(0, 0, 0, .3); text-underline-offset: 2px; }
+.page-guide { position: absolute; height: 0; border-top: 1.5px dashed #C0392B; opacity: .75; pointer-events: none; }
+.page-guide span { position: absolute; right: 4px; top: -8px; font: 650 9.5px/14px var(--sans); color: #B03A2E; background: #fff; padding: 0 4px; white-space: nowrap; }
 .paper {
   --cv-accent: #1D2A40;
   background: #fff; width: 210mm; min-height: 297mm; margin: 0 auto; padding: 16mm 17mm;
@@ -466,10 +469,12 @@ table.reqs td .chips { display: flex; flex-wrap: wrap; gap: 5px; }
 
 /* ---------- print: only the chosen document ---------- */
 @media print {
-  @page { size: A4; margin: 0; }
+  @page { size: A4; margin: 15mm 0; }
+  @page compact { size: A4; margin: 11mm 0; }
+  .page-guide { display: none; }
   body { background: #fff; }
   body > *:not(#print-root) { display: none !important; }
   #print-root { display: block !important; }
-  #print-root .paper { width: auto; min-height: 0; margin: 0; box-shadow: none; padding: 15mm 17mm !important; }
-  #print-root .paper.cv-compact { padding: 11mm 14mm !important; }
+  #print-root .paper { width: auto; min-height: 0; margin: 0; box-shadow: none; padding: 0 17mm !important; }
+  #print-root .paper.cv-compact { padding: 0 14mm !important; page: compact; }
 }

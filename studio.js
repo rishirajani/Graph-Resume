@@ -972,12 +972,54 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     el.classList.add("cv-" + cvui.layout);
     el.style.setProperty("--cv-accent", cvui.accent || CV_ACCENT[cvui.layout]);
   }
+  // A dashed line where each printed A4 page ends. It sits beside the page, not in it,
+  // so it never ends up in the PDF, the Word file or the copied text.
+  function markPages(paper) {
+    const wrap = paper?.parentElement; if (!wrap) return;
+    wrap.querySelectorAll(".page-guide").forEach((e) => e.remove());
+    if (!paper.offsetHeight || !paper.textContent.trim()) return;
+    const pr = paper.getBoundingClientRect(), mm = pr.width / 210;
+    const margin = (paper.classList.contains("cv-compact") ? 11 : 15) * mm, perPage = 297 * mm - 2 * margin;
+    const cs = getComputedStyle(paper), top = parseFloat(cs.paddingTop), end = pr.height - parseFloat(cs.paddingBottom);
+    const y = (el) => el.getBoundingClientRect().top - pr.top, yb = (el) => el.getBoundingClientRect().bottom - pr.top;
+    const keep = [...paper.querySelectorAll(".p-item, h2, .l-head")];
+    let start = top, page = 2;
+    while (start + perPage < end - 2 && page < 12) {
+      let cut = start + perPage;
+      // an entry isn't split across pages, and a heading stays with what follows it
+      const item = keep.find((el) => el.classList.contains("p-item") && y(el) < cut && yb(el) > cut && y(el) > start);
+      if (item) cut = y(item);
+      const head = keep.find((el) => el.nodeName === "H2" && y(el) < cut && (!el.nextElementSibling || y(el.nextElementSibling) >= cut - 1) && y(el) > start);
+      if (head) cut = y(head);
+      const g = document.createElement("div");
+      g.className = "page-guide"; g.setAttribute("aria-hidden", "true");
+      g.style.top = `${paper.offsetTop + cut}px`; g.style.left = `${paper.offsetLeft}px`; g.style.width = `${pr.width}px`;
+      g.innerHTML = `<span>Page ${page}</span>`;
+      wrap.appendChild(g);
+      start = cut; page++;
+    }
+  }
+  const pageObserver = window.ResizeObserver ? new ResizeObserver((es) => es.forEach((e) => markPages(e.target))) : null;
+  ["#cv-paper", "#cl-paper"].forEach((sel) => {
+    const el = $(sel); if (!el) return;
+    pageObserver?.observe(el);
+    let t; el.addEventListener("input", () => { clearTimeout(t); t = setTimeout(() => markPages(el), 250); });
+  });
+  window.addEventListener("resize", () => ["#cv-paper", "#cl-paper"].forEach((sel) => $(sel) && markPages($(sel))));
   function paintDocs(result, input) {
     $("#cv-paper").innerHTML = renderCv(result); styleCv($("#cv-paper"));
     if (result.coverLetter) { $("#cl-paper").innerHTML = renderLetter(result, input); styleCv($("#cl-paper")); }
+    (document.fonts?.ready || Promise.resolve()).then(() => { markPages($("#cv-paper")); markPages($("#cl-paper")); });
   }
   function contactLine() {
-    const parts = [me.location, LS.get("private", {}).phone, me.email, ...(me.links || []).map((l) => l.url.replace(/^https?:\/\/(www\.)?/, ""))].filter(Boolean).map(esc);
+    const a = (href, text) => `<a href="${esc(href)}">${esc(text)}</a>`;
+    const phone = LS.get("private", {}).phone;
+    const parts = [
+      me.location ? esc(me.location) : "",
+      phone ? a("tel:" + phone.replace(/[^\d+]/g, ""), phone) : "",
+      me.email ? a("mailto:" + me.email, me.email) : "",
+      ...(me.links || []).filter((l) => l.url).map((l) => a(l.url, l.url.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")))
+    ].filter(Boolean);
     if (current?.link?.inCv && current.link.url) parts.push(`<a href="${esc(current.link.url)}">${esc(CVUI().linkLabel || "Portfolio")}</a>`);
     return parts.join("  |  ");
   }
@@ -1137,7 +1179,7 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     const font = isLetter ? "Georgia" : "Calibri";
     const textWidth = 11906 - 2 * 1080;
     const mk = (rs, extra = {}) => rs.flatMap((r) => {
-      const t = r.text.split("\n").map((t, i) => new TextRun({ text: t, bold: r.bold, italics: r.italic, break: i ? 1 : 0, ...extra, ...(r.href ? { color: "1D4ED8", underline: {} } : {}) }));
+      const t = r.text.split("\n").map((t, i) => new TextRun({ text: t, bold: r.bold, italics: r.italic, break: i ? 1 : 0, ...extra, ...(r.href ? { underline: {} } : {}) }));
       return r.href && ExternalHyperlink ? [new ExternalHyperlink({ link: r.href, children: t })] : t;
     });
     const children = toBlocks(root).map((b) => {
@@ -1146,12 +1188,12 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
         case "lead": return new Paragraph({ children: mk(b.runs, { size: compact ? 20 : 22, ...(modern ? { color: accent } : {}) }), spacing: { after: 40 } });
         case "contact": return new Paragraph({ children: mk(b.runs, { size: 18, color: "444444" }), spacing: { after: 160 } });
         case "heading": return modern
-          ? new Paragraph({ children: mk(b.runs, { bold: true, size: 17, color: accent, allCaps: true, characterSpacing: 40 }), spacing: { before: 240, after: 80 } })
-          : new Paragraph({ children: mk(b.runs, { bold: true, size: compact ? 19 : 20, color: accent }), spacing: { before: compact ? 140 : 220, after: compact ? 50 : 80 },
+          ? new Paragraph({ keepNext: true, children: mk(b.runs, { bold: true, size: 17, color: accent, allCaps: true, characterSpacing: 40 }), spacing: { before: 240, after: 80 } })
+          : new Paragraph({ keepNext: true, children: mk(b.runs, { bold: true, size: compact ? 19 : 20, color: accent }), spacing: { before: compact ? 140 : 220, after: compact ? 50 : 80 },
             border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: "BFC6CF", space: 2 } } });
-        case "row": return new Paragraph({ tabStops: [{ type: TabStopType.RIGHT, position: textWidth }], spacing: { before: compact ? 60 : 100, after: 20 },
+        case "row": return new Paragraph({ keepNext: true, keepLines: true, tabStops: [{ type: TabStopType.RIGHT, position: textWidth }], spacing: { before: compact ? 60 : 100, after: 20 },
           children: [new TextRun({ text: b.left.trim(), bold: true }), new TextRun({ text: b.right.trim() ? `\t${b.right.trim()}` : "", color: "444444", size: 19 })] });
-        case "sub": return new Paragraph({ children: mk(b.runs, { color: "444444", size: 19 }), spacing: { after: 20 } });
+        case "sub": return new Paragraph({ keepNext: true, children: mk(b.runs, { color: "444444", size: 19 }), spacing: { after: 20 } });
         case "bullet": return new Paragraph({ children: mk(b.runs), numbering: { reference: "bul", level: 0 }, spacing: { after: compact ? 10 : 30 } });
         default: return new Paragraph({ children: mk(b.runs), spacing: { after: isLetter ? 200 : 60 } });
       }
@@ -1169,10 +1211,12 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
   const fontLink = () => { const f = window.GRUI?.FONTS[window.GRUI.ui.fonts]; return f?.href ? `<link href="${esc(f.href)}" rel="stylesheet">` : ""; };
   function standaloneHtml(root, title) {
     const cssText = [...document.styleSheets].flatMap((s) => { try { return [...s.cssRules].map((r) => r.cssText); } catch { return []; } })
-      .filter((t) => /\.paper|:root|@page/.test(t)).join("\n");
+      .filter((t) => /\.paper|:root/.test(t) && !/^@media print/.test(t)).join("\n");
     return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${esc(title)}</title>
 ${fontLink()}
-<style>${cssText}\n:root{--sans:${css("--sans")};--serif:${css("--serif")}}\nbody{margin:0;background:#fff}.paper{margin:0 auto}@media print{@page{size:A4;margin:0}}</style></head>
+<style>${cssText}\n:root{--sans:${css("--sans")};--serif:${css("--serif")}}\nbody{margin:0;background:#fff}.paper{margin:0 auto}
+@page{size:A4;margin:15mm 0}@page compact{size:A4;margin:11mm 0}
+@media print{.paper{width:auto;min-height:0;margin:0;padding-top:0!important;padding-bottom:0!important}.paper.cv-compact{page:compact}}</style></head>
 <body>${root.outerHTML.replace(/contenteditable="true"/g, "")}<script>document.fonts.ready.then(()=>setTimeout(()=>print(),300))<\/script></body></html>`;
   }
 
@@ -1205,7 +1249,7 @@ ${fontLink()}
   }));
 
   // test hook: lets the test suite render a result without calling a model
-  window.GR.studio = { renderResult: (x) => { x.result.warnings = groundingCheck(x.result); current = x; renderResult(x); }, buildPrompt, groundingCheck, toMarkdown, toBlocks,
+  window.GR.studio = { renderResult: (x) => { x.result.warnings = groundingCheck(x.result); current = x; renderResult(x); }, buildPrompt, groundingCheck, toMarkdown, toBlocks, standaloneHtml, markPages,
     // for customize.js
     renderCv, renderLetter, styleCv, getCurrent: () => current, ghGet, ghPut, connected, enterStudio };
 })();
