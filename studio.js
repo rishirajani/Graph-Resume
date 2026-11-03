@@ -996,16 +996,20 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     const perPage = (297 - 2 * pageMargin(el)) * mm;
     const y = (n) => n.getBoundingClientRect().top - pr.top, yb = (n) => n.getBoundingClientRect().bottom - pr.top;
     const blocks = [...el.querySelectorAll(BLOCKS)];
-    const keep = [...el.querySelectorAll(".p-item, h2")];
+    // blocks printed whole (styles.css keeps them together): entries, skill lines, summaries, letter heads
+    const WHOLE = ".p-item, .p-skills > p, .p-summary, .l-head, .l-meta";
+    const keep = [...el.querySelectorAll(WHOLE + ", h2")];
+    // what a heading must stay with: the first block of its section
+    const firstAfter = (h) => { let n = h.nextElementSibling; while (n && !n.matches(WHOLE) && n.firstElementChild) n = n.firstElementChild; return n; };
     const last = blocks.reduce((m, n) => Math.max(m, yb(n)), 0);
     const cuts = [];
     let from = 0;
     while (from + perPage < last - 2 && cuts.length < 10) {
       let cut = from + perPage;
       // an entry isn't split across pages, and a heading stays with what follows it
-      const item = keep.find((n) => n.classList.contains("p-item") && y(n) < cut && yb(n) > cut && y(n) > from);
+      const item = keep.find((n) => n.matches(WHOLE) && y(n) < cut && yb(n) > cut && y(n) > from);
       if (item) cut = y(item);
-      const head = keep.find((n) => n.nodeName === "H2" && y(n) < cut && (!n.nextElementSibling || y(n.nextElementSibling) >= cut - 1) && y(n) > from);
+      const head = keep.find((n) => n.nodeName === "H2" && y(n) < cut && (!firstAfter(n) || y(firstAfter(n)) >= cut - 1) && y(n) > from);
       if (head) cut = y(head);
       // the block that starts the next page, by its place in the page (same order on screen)
       let at = blocks.findIndex((n) => y(n) >= cut - 1 && y(n) > from + 1);
@@ -1013,7 +1017,14 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
       if (at < 0 || y(blocks[at]) > cut + 2) {
         // the break falls inside a paragraph (long letters): it breaks between lines there
         const i = blocks.findIndex((n) => y(n) < cut && yb(n) > cut && !n.querySelector("p, li"));
-        if (i >= 0) { const lh = parseFloat(getComputedStyle(blocks[i]).lineHeight) || 16; cut = y(blocks[i]) + Math.max(1, Math.floor((cut - y(blocks[i])) / lh)) * lh; inside = { index: i, offset: (cut - y(blocks[i])) / (yb(blocks[i]) - y(blocks[i])) }; at = -1; }
+        if (i >= 0) {
+          // at least two lines stay at the bottom and two move to the next page, as browsers print
+          const b = blocks[i], lh = parseFloat(getComputedStyle(b).lineHeight) || 16, lines = Math.round((yb(b) - y(b)) / lh);
+          let before = Math.floor((cut - y(b)) / lh);
+          if (lines - before < 2) before = lines - 2;
+          if (before < 2) { cut = y(b); at = i; }
+          else { cut = y(b) + before * lh; inside = { index: i, offset: (cut - y(b)) / (yb(b) - y(b)) }; at = -1; }
+        }
       }
       cuts.push({ cut, at, inside }); from = cut;
     }
@@ -1046,6 +1057,9 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
           const yNoMargin = el.getBoundingClientRect().top - top() - m0;
           const want = n * (sheet + SHEET_GAP) + margin;
           el.classList.add("pg-start"); el.style.marginTop = `${Math.max(0, want - yNoMargin)}px`;
+          // collapsing margins can shift it a little: measure and correct once
+          const off = want - (el.getBoundingClientRect().top - top());
+          if (Math.abs(off) > 0.5) el.style.marginTop = `${Math.max(0, parseFloat(el.style.marginTop) + off)}px`;
           lineY = n * sheet + (n - 1) * SHEET_GAP;
         } else if (el) {
           lineY = el.getBoundingClientRect().top - top() - 4;

@@ -1,8 +1,8 @@
 {
-  "version": "1.5.5",
+  "version": "1.5.6",
   "date": "2026-11-04",
   "notes": [
-    "The CV and letter preview is drawn as separate A4 sheets, broken exactly where the printed PDF breaks, whatever the window width."
+    "Skill lines and summaries on a CV are never split across two pages, and the preview's sheets follow the same rule."
   ],
   "files": [
     "index.html",

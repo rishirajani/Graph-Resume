@@ -314,6 +314,9 @@ table.reqs td .chips { display: flex; flex-wrap: wrap; gap: 5px; }
 .paper h2 { font-size: 10pt; font-weight: 700; margin: 12pt 0 4pt; padding-bottom: 2pt; border-bottom: 1px solid #BFC6CF; color: var(--cv-accent); }
 .paper h2 { break-after: avoid; page-break-after: avoid; }
 .paper .p-summary { margin: 0; }
+.paper.cv .p-summary, .paper.cv .p-skills p { break-inside: avoid; }
+.paper.letter p { orphans: 2; widows: 2; }
+.paper.letter .l-head, .paper.letter .l-meta { break-inside: avoid; }
 .paper .p-item { margin: 0 0 7pt; break-inside: avoid; }
 .paper .p-row { display: flex; justify-content: space-between; gap: 10pt; }
 .paper .p-title { font-weight: 650; }
