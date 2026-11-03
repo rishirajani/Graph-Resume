@@ -76,7 +76,7 @@
   };
 
   // version of the shared code; must match release.json (checked when publishing)
-  const VERSION = "1.3.0";
+  const VERSION = "1.4.0";
   // where released versions are announced (copies of the code check this for updates)
   const UPSTREAM = "https://rishirajani.github.io/Graph-Resume/";
   // the gr: vocabulary lives at one fixed address, whichever site uses it

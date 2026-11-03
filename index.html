@@ -82,7 +82,7 @@
     </div>
     <div class="studio-top-actions">
       <button class="btn ghost" id="studio-customize-btn">Customize</button>
-      <button class="btn ghost" id="studio-links-btn">Company links</button>
+      <button class="btn ghost" id="studio-links-btn">Tailored links</button>
       <button class="btn ghost" id="studio-vis-btn">What visitors see</button>
       <button class="btn ghost" id="studio-settings-btn">Model settings</button>
       <button class="btn ghost" data-view="graph">Back to graph</button>
@@ -219,10 +219,10 @@
     </div>
   </section>
 
-  <!-- company links -->
+  <!-- tailored links -->
   <section id="links" class="settings visibility" hidden>
-    <h2>Company links</h2>
-    <p class="help">Links you've made for specific jobs. Switching one off or letting it run out takes it off your site within a few minutes; the link then shows your public resume instead. In GoatCounter each link appears by its code, e.g. <code>#for/k3x9ab</code>.</p>
+    <h2>Tailored links</h2>
+    <p class="help">Tailored links you've made for specific jobs. Switching one off or letting it run out takes it off your site within a few minutes; the link then shows your public resume instead. In GoatCounter each link appears by its code, e.g. <code>#for/k3x9ab</code>.</p>
     <p><button class="btn ink small" id="links-new" type="button" hidden>New link</button></p>
     <div id="links-new-box" class="links-new" hidden></div>
     <div id="links-body"></div>
@@ -279,7 +279,7 @@
         <button role="tab" aria-selected="true" data-tab="fit">Fit</button>
         <button role="tab" aria-selected="false" data-tab="cv">CV</button>
         <button role="tab" aria-selected="false" data-tab="letter">Cover letter</button>
-        <button role="tab" aria-selected="false" data-tab="link">Company link</button>
+        <button role="tab" aria-selected="false" data-tab="link">Tailored link</button>
       </div>
 
       <div class="tab" id="tab-fit"></div>
@@ -292,7 +292,7 @@
             <button class="btn ghost small" data-export="cv-docx">Word</button>
             <button class="btn ghost small" data-export="cv-md">Markdown</button>
             <button class="btn ghost small" data-export="cv-copy">Copy text</button>
-            <button class="btn ghost small" id="cv-transfer" type="button" title="For making a company link that matches this CV on your live site">Copy for company link</button>
+            <button class="btn ghost small" id="cv-link-tab" type="button">Tailored link…</button>
           </div>
         </div>
         <div class="paper-wrap"><div id="cv-paper" class="paper cv" contenteditable="true" spellcheck="true"></div></div>

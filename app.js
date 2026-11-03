@@ -54,11 +54,11 @@
   const ownerView = owner.source === "master";
   const hiddenCount = allNodes.filter((n) => n.private).length;
   const shownNodes = ownerView ? allNodes : publicNodes;
-  // company link (#for/<id>.<key>): loader.js has already prepared the data for it
+  // tailored link (#for/<id>.<key>): loader.js has already prepared the data for it
   const forLink = window.GR_FOR || null;
   const forOK = forLink?.status === "ok";
   const forPrefix = forOK ? `for/${forLink.token}` : "";
-  // all in-page navigation goes through here, so a company link keeps its context
+  // all in-page navigation goes through here, so a tailored link keeps its context
   const go = (h) => { location.hash = forPrefix ? (h ? `${forPrefix}/${h}` : forPrefix) : h; };
   const currentHash = () => {
     let h = decodeURIComponent(location.hash.slice(1));
@@ -741,11 +741,11 @@
     if (h === "studio") return;                           // the studio is owner-only; don't count it
     if (/^for\//.test(h)) h = "";                         // never send a link key anywhere
     const n = h && byId.get(h);
-    // a company link is counted by its code only; the key never leaves the browser
+    // a tailored link is counted by its code only; the key never leaves the browser
     const path = location.pathname + (forOK ? `#for/${forLink.id}${h ? "/" + h : ""}` : h ? `#${h}` : "");
     if (gc.ready && path === lastCounted) return;         // start-up can route twice; count once
     if (gc.ready) lastCounted = path;
-    gcCount(path, (forOK ? "Company link: " : "") + (h === "read" ? "Read as text" : n ? (n.label || n.name) : "Graph"));
+    gcCount(path, (forOK ? "Tailored link: " : "") + (h === "read" ? "Read as text" : n ? (n.label || n.name) : "Graph"));
   }
 
   /* ---------------- routing ---------------- */
@@ -777,7 +777,7 @@
   window.addEventListener("hashchange", route);
   $("#studio-btn").addEventListener("click", () => (location.hash = "studio"));
 
-  /* ---------------- company link ---------------- */
+  /* ---------------- tailored link ---------------- */
   function renderForCard() {
     const card = $("#for-card");
     if (!forLink) return;

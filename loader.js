@@ -1,4 +1,4 @@
-/* Loads the app. For a company link (#for/<id>.<key>) it first fetches that link's
+/* Loads the app. For a tailored link (#for/<id>.<key>) it first fetches that link's
    scrambled file, unlocks it with the key from the address, and prepares the data the
    company should see. The key never leaves the browser: the part after # isn't sent to
    any server. */

@@ -1,9 +1,10 @@
 {
-  "version": "1.3.0",
+  "version": "1.4.0",
   "date": "2026-11-03",
   "notes": [
-    "Company links follow your CV: what the tailored CV contains is highlighted, including hidden items it uses; or choose to show only that.",
-    "Make a link without analysing the job again: “Copy for company link” next to a CV, then Company links → New link and paste."
+    "“Company links” are now called tailored links.",
+    "Tailored links follow your CV: what the CV contains is highlighted (or, per link, shown on its own).",
+    "Where links can't be saved (such as a claude.ai preview), Make tailored link fixes the address at once, so it can go into the CV and letter; a code then activates it under Tailored links → New link."
   ],
   "files": [
     "index.html",

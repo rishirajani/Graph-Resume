@@ -151,7 +151,7 @@
   }
   const connected = () => !!(window.GR_OWNER?.configured && G.ownerView);
 
-  /* ---------------- company links ---------------- */
+  /* ---------------- tailored links ---------------- */
   const rand = (n) => crypto.getRandomValues(new Uint8Array(n));
   const b64u = (u) => btoa(String.fromCharCode(...u)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
   const linkCode = () => { const A = "abcdefghijkmnpqrstuvwxyz23456789"; return [...rand(6)].map((x) => A[x % A.length]).join(""); };
@@ -185,29 +185,44 @@
 
   // A short code that carries a CV's link settings from one copy of the site to another,
   // e.g. from the claude.ai preview (where the CV was written) to the live site (which saves links).
-  const TRANSFER = "GRLINK1:";
+  const TRANSFER = "GRLINK2:";
   function transferCode(x = current) {
     const c = cvContents(x.result);
-    const data = { company: x.input?.company || x.result?.job?.company || "", role: x.result?.job?.title || "", items: c.items, skills: c.skills };
+    const data = { id: x.link?.id, key: x.link?.key, company: x.input?.company || x.result?.job?.company || "", role: x.result?.job?.title || "", items: c.items, skills: c.skills };
     return TRANSFER + b64u(new TextEncoder().encode(JSON.stringify(data)));
+  }
+  // In a page that can't save links (the claude.ai preview), fix the link's address now,
+  // so it can go into this CV straight away; the live site later creates the link at it.
+  function reserveLink() {
+    if (current.link?.url) return current.link;
+    const id = linkCode(), key = b64u(rand(16));
+    const company = current.input?.company || current.result?.job?.company || "";
+    current.link = { id, key, url: linkUrl({ id, key }), company, pending: true, inCv: false };
+    updateHistoryItem();
+    return current.link;
   }
   function readTransfer(text) {
     const t = String(text || "").trim();
-    if (!t.startsWith(TRANSFER)) throw new Error("That isn't a code from “Copy for company link”.");
+    if (!t.startsWith(TRANSFER)) throw new Error(t.startsWith("GRLINK1:") ? "That code is from an older version. Make the tailored link again next to the CV and copy the new code." : "That isn't a code from “Make tailored link”.");
     const b = t.slice(TRANSFER.length).replace(/-/g, "+").replace(/_/g, "/");
     const bytes = Uint8Array.from(atob(b.padEnd(Math.ceil(b.length / 4) * 4, "=")), (ch) => ch.charCodeAt(0));
     const d = JSON.parse(new TextDecoder().decode(bytes));
     const ok = (id) => byId.has(id);
-    return { company: String(d.company || "").slice(0, 80), role: String(d.role || "").slice(0, 100),
+    const okId = /^[a-z0-9]{6}$/.test(d.id || ""), okKey = /^[A-Za-z0-9_-]{22}$/.test(d.key || "");
+    return { id: okId && okKey ? d.id : null, key: okId && okKey ? d.key : null,
+      company: String(d.company || "").slice(0, 80), role: String(d.role || "").slice(0, 100),
       items: (d.items || []).filter(ok), skills: (d.skills || []).filter(ok), missing: [...(d.items || []), ...(d.skills || [])].filter((id) => !ok(id)).length };
   }
   function copyTransfer() {
     if (!current) return;
-    G.copyText(transferCode()).then(() => toast("Copied. On your live site: Company links → New link → paste.", 4500));
+    if (!connected()) reserveLink();
+    G.copyText(transferCode()).then(() => toast("Copied. On your live site: Tailored links → New link → paste.", 4500));
+    if ($("#tab-link") && !$("#tab-link").hidden) renderLinkTab();
   }
 
-  // The link form, used after a CV (prefilled from it) and under Company links → New link.
-  // init: { company, role, items, skills } — items and skills are what the CV contains.
+  // The link form, used after a CV (prefilled from it) and under Tailored links → New link.
+  // init: { company, role, items, skills, id?, key? }: items and skills are what the CV contains;
+  // id and key, when given, are the address the preview already put into the CV.
   function mountLinkForm(root, init, onCreated) {
     const pub = publicIds(), inCv = new Set(init.items || []);
     const items = allNodes.filter((n) => LINK_TYPES.includes(n.type));
@@ -262,15 +277,18 @@
       const focus = [...new Set([...picked.filter((id) => !omit.includes(id)), ...skills])];
       q("create").disabled = true; st("Creating the link…");
       try {
-        const id = linkCode(), keyBytes = rand(16), iv = rand(12);
+        const reg0 = await readRegistry();
+        if (init.id && reg0.data.links.some((l) => l.id === init.id)) throw new Error(`This tailored link (code ${init.id}) has already been created. Find it in the list below.`);
+        const id = init.id || linkCode(), iv = rand(12);
+        const keyBytes = init.key ? Uint8Array.from(atob(init.key.replace(/-/g, "+").replace(/_/g, "/") + "=="), (ch) => ch.charCodeAt(0)) : rand(16);
         const payload = { v: 1, company, role, note, mode, focus, omit, add: added, created: new Date().toISOString().slice(0, 10) };
         const key = await crypto.subtle.importKey("raw", keyBytes, "AES-GCM", false, ["encrypt"]);
         const ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, new TextEncoder().encode(JSON.stringify(payload))));
-        await ghPut(`links/${id}.json`, JSON.stringify({ v: 1, iv: b64u(iv), ct: b64u(ct) }) + "\n", null, `Company link ${id}`);
+        await ghPut(`links/${id}.json`, JSON.stringify({ v: 1, iv: b64u(iv), ct: b64u(ct) }) + "\n", null, `Tailored link ${id}`);
         const reg = await readRegistry();
         const entry = { id, key: b64u(keyBytes), company, role, created: payload.created, expires, off: false };
         reg.data.links.push(entry);
-        await ghPut("links.json", JSON.stringify(reg.data, null, 2) + "\n", reg.sha, `Company link ${id}: ${company || "no company"}`);
+        await ghPut("links.json", JSON.stringify(reg.data, null, 2) + "\n", reg.sha, `Tailored link ${id}: ${company || "no company"}`);
         toast("Link created");
         onCreated(entry);
       } catch (e) { st(e.message); q("create").disabled = false; }
@@ -279,25 +297,40 @@
   function linkResultHtml(entry, extra = "") {
     return `<p>Link for <b>${esc(entry.company || "this job")}</b>, code <code>${esc(entry.id)}</code>, works until ${esc(entry.expires || "you switch it off")}.</p>
       <div class="link-out"><input readonly value="${esc(entry.url || linkUrl(entry))}"><button class="btn ink small" data-copy-link type="button">Copy</button></div>${extra}
-      <p class="help">It goes live a minute or two after you made it. Manage, extend or switch it off under <b>Company links</b>.</p>`;
+      <p class="help">It goes live a minute or two after you made it. Manage, extend or switch it off under <b>Tailored links</b>.</p>`;
   }
 
   function renderLinkTab() {
     const el = $("#tab-link");
     if (!current) { el.innerHTML = ""; return; }
-    if (current.link?.url) {
-      el.innerHTML = `<div class="link-form">${linkResultHtml(current.link,
-        `<label class="check" style="margin-top:12px"><input type="checkbox" id="link-in-cv" ${current.link.inCv ? "checked" : ""}> Add it to this CV as "Interactive version" (next to your email and LinkedIn)</label>`)}</div>`;
+    const inCvBox = () => `<label class="check" style="margin-top:12px"><input type="checkbox" id="link-in-cv" ${current.link.inCv ? "checked" : ""}> Add it to this CV and cover letter as "Interactive version" (next to your email and LinkedIn)</label>`;
+    const wireInCv = () => $("#link-in-cv").addEventListener("change", (e) => { current.link.inCv = e.target.checked; updateHistoryItem(); paintDocs(current.result, current.input); });
+    if (current.link?.url && current.link.pending) {
+      // made here, still to be created on the live site
+      el.innerHTML = `<div class="link-form">
+        <p>Tailored link for <b>${esc(current.link.company || "this job")}</b>, code <code>${esc(current.link.id)}</code>:</p>
+        <div class="link-out"><input readonly value="${esc(current.link.url)}"><button class="btn ghost small" data-copy-link type="button">Copy link</button></div>
+        ${inCvBox()}
+        <div class="note" style="margin-top:14px"><b>Still to do:</b> until you activate it, this address opens your normal public site. To activate it, copy the code and paste it on your live site, connected to your private repository, under <b>Tailored links → New link</b>. It then highlights exactly what's in this CV.
+          <p style="margin:10px 0 0"><button class="btn ink small" id="link-transfer" type="button">Copy code for the live site</button></p></div></div>`;
       el.querySelector("[data-copy-link]").addEventListener("click", () => G.copyText(current.link.url).then(() => toast("Link copied")));
-      $("#link-in-cv").addEventListener("change", (e) => { current.link.inCv = e.target.checked; updateHistoryItem(); paintDocs(current.result, current.input); });
+      $("#link-transfer").addEventListener("click", copyTransfer);
+      wireInCv();
+      return;
+    }
+    if (current.link?.url) {
+      el.innerHTML = `<div class="link-form">${linkResultHtml(current.link, inCvBox())}</div>`;
+      el.querySelector("[data-copy-link]").addEventListener("click", () => G.copyText(current.link.url).then(() => toast("Link copied")));
+      wireInCv();
       return;
     }
     if (!connected()) {
-      // e.g. the claude.ai preview: the CV is written here, the link is made on the live site
+      // e.g. the claude.ai preview: the CV is written here, the link is created on the live site
       el.innerHTML = `<div class="link-form">
-        <p class="note">Links are saved to your private repository, which this page can't reach. Copy this CV's link settings and paste them on your live site, connected to your private master, under <b>Company links → New link</b>. The link will highlight exactly what's in this CV.</p>
-        <p><button class="btn ink small" id="link-transfer" type="button">Copy for company link</button></p></div>`;
-      $("#link-transfer").addEventListener("click", copyTransfer);
+        <p>A tailored link opens your graph for this job: their company and role at the top, your note, and what's in this CV highlighted. Only people with the link can open it.</p>
+        <p class="help">This page can't save links, so it works in two steps: make the link here (its address is fixed straight away, so you can put it in this CV), then activate it on your live site with a code.</p>
+        <p><button class="btn ink small" id="link-reserve" type="button">Make tailored link</button></p></div>`;
+      $("#link-reserve").addEventListener("click", () => { reserveLink(); renderLinkTab(); });
       return;
     }
     const c = cvContents(current.result);
@@ -329,7 +362,7 @@
     try { reg = await readRegistry(); } catch (e) { body.innerHTML = ""; st(e.message); return; }
     const today = new Date().toISOString().slice(0, 10);
     const links = reg.data.links.slice().reverse();
-    if (!links.length) { body.innerHTML = `<p class="help">No links yet. Make one from a job's result, in the <b>Company link</b> tab.</p>`; return; }
+    if (!links.length) { body.innerHTML = `<p class="help">No tailored links yet. Make one with <b>New link</b>, or from a CV in its <b>Tailored link</b> tab.</p>`; return; }
     const state = (l) => (l.off ? "Switched off" : l.expires && l.expires < today ? "Ended" : "Active");
     body.innerHTML = `<table class="links-table"><thead><tr><th>Company and role</th><th>Code</th><th>Made</th><th>Works until</th><th>State</th><th></th></tr></thead><tbody>${
       links.map((l) => `<tr data-id="${esc(l.id)}" class="${state(l) === "Active" ? "" : "state-off"}">
@@ -346,18 +379,18 @@
     $$("#links-body tr[data-id]").forEach((tr) => {
       const id = tr.dataset.id, l = reg.data.links.find((x) => x.id === id);
       tr.querySelector('[data-act="copy"]').addEventListener("click", () => G.copyText(linkUrl(l)).then(() => toast("Link copied")));
-      tr.querySelector('[data-act="toggle"]').addEventListener("click", () => save((ls) => { const x = ls.find((y) => y.id === id); x.off = !x.off; }, `Company link ${id}: switched ${l.off ? "on" : "off"}`));
-      tr.querySelector('input[type="date"]').addEventListener("change", (e) => save((ls) => { ls.find((y) => y.id === id).expires = e.target.value; }, `Company link ${id}: works until ${e.target.value}`));
+      tr.querySelector('[data-act="toggle"]').addEventListener("click", () => save((ls) => { const x = ls.find((y) => y.id === id); x.off = !x.off; }, `Tailored link ${id}: switched ${l.off ? "on" : "off"}`));
+      tr.querySelector('input[type="date"]').addEventListener("change", (e) => save((ls) => { ls.find((y) => y.id === id).expires = e.target.value; }, `Tailored link ${id}: works until ${e.target.value}`));
     });
   }
   $("#studio-links-btn").addEventListener("click", openLinks);
-  $("#cv-transfer").addEventListener("click", copyTransfer);
+  $("#cv-link-tab").addEventListener("click", () => selectTab("link"));
   // New link: blank, or prefilled from a code copied next to a CV
   $("#links-new").addEventListener("click", () => {
     const box = $("#links-new-box"); box.hidden = false; $("#links-new").hidden = true;
     box.innerHTML = `<h3 style="margin:0 0 6px">New link</h3>
-      <div class="field"><label for="links-code">Code from “Copy for company link” <span class="opt">optional</span></label>
-        <div class="row"><input id="links-code" type="text" spellcheck="false" placeholder="GRLINK1:…"><button class="btn ghost small" id="links-code-use" type="button">Use</button></div>
+      <div class="field"><label for="links-code">Code from the CV's Tailored link tab <span class="opt">optional</span></label>
+        <div class="row"><input id="links-code" type="text" spellcheck="false" placeholder="GRLINK2:…"><button class="btn ghost small" id="links-code-use" type="button">Use</button></div>
         <p class="help" id="links-code-msg">Paste it to highlight exactly what your CV contains, or leave it empty and choose below.</p></div>
       <div id="links-new-form"></div>`;
     const mount = (init) => mountLinkForm($("#links-new-form"), init, (entry) => {
@@ -370,7 +403,7 @@
       try {
         const init = readTransfer($("#links-code").value);
         mount(init);
-        $("#links-code-msg").textContent = `Using the CV for ${init.company || "this job"}: ${init.items.length} items and ${init.skills.length} skills.` + (init.missing ? ` ${init.missing} no longer exist in your graph and were skipped.` : "");
+        $("#links-code-msg").textContent = `Using the CV for ${init.company || "this job"}: ${init.items.length} items and ${init.skills.length} skills.` + (init.id ? ` The link keeps the address already in your CV (code ${init.id}).` : "") + (init.missing ? ` ${init.missing} no longer exist in your graph and were skipped.` : "");
       } catch (e) { $("#links-code-msg").textContent = e.message; }
     });
   });
