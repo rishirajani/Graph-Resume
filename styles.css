@@ -310,6 +310,7 @@ table.reqs td .chips { display: flex; flex-wrap: wrap; gap: 5px; }
 .paper .p-headline { font-size: 11pt; margin: 0 0 4pt; color: #333; }
 .paper .p-contact { font-size: 9pt; color: #444; margin: 0 0 10pt; }
 .paper h2 { font-size: 10pt; font-weight: 700; margin: 12pt 0 4pt; padding-bottom: 2pt; border-bottom: 1px solid #BFC6CF; color: var(--cv-accent); }
+.paper h2 { break-after: avoid; page-break-after: avoid; }
 .paper .p-summary { margin: 0; }
 .paper .p-item { margin: 0 0 7pt; break-inside: avoid; }
 .paper .p-row { display: flex; justify-content: space-between; gap: 10pt; }

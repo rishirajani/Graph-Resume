@@ -1,8 +1,9 @@
 {
-  "version": "1.5.3",
-  "date": "2026-11-03",
+  "version": "1.5.4",
+  "date": "2026-11-04",
   "notes": [
-    "Sections… on a CV moves sections up or down, or hides one, for that CV only. Your text edits stay; new CVs start from your order in Customize."
+    "The print-ready page saved from the claude.ai preview now prints with the proper side margins, and says on screen how to save it as an A4 PDF.",
+    "A section heading is never left alone at the bottom of a printed page."
   ],
   "files": [
     "index.html",

@@ -1329,13 +1329,16 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
   const fontLink = () => { const f = window.GRUI?.FONTS[window.GRUI.ui.fonts]; return f?.href ? `<link href="${esc(f.href)}" rel="stylesheet">` : ""; };
   function standaloneHtml(root, title) {
     const cssText = [...document.styleSheets].flatMap((s) => { try { return [...s.cssRules].map((r) => r.cssText); } catch { return []; } })
-      .filter((t) => /\.paper|:root/.test(t) && !/^@media print/.test(t)).join("\n");
+      // the page's own rules only: the site's print and narrow-screen rules would change its margins on paper
+      .filter((t) => /\.paper|:root/.test(t) && !/^@media/.test(t)).join("\n");
     return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${esc(title)}</title>
 ${fontLink()}
-<style>${cssText}\n:root{--sans:${css("--sans")};--serif:${css("--serif")}}\nbody{margin:0;background:#fff}.paper{margin:0 auto}
+<style>${cssText}\n:root{--sans:${css("--sans")};--serif:${css("--serif")}}\n*{box-sizing:border-box}body{margin:0;background:#fff}.paper{margin:0 auto}
 @page{size:A4;margin:15mm 0}@page compact{size:A4;margin:11mm 0}
-@media print{.paper{width:auto;min-height:0;margin:0;padding-top:0!important;padding-bottom:0!important}.paper.cv-compact{page:compact}}</style></head>
-<body>${root.outerHTML.replace(/contenteditable="true"/g, "")}<script>document.fonts.ready.then(()=>setTimeout(()=>print(),300))<\/script></body></html>`;
+@media print{.paper{width:auto;min-height:0;margin:0;padding-top:0!important;padding-bottom:0!important}.paper.cv-compact{page:compact}.print-hint{display:none}}
+.print-hint{font:14px/1.45 system-ui,sans-serif;background:#FFF6D6;border-bottom:1px solid #E8D48A;padding:10px 16px;text-align:center}
+@media screen{body{background:#DCE1E7}.paper{margin:20px auto;box-shadow:0 1px 4px rgba(0,0,0,.15)}}</style></head>
+<body><div class="print-hint">This is a print-ready page, not the PDF yet. Press <b>Ctrl+P</b> (<b>⌘P</b> on a Mac), choose <b>Save as PDF</b> and paper size <b>A4</b>, with margins left at default.</div>${root.outerHTML.replace(/contenteditable="true"/g, "")}<script>document.fonts.ready.then(()=>setTimeout(()=>print(),300))<\/script></body></html>`;
   }
 
   async function doPrint(root, title) {
