@@ -223,6 +223,8 @@
   <section id="links" class="settings visibility" hidden>
     <h2>Company links</h2>
     <p class="help">Links you've made for specific jobs. Switching one off or letting it run out takes it off your site within a few minutes; the link then shows your public resume instead. In GoatCounter each link appears by its code, e.g. <code>#for/k3x9ab</code>.</p>
+    <p><button class="btn ink small" id="links-new" type="button" hidden>New link</button></p>
+    <div id="links-new-box" class="links-new" hidden></div>
     <div id="links-body"></div>
     <p class="help" id="links-status" role="status"></p>
     <div class="row end"><button class="btn ghost" id="links-back" type="button">Back</button></div>
@@ -290,6 +292,7 @@
             <button class="btn ghost small" data-export="cv-docx">Word</button>
             <button class="btn ghost small" data-export="cv-md">Markdown</button>
             <button class="btn ghost small" data-export="cv-copy">Copy text</button>
+            <button class="btn ghost small" id="cv-transfer" type="button" title="For making a company link that matches this CV on your live site">Copy for company link</button>
           </div>
         </div>
         <div class="paper-wrap"><div id="cv-paper" class="paper cv" contenteditable="true" spellcheck="true"></div></div>

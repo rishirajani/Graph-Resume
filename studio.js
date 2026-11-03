@@ -173,48 +173,137 @@
     return [...out.values()].map((n) => { const c = JSON.parse(JSON.stringify(n)); delete c.private; return c; });
   }
 
+  // what a tailored CV contains: its items and its skills
+  function cvContents(result) {
+    const cv = result?.cv || {};
+    const items = [...(cv.experience || []), ...(cv.projects || []), ...(cv.education || [])].map((x) => x.id)
+      .concat(cv.certifications || [], cv.awards || [], cv.languages || []);
+    const skills = (cv.skills || []).flatMap((g) => g.ids || []);
+    const ok = (id) => byId.has(id);
+    return { items: [...new Set(items)].filter(ok), skills: [...new Set(skills)].filter(ok) };
+  }
+
+  // A short code that carries a CV's link settings from one copy of the site to another,
+  // e.g. from the claude.ai preview (where the CV was written) to the live site (which saves links).
+  const TRANSFER = "GRLINK1:";
+  function transferCode(x = current) {
+    const c = cvContents(x.result);
+    const data = { company: x.input?.company || x.result?.job?.company || "", role: x.result?.job?.title || "", items: c.items, skills: c.skills };
+    return TRANSFER + b64u(new TextEncoder().encode(JSON.stringify(data)));
+  }
+  function readTransfer(text) {
+    const t = String(text || "").trim();
+    if (!t.startsWith(TRANSFER)) throw new Error("That isn't a code from “Copy for company link”.");
+    const b = t.slice(TRANSFER.length).replace(/-/g, "+").replace(/_/g, "/");
+    const bytes = Uint8Array.from(atob(b.padEnd(Math.ceil(b.length / 4) * 4, "=")), (ch) => ch.charCodeAt(0));
+    const d = JSON.parse(new TextDecoder().decode(bytes));
+    const ok = (id) => byId.has(id);
+    return { company: String(d.company || "").slice(0, 80), role: String(d.role || "").slice(0, 100),
+      items: (d.items || []).filter(ok), skills: (d.skills || []).filter(ok), missing: [...(d.items || []), ...(d.skills || [])].filter((id) => !ok(id)).length };
+  }
+  function copyTransfer() {
+    if (!current) return;
+    G.copyText(transferCode()).then(() => toast("Copied. On your live site: Company links → New link → paste.", 4500));
+  }
+
+  // The link form, used after a CV (prefilled from it) and under Company links → New link.
+  // init: { company, role, items, skills } — items and skills are what the CV contains.
+  function mountLinkForm(root, init, onCreated) {
+    const pub = publicIds(), inCv = new Set(init.items || []);
+    const items = allNodes.filter((n) => LINK_TYPES.includes(n.type));
+    const shownItems = items.filter((n) => pub.has(n.id)), hiddenItems = items.filter((n) => !pub.has(n.id));
+    const sub = (n) => [G.dateRange(n), byId.get(n.org || n.school)?.short || byId.get(n.org || n.school)?.label].filter(Boolean).join(" · ");
+    const row = (n, name, checked) => `<label class="vis-row"><input type="checkbox" name="${name}" value="${esc(n.id)}" ${checked ? "checked" : ""}><span><span class="vis-label">${esc(n.label)}</span> <span class="vis-meta">${esc(sub(n))}</span></span></label>`;
+    const fromCv = inCv.size > 0, nSkills = (init.skills || []).length;
+    const usesHidden = hiddenItems.some((n) => inCv.has(n.id));
+    root.innerHTML = `<div class="link-form">
+      <div class="field two">
+        <div><label>Company</label><input data-f="company" type="text" maxlength="80" value="${esc(init.company || "")}"></div>
+        <div><label>Role</label><input data-f="role" type="text" maxlength="100" value="${esc(init.role || "")}"></div>
+      </div>
+      <div class="field"><label>A short note to them <span class="opt">optional</span></label>
+        <textarea data-f="note" rows="3" maxlength="500" placeholder="e.g. why this team, or what you'd like them to look at first"></textarea></div>
+      <div class="field"><label>What they see</label>
+        <label class="check"><input type="radio" name="mode" value="highlight" checked> Your whole graph, with what's highlighted below lit up</label>
+        <label class="check"><input type="radio" name="mode" value="only"> Only what's highlighted below (everything else left out of this link)</label></div>
+      <div class="field"><label>Highlight</label>
+        <p class="help" style="margin-top:0">${fromCv ? `Ticked: what this CV contains${nSkills ? `, plus its ${nSkills} skill${nSkills === 1 ? "" : "s"}` : ""}. Change as you like.` : "Tick the roles, projects and other items that matter most for this job."}</p>
+        ${shownItems.map((n) => row(n, "focus", inCv.has(n.id))).join("")}</div>
+      ${hiddenItems.length ? `<details ${usesHidden ? "open" : ""}><summary>Also show items hidden from visitors (${hiddenItems.length})</summary>
+        ${usesHidden ? '<p class="help">Ticked where the CV uses them, so the link matches what you sent.</p>' : ""}${hiddenItems.map((n) => row(n, "add", inCv.has(n.id))).join("")}</details>` : ""}
+      <details data-omit><summary>Leave things out of this link</summary>${shownItems.map((n) => row(n, "omit", false)).join("")}</details>
+      <div class="field two" style="margin-top:16px">
+        <div><label>Works until</label><input data-f="expires" type="date" value="${plusMonths(6)}" min="${new Date().toISOString().slice(0, 10)}"></div>
+        <div style="align-self:end"><button class="btn ink wide" data-f="create" type="button">Create link</button></div>
+      </div>
+      <p class="help" data-f="status" role="status"></p></div>`;
+    const q = (k) => root.querySelector(`[data-f="${k}"]`);
+    // "only what's highlighted" makes the leave-out list unnecessary
+    root.querySelectorAll('input[name="mode"]').forEach((r) => r.addEventListener("change", () => { root.querySelector("[data-omit]").hidden = r.value === "only" && r.checked; }));
+    q("create").addEventListener("click", async () => {
+      const st = (t) => (q("status").textContent = t);
+      const val = (name) => [...root.querySelectorAll(`input[name="${name}"]:checked`)].map((b) => b.value);
+      const company = q("company").value.trim(), role = q("role").value.trim(), note = q("note").value.trim(), expires = q("expires").value;
+      const mode = root.querySelector('input[name="mode"]:checked').value;
+      if (!expires) { st("Pick an end date. You can extend it or switch it off later."); return; }
+      const addIds = val("add"), picked = [...val("focus"), ...addIds];
+      if (!picked.length) { st("Highlight at least one item."); return; }
+      const added = withDependencies(addIds), visible = new Set([...pub, ...added.map((n) => n.id)]);
+      const skills = (init.skills || []).filter((id) => visible.has(id));
+      let omit = mode === "highlight" ? val("omit") : [];
+      if (mode === "only") {
+        // leave out every item and skill that isn't highlighted; their companies and schools follow
+        const keep = new Set([...picked, ...skills]);
+        omit = allNodes.filter((n) => pub.has(n.id) && (LINK_TYPES.includes(n.type) || n.type === "Skill") && !keep.has(n.id)).map((n) => n.id);
+        // and skill areas left with none of their skills
+        const keptGroups = new Set([...keep].map((id) => byId.get(id)).filter((n) => n?.type === "Skill").map((n) => n.group));
+        omit.push(...allNodes.filter((n) => n.type === "SkillGroup" && pub.has(n.id) && !keptGroups.has(n.id)).map((n) => n.id));
+      }
+      const focus = [...new Set([...picked.filter((id) => !omit.includes(id)), ...skills])];
+      q("create").disabled = true; st("Creating the link…");
+      try {
+        const id = linkCode(), keyBytes = rand(16), iv = rand(12);
+        const payload = { v: 1, company, role, note, mode, focus, omit, add: added, created: new Date().toISOString().slice(0, 10) };
+        const key = await crypto.subtle.importKey("raw", keyBytes, "AES-GCM", false, ["encrypt"]);
+        const ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, new TextEncoder().encode(JSON.stringify(payload))));
+        await ghPut(`links/${id}.json`, JSON.stringify({ v: 1, iv: b64u(iv), ct: b64u(ct) }) + "\n", null, `Company link ${id}`);
+        const reg = await readRegistry();
+        const entry = { id, key: b64u(keyBytes), company, role, created: payload.created, expires, off: false };
+        reg.data.links.push(entry);
+        await ghPut("links.json", JSON.stringify(reg.data, null, 2) + "\n", reg.sha, `Company link ${id}: ${company || "no company"}`);
+        toast("Link created");
+        onCreated(entry);
+      } catch (e) { st(e.message); q("create").disabled = false; }
+    });
+  }
+  function linkResultHtml(entry, extra = "") {
+    return `<p>Link for <b>${esc(entry.company || "this job")}</b>, code <code>${esc(entry.id)}</code>, works until ${esc(entry.expires || "you switch it off")}.</p>
+      <div class="link-out"><input readonly value="${esc(entry.url || linkUrl(entry))}"><button class="btn ink small" data-copy-link type="button">Copy</button></div>${extra}
+      <p class="help">It goes live a minute or two after you made it. Manage, extend or switch it off under <b>Company links</b>.</p>`;
+  }
+
   function renderLinkTab() {
     const el = $("#tab-link");
     if (!current) { el.innerHTML = ""; return; }
-    if (!connected()) {
-      el.innerHTML = `<p class="note">To make company links, connect this browser to your private master first: <b>Model settings → Private master on GitHub</b>.</p>`; return;
-    }
     if (current.link?.url) {
-      el.innerHTML = `<div class="link-form">
-        <p>Link for <b>${esc(current.link.company || "this job")}</b>, code <code>${esc(current.link.id)}</code>, works until ${esc(current.link.expires || "you switch it off")}.</p>
-        <div class="link-out"><input id="link-url" readonly value="${esc(current.link.url)}"><button class="btn ink small" id="link-copy" type="button">Copy</button></div>
-        <label class="check" style="margin-top:12px"><input type="checkbox" id="link-in-cv" ${current.link.inCv ? "checked" : ""}> Add it to this CV as "Interactive version" (next to your email and LinkedIn)</label>
-        <p class="help">It goes live a minute or two after you made it. Manage, extend or switch it off under <b>Company links</b>.</p></div>`;
-      $("#link-copy").addEventListener("click", () => G.copyText(current.link.url).then(() => toast("Link copied")));
+      el.innerHTML = `<div class="link-form">${linkResultHtml(current.link,
+        `<label class="check" style="margin-top:12px"><input type="checkbox" id="link-in-cv" ${current.link.inCv ? "checked" : ""}> Add it to this CV as "Interactive version" (next to your email and LinkedIn)</label>`)}</div>`;
+      el.querySelector("[data-copy-link]").addEventListener("click", () => G.copyText(current.link.url).then(() => toast("Link copied")));
       $("#link-in-cv").addEventListener("change", (e) => { current.link.inCv = e.target.checked; updateHistoryItem(); paintDocs(current.result, current.input); });
       return;
     }
-    const reqs = current.result.fit?.requirements || [];
-    const evidence = new Set(reqs.filter((r) => r.strength !== "gap").flatMap((r) => r.evidence || []));
-    const items = allNodes.filter((n) => LINK_TYPES.includes(n.type));
-    const pub = publicIds();
-    const shownItems = items.filter((n) => pub.has(n.id)), hiddenItems = items.filter((n) => !pub.has(n.id) && n.type !== "Person");
-    const row = (n, name, checked) => `<label class="vis-row"><input type="checkbox" name="${name}" value="${esc(n.id)}" ${checked ? "checked" : ""}><span><span class="vis-label">${esc(n.label)}</span> <span class="vis-meta">${esc([G.dateRange(n), byId.get(n.org || n.school)?.short || byId.get(n.org || n.school)?.label].filter(Boolean).join(" · "))}</span></span></label>`;
-    const skillCount = [...evidence].filter((id) => byId.get(id)?.type === "Skill").length;
-    el.innerHTML = `<div class="link-form">
-      <p class="help" style="margin-top:0">A short link that opens your graph for this job: their company and the role at the top, your note, and the most relevant parts highlighted. Only people with the link can open it.</p>
-      <div class="field two">
-        <div><label for="link-company">Company</label><input id="link-company" type="text" maxlength="80" value="${esc(current.input.company || current.result.job?.company || "")}"></div>
-        <div><label for="link-role">Role</label><input id="link-role" type="text" maxlength="100" value="${esc(current.result.job?.title || "")}"></div>
-      </div>
-      <div class="field"><label for="link-note">A short note to them <span class="opt">optional</span></label>
-        <textarea id="link-note" rows="3" maxlength="500" placeholder="e.g. why this team, or what you'd like them to look at first"></textarea></div>
-      <div class="field"><label>Highlight</label>
-        <p class="help" style="margin-top:0">Ticked from the fit analysis${skillCount ? `, plus ${skillCount} matching skill${skillCount === 1 ? "" : "s"}` : ""}. Change as you like.</p>
-        ${shownItems.map((n) => row(n, "focus", evidence.has(n.id))).join("")}</div>
-      ${hiddenItems.length ? `<details><summary>Also show items hidden from visitors (${hiddenItems.length})</summary>${hiddenItems.map((n) => row(n, "add", false)).join("")}</details>` : ""}
-      <details><summary>Leave things out of this link</summary>${shownItems.map((n) => row(n, "omit", false)).join("")}</details>
-      <div class="field two" style="margin-top:16px">
-        <div><label for="link-expires">Works until</label><input id="link-expires" type="date" value="${plusMonths(6)}" min="${new Date().toISOString().slice(0, 10)}"></div>
-        <div style="align-self:end"><button class="btn ink wide" id="link-create" type="button">Create link</button></div>
-      </div>
-      <p class="help" id="link-status" role="status"></p></div>`;
-    $("#link-create").addEventListener("click", () => createLink(evidence));
+    if (!connected()) {
+      // e.g. the claude.ai preview: the CV is written here, the link is made on the live site
+      el.innerHTML = `<div class="link-form">
+        <p class="note">Links are saved to your private repository, which this page can't reach. Copy this CV's link settings and paste them on your live site, connected to your private master, under <b>Company links → New link</b>. The link will highlight exactly what's in this CV.</p>
+        <p><button class="btn ink small" id="link-transfer" type="button">Copy for company link</button></p></div>`;
+      $("#link-transfer").addEventListener("click", copyTransfer);
+      return;
+    }
+    const c = cvContents(current.result);
+    el.innerHTML = `<p class="help" style="margin-top:0">A short link that opens your graph for this job: their company and the role at the top, your note, and what's in this CV highlighted. Only people with the link can open it.</p><div id="link-form-tab"></div>`;
+    mountLinkForm($("#link-form-tab"), { company: current.input.company || current.result.job?.company || "", role: current.result.job?.title || "", items: c.items, skills: c.skills },
+      (entry) => { current.link = { id: entry.id, url: linkUrl(entry), company: entry.company, expires: entry.expires, inCv: false }; updateHistoryItem(); renderLinkTab(); });
   }
 
   function updateHistoryItem() {
@@ -228,39 +317,14 @@
     return { sha: f?.sha, data: f ? JSON.parse(f.text) : { links: [] } };
   }
 
-  async function createLink(evidence) {
-    const st = (t) => ($("#link-status").textContent = t);
-    const val = (sel) => $$(`#tab-link input[name="${sel}"]:checked`).map((b) => b.value);
-    const company = $("#link-company").value.trim(), role = $("#link-role").value.trim(), note = $("#link-note").value.trim();
-    const expires = $("#link-expires").value;
-    if (!expires) { st("Pick an end date. You can extend it or switch it off later."); return; }
-    const omit = val("omit"), addIds = val("add");
-    const skills = [...evidence].filter((id) => byId.get(id)?.type === "Skill");
-    const focus = [...new Set([...val("focus").filter((id) => !omit.includes(id)), ...addIds, ...skills])];
-    $("#link-create").disabled = true; st("Creating the link…");
-    try {
-      const id = linkCode(), keyBytes = rand(16), iv = rand(12);
-      const payload = { v: 1, company, role, note, focus, omit, add: withDependencies(addIds), created: new Date().toISOString().slice(0, 10) };
-      const key = await crypto.subtle.importKey("raw", keyBytes, "AES-GCM", false, ["encrypt"]);
-      const ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, new TextEncoder().encode(JSON.stringify(payload))));
-      await ghPut(`links/${id}.json`, JSON.stringify({ v: 1, iv: b64u(iv), ct: b64u(ct) }) + "\n", null, `Company link ${id}`);
-      const reg = await readRegistry();
-      const entry = { id, key: b64u(keyBytes), company, role, created: payload.created, expires, off: false };
-      reg.data.links.push(entry);
-      await ghPut("links.json", JSON.stringify(reg.data, null, 2) + "\n", reg.sha, `Company link ${id}: ${company || "no company"}`);
-      current.link = { id, url: linkUrl(entry), company, expires, inCv: false };
-      updateHistoryItem();
-      renderLinkTab();
-      toast("Link created");
-    } catch (e) { st(e.message); $("#link-create").disabled = false; }
-  }
-
   async function openLinks() {
     ["#gate", "#settings", "#workspace", "#visibility", "#customize"].forEach((x) => ($(x).hidden = true));
     $("#links").hidden = false;
     const body = $("#links-body"), st = (t) => ($("#links-status").textContent = t);
+    $("#links-new").hidden = true; $("#links-new-box").hidden = true;
     if (!connected()) { body.innerHTML = `<p class="note">Connect this browser to your private master first: <b>Model settings → Private master on GitHub</b>.</p>`; return; }
     body.innerHTML = `<p class="help">Loading…</p>`; st("");
+    $("#links-new").hidden = false;
     let reg;
     try { reg = await readRegistry(); } catch (e) { body.innerHTML = ""; st(e.message); return; }
     const today = new Date().toISOString().slice(0, 10);
@@ -287,6 +351,29 @@
     });
   }
   $("#studio-links-btn").addEventListener("click", openLinks);
+  $("#cv-transfer").addEventListener("click", copyTransfer);
+  // New link: blank, or prefilled from a code copied next to a CV
+  $("#links-new").addEventListener("click", () => {
+    const box = $("#links-new-box"); box.hidden = false; $("#links-new").hidden = true;
+    box.innerHTML = `<h3 style="margin:0 0 6px">New link</h3>
+      <div class="field"><label for="links-code">Code from “Copy for company link” <span class="opt">optional</span></label>
+        <div class="row"><input id="links-code" type="text" spellcheck="false" placeholder="GRLINK1:…"><button class="btn ghost small" id="links-code-use" type="button">Use</button></div>
+        <p class="help" id="links-code-msg">Paste it to highlight exactly what your CV contains, or leave it empty and choose below.</p></div>
+      <div id="links-new-form"></div>`;
+    const mount = (init) => mountLinkForm($("#links-new-form"), init, (entry) => {
+      box.innerHTML = `<h3 style="margin:0 0 6px">New link</h3>${linkResultHtml(entry)}`;
+      box.querySelector("[data-copy-link]").addEventListener("click", () => G.copyText(linkUrl(entry)).then(() => toast("Link copied")));
+      openLinks().then(() => { $("#links-new-box").hidden = false; $("#links-new").hidden = false; });
+    });
+    mount({ company: "", role: "", items: [], skills: [] });
+    $("#links-code-use").addEventListener("click", () => {
+      try {
+        const init = readTransfer($("#links-code").value);
+        mount(init);
+        $("#links-code-msg").textContent = `Using the CV for ${init.company || "this job"}: ${init.items.length} items and ${init.skills.length} skills.` + (init.missing ? ` ${init.missing} no longer exist in your graph and were skipped.` : "");
+      } catch (e) { $("#links-code-msg").textContent = e.message; }
+    });
+  });
   $("#links-back").addEventListener("click", () => { $("#links").hidden = true; enterStudio(); });
 
   /* ---------------- what visitors see ---------------- */

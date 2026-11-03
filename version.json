@@ -1,8 +1,9 @@
 {
-  "version": "1.2.0",
+  "version": "1.3.0",
   "date": "2026-11-03",
   "notes": [
-    "Read as text: a section menu (beside the text on wide screens, a bar at the top on phones) that shows where you are and jumps to any section."
+    "Company links follow your CV: what the tailored CV contains is highlighted, including hidden items it uses; or choose to show only that.",
+    "Make a link without analysing the job again: “Copy for company link” next to a CV, then Company links → New link and paste."
   ],
   "files": [
     "index.html",

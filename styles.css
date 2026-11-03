@@ -403,6 +403,8 @@ table.reqs td .chips { display: flex; flex-wrap: wrap; gap: 5px; }
 .link-form details > summary { font: 600 14.5px/1.3 var(--sans); cursor: pointer; }
 .link-out { display: flex; gap: 8px; margin-top: 10px; }
 .link-out input { flex: 1; font: 13px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; }
+.links-new { background: var(--surface-2); border: 1px solid var(--rule); border-radius: 12px; padding: 16px; margin: 0 0 16px; }
+.links-new .row input { flex: 1; font: 13px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; }
 .links-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 8px; }
 .links-table th, .links-table td { text-align: left; padding: 8px 6px; border-top: 1px solid var(--rule); vertical-align: top; }
 .links-table th { font-weight: 600; color: var(--muted); font-size: 12.5px; border-top: 0; }

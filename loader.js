@@ -33,7 +33,7 @@
       for (const n of p.add || []) if (!have.has(n.id)) { R.nodes.push(unhide(n)); have.add(n.id); }
       window.RESUME = R;
       if (window.GR_OWNER) window.GR_OWNER.source = "public";   // even on your own device, show it as they see it
-      Object.assign(F, { status: "ok", company: p.company || "", role: p.role || "", note: p.note || "", focus: p.focus || [] });
+      Object.assign(F, { status: "ok", company: p.company || "", role: p.role || "", note: p.note || "", focus: p.focus || [], mode: p.mode || "highlight" });
     } catch (e) {
       F.status = "error"; F.error = e.message;
     }

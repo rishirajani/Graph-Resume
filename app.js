@@ -791,7 +791,7 @@
       ${forLink.company ? `<p class="for-kicker">Prepared for ${esc(forLink.company)}</p>` : ""}
       ${forLink.role ? `<p class="for-role">${esc(forLink.role)}</p>` : ""}
       ${forLink.note ? `<p class="for-note">${esc(forLink.note).replace(/\n/g, "<br>")}</p>` : ""}
-      ${forLink.focus.length ? `<p class="for-hint">The highlighted parts are the most relevant to this role. Everything else is still there to explore.</p>` : ""}`;
+      ${forLink.focus.length ? `<p class="for-hint">${forLink.mode === "only" ? "This link shows the parts of my resume that matter for this role." : "The highlighted parts are the most relevant to this role. Everything else is still there to explore."}</p>` : ""}`;
     card.hidden = false;
     // on a phone the note is clamped to a few lines; tap to read all of it
     card.addEventListener("click", () => card.classList.toggle("open"));
