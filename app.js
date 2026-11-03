@@ -110,6 +110,18 @@
   const ownerView = owner.source === "master";
   const hiddenCount = allNodes.filter((n) => n.private).length;
   const shownNodes = ownerView ? allNodes : publicNodes;
+  // company link (#for/<id>.<key>): loader.js has already prepared the data for it
+  const forLink = window.GR_FOR || null;
+  const forOK = forLink?.status === "ok";
+  const forPrefix = forOK ? `for/${forLink.token}` : "";
+  // all in-page navigation goes through here, so a company link keeps its context
+  const go = (h) => { location.hash = forPrefix ? (h ? `${forPrefix}/${h}` : forPrefix) : h; };
+  const currentHash = () => {
+    let h = decodeURIComponent(location.hash.slice(1));
+    if (forPrefix && h.startsWith(forPrefix)) h = h.slice(forPrefix.length).replace(/^\//, "");
+    else if (/^for\//.test(h)) h = "";
+    return h;
+  };
   const shownEdges = ownerView ? fullEdges : publicEdges;
 
   const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -306,7 +318,7 @@
     runLayout();
     cy.on("mouseover", "node", (e) => focusNeighbourhood(e.target));
     cy.on("mouseout", "node", () => { if (!cy.$("node:selected").length) clearFocus(); else focusNeighbourhood(cy.$("node:selected")); });
-    cy.on("tap", "node", (e) => { location.hash = e.target.id(); });
+    cy.on("tap", "node", (e) => go(e.target.id()));
     cy.on("tap", (e) => { if (e.target === cy) closeDrawer(true); });
     applyDraftMarks();
   }
@@ -519,7 +531,7 @@
         return `<li><button type="button" data-goto="${esc(t.other)}"><span class="pred">${esc(t.pred)}</span><span class="obj" style="--c:${colorOf(o)}"><span class="dot"></span>${esc(o.label || o.name)}${o.type === "Role" && byId.get(o.org) ? `, ${esc(byId.get(o.org).label)}` : ""}</span></button></li>`;
       }).join("")}</ul>` : ""}
     `;
-    $$("#drawer-body [data-goto]").forEach((b) => b.addEventListener("click", () => (location.hash = b.dataset.goto)));
+    $$("#drawer-body [data-goto]").forEach((b) => b.addEventListener("click", () => go(b.dataset.goto)));
     $("#drawer").hidden = false;
     $("#hint").hidden = true;
   }
@@ -529,7 +541,7 @@
     const wasOpen = document.body.classList.contains("sheet-open");
     document.body.classList.remove("sheet-open");
     if (cy) { cy.$("node:selected").unselect(); unpeek(); clearFocus(); if (wasOpen) { cy.resize(); frame(cy.elements(":visible")); } }
-    if (resetHash && location.hash && !["#read", "#studio"].includes(location.hash)) history.replaceState(null, "", location.pathname + location.search);
+    if (resetHash && currentHash() && !["read", "studio"].includes(currentHash())) history.replaceState(null, "", location.pathname + location.search + (forPrefix ? "#" + forPrefix : ""));
   }
   $("#drawer-close").addEventListener("click", () => closeDrawer(true));
   $("#drawer-grab").addEventListener("click", () => {
@@ -576,7 +588,7 @@
       ? hits.map((n) => `<li><button type="button" data-id="${esc(n.id)}" style="--c:${colorOf(n)}"><span class="dot"></span>${esc(n.label || n.name)}</button></li>`).join("")
       : `<li class="muted" style="padding:7px 8px">No match. Try a skill like “SPARQL”.</li>`;
     results.hidden = false;
-    $$("button", results).forEach((b) => b.addEventListener("click", () => { location.hash = b.dataset.id; results.hidden = true; searchInput.value = ""; }));
+    $$("button", results).forEach((b) => b.addEventListener("click", () => { go(b.dataset.id); results.hidden = true; searchInput.value = ""; }));
   });
   searchInput.addEventListener("keydown", (e) => { if (e.key === "Enter") { const b = $("button", results); if (b) b.click(); } });
 
@@ -600,6 +612,7 @@
         ${(n.skills || []).length ? `<div class="links">${n.skills.map((s) => chip(s)).join("")}</div>` : ""}
       </div>`;
     };
+    const forTop = forOK && (forLink.company || forLink.note) ? `<div class="for-card for-read">${forLink.company ? `<p class="for-kicker">Prepared for ${esc(forLink.company)}</p>` : ""}${forLink.role ? `<p class="for-role">${esc(forLink.role)}</p>` : ""}${forLink.note ? `<p class="for-note">${esc(forLink.note).replace(/\n/g, "<br>")}</p>` : ""}</div>` : "";
     const section = (title, color, html) => (html ? `<h2 style="--c:var(${color})"><span class="dot"></span>${title}</h2>${html}` : "");
     const roles = [...nodesOf("Role"), ...nodesOf("Break")].sort(byDateDesc).map((n) => item(n, meta(n).join(", "))).join("");
     const edu = nodesOf("Education").sort(byDateDesc).map((n) => item(n, meta(n).join(", "))).join("");
@@ -617,6 +630,7 @@
       <p class="lede">${esc(me.headline || "")}</p>
       <p class="contact">${[me.location, me.email].filter(Boolean).map(esc).join(", ")}${(me.links || []).map((l) => `, <a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join("")}</p>
       ${me.summary ? `<p class="about">${esc(me.summary)}</p>` : ""}
+      ${forTop}
       ${section("Experience", "--c-role", roles)}
       ${section("Projects", "--c-project", proj)}
       ${section("Education", "--c-edu", edu)}
@@ -625,7 +639,7 @@
       ${R.site?.allowPublicGraphExport !== false ? '<p class="read-foot"><button class="btn ghost small" type="button" id="read-download">Download this graph as JSON-LD or Turtle</button></p>' : ""}
     `;
     $("#read-download")?.addEventListener("click", () => $("#export-graph-btn").click());
-    $$("#read-body [data-goto]").forEach((b) => b.addEventListener("click", () => (location.hash = b.dataset.goto)));
+    $$("#read-body [data-goto]").forEach((b) => b.addEventListener("click", () => go(b.dataset.goto)));
   }
 
   /* ---------------- highlight lens (used by the studio) ---------------- */
@@ -752,7 +766,7 @@
       s.onload = s.onerror = () => resolve();
       document.head.appendChild(s);
     });
-    countView(decodeURIComponent(location.hash.slice(1)));
+    countView(currentHash());
   }
   function gcCount(path, title, event) {
     if (!gc.ready) return;
@@ -761,11 +775,13 @@
   let lastCounted = "";
   function countView(h) {
     if (h === "studio") return;                           // the studio is owner-only; don't count it
+    if (/^for\//.test(h)) h = "";                         // never send a link key anywhere
     const n = h && byId.get(h);
-    const path = location.pathname + (h ? `#${h}` : "");
+    // a company link is counted by its code only; the key never leaves the browser
+    const path = location.pathname + (forOK ? `#for/${forLink.id}${h ? "/" + h : ""}` : h ? `#${h}` : "");
     if (gc.ready && path === lastCounted) return;         // start-up can route twice; count once
     if (gc.ready) lastCounted = path;
-    gcCount(path, h === "read" ? "Read as text" : n ? (n.label || n.name) : "Graph");
+    gcCount(path, (forOK ? "Company link: " : "") + (h === "read" ? "Read as text" : n ? (n.label || n.name) : "Graph"));
   }
 
   /* ---------------- routing ---------------- */
@@ -777,7 +793,7 @@
     window.dispatchEvent(new CustomEvent("gr:view", { detail: view }));
   }
   function route() {
-    const h = decodeURIComponent(location.hash.slice(1));
+    const h = currentHash();
     countView(h);
     if (h === "read") { renderRead(); show("read"); window.scrollTo(0, 0); return; }
     if (h === "studio") { show("studio"); return; }
@@ -786,11 +802,36 @@
   }
   $$("[data-view]").forEach((b) => b.addEventListener("click", () => {
     const v = b.dataset.view;
-    if (v === "graph") { if (location.hash === "" || location.hash === "#") route(); else location.hash = ""; }
-    else location.hash = v;
+    if (v === "graph") { if (currentHash() === "") route(); else go(""); }
+    else go(v);
   }));
   window.addEventListener("hashchange", route);
   $("#studio-btn").addEventListener("click", () => (location.hash = "studio"));
+
+  /* ---------------- company link ---------------- */
+  function renderForCard() {
+    const card = $("#for-card");
+    if (!forLink) return;
+    if (!forOK) {
+      card.innerHTML = `<p class="for-gone">${forLink.status === "gone" ? "This link is no longer active." : "This link couldn't be opened."} You're seeing the public version of the resume.</p>`;
+      card.hidden = false;
+      history.replaceState(null, "", location.pathname + location.search);
+      return;
+    }
+    card.innerHTML = `
+      ${forLink.company ? `<p class="for-kicker">Prepared for ${esc(forLink.company)}</p>` : ""}
+      ${forLink.role ? `<p class="for-role">${esc(forLink.role)}</p>` : ""}
+      ${forLink.note ? `<p class="for-note">${esc(forLink.note).replace(/\n/g, "<br>")}</p>` : ""}
+      ${forLink.focus.length ? `<p class="for-hint">The highlighted parts are the most relevant to this role. Everything else is still there to explore.</p>` : ""}`;
+    card.hidden = false;
+    // on a phone the note is clamped to a few lines; tap to read all of it
+    card.addEventListener("click", () => card.classList.toggle("open"));
+  }
+  function applyForLens() {
+    if (!forOK || !forLink.focus.length) return;
+    const ids = forLink.focus.filter((id) => byId.has(id) && shownNodes.some((n) => n.id === id));
+    if (ids.length) setLens(ids.map((id) => ({ id, strength: "strong" })), forLink.company ? `Highlighted for ${forLink.company}` : "Highlighted for this role");
+  }
 
   /* ---------------- owner bar ---------------- */
   function renderOwnerBar() {
@@ -813,9 +854,10 @@
   /* ---------------- boot ---------------- */
   renderLegend();
   if (R.site?.allowPublicGraphExport !== false) $("#export-graph-btn").hidden = false;
-  const boot = () => { initGraph(); route(); };
-  // wait until every script (including studio.js) has run, then for the web fonts
-  const afterScripts = new Promise((r) => (document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", r) : r()));
+  const boot = () => { renderForCard(); initGraph(); applyForLens(); route(); };
+  // wait until every script (including studio.js, which loader.js adds after this one) has run, then for the web fonts
+  const afterScripts = new Promise((r) => (document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", r) : r()))
+    .then(() => window.GR_SCRIPTS);
   afterScripts.then(() => document.fonts?.ready).then(boot, boot);
   ready.then(() => {
     gcInit();

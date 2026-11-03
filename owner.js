@@ -23,6 +23,7 @@
   };
 
   const cached = get("gr.masterCache");
+  window.RESUME_PUBLIC = window.RESUME;   // company links start from what visitors see
   if (cached && !asVisitor) {
     try { window.RESUME = evalMaster(cached); O.source = "master"; } catch (e) { O.error = "Cached copy unreadable: " + e.message; }
   }

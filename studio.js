@@ -49,7 +49,7 @@
 
   async function enterStudio() {
     await ready;
-    ["#gate", "#settings", "#workspace", "#visibility"].forEach((s) => ($(s).hidden = true));
+    ["#gate", "#settings", "#workspace", "#visibility", "#links"].forEach((s) => ($(s).hidden = true));
     if (runtime.inArtifact && !runtime.isOwner) {
       $("#gate").hidden = false;
       $("#gate").innerHTML = "<h2>Owner only</h2><p>The studio is available to the owner of this page.</p>";
@@ -111,7 +111,162 @@
   });
   ["#model", "#base-url"].forEach((s) => $(s).addEventListener("input", () => ($("#preset").value = "")));
   $("#base-url").addEventListener("change", () => ($("#api-key").value = getKey($("#provider").value, $("#base-url").value)));
-  $("#studio-settings-btn").addEventListener("click", () => { $("#visibility").hidden = true; openSettings(); });
+  $("#studio-settings-btn").addEventListener("click", () => { $("#visibility").hidden = true; $("#links").hidden = true; openSettings(); });
+
+  /* ---------------- GitHub (private master) ---------------- */
+  const ghHeaders = () => { const gh = LS.get("gh", {}) || {}; return { Authorization: `Bearer ${gh.token}`, Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" }; };
+  const ghUrl = (p) => `https://api.github.com/repos/${(LS.get("gh", {}) || {}).repo}/contents/${p}`;
+  async function ghGet(p) {
+    const r = await fetch(ghUrl(p), { headers: ghHeaders(), cache: "no-store" });
+    if (r.status === 404) return null;
+    if (!r.ok) throw new Error(r.status === 401 ? "GitHub didn't accept the token." : `Couldn't read ${p} (GitHub answered ${r.status}).`);
+    const j = await r.json(); return { sha: j.sha, text: b64ToText(j.content) };
+  }
+  async function ghPut(p, text, sha, message) {
+    const r = await fetch(ghUrl(p), { method: "PUT", headers: ghHeaders(), body: JSON.stringify({ message, content: textToB64(text), ...(sha ? { sha } : {}) }) });
+    if (r.status === 409 || r.status === 422) throw new Error(`${p} changed on GitHub in the meantime. Try again.`);
+    if (r.status === 403 || r.status === 404) throw new Error("The token can read but not save. Give it Contents: Read and write on your private repository.");
+    if (!r.ok) throw new Error(`GitHub answered ${r.status} when saving ${p}.`);
+  }
+  const connected = () => !!(window.GR_OWNER?.configured && G.ownerView);
+
+  /* ---------------- company links ---------------- */
+  const rand = (n) => crypto.getRandomValues(new Uint8Array(n));
+  const b64u = (u) => btoa(String.fromCharCode(...u)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  const linkCode = () => { const A = "abcdefghijkmnpqrstuvwxyz23456789"; return [...rand(6)].map((x) => A[x % A.length]).join(""); };
+  const siteBase = () => (G.R.site?.baseIri || location.href.split("#")[0]).replace(/[?#].*$/, "");
+  const linkUrl = (l) => `${siteBase()}#for/${l.id}.${l.key}`;
+  const plusMonths = (m) => { const d = new Date(); d.setMonth(d.getMonth() + m); return d.toISOString().slice(0, 10); };
+  const LINK_TYPES = ["Role", "Break", "Education", "Project", "Certification", "Award", "Publication", "Language"];
+  const publicIds = () => new Set(G.publicNodes.map((n) => n.id));
+
+  // a hidden item plus whatever it needs to show properly (its company, school, skills)
+  function withDependencies(ids) {
+    const pub = publicIds(), out = new Map();
+    const visit = (id) => {
+      const n = byId.get(id); if (!n || out.has(id) || n.type === "Person") return;
+      out.set(id, n);
+      refsOf(n).forEach((r) => { if (!pub.has(r) && ["Organization", "School", "Skill", "SkillGroup"].includes(byId.get(r)?.type)) visit(r); });
+    };
+    ids.forEach(visit);
+    return [...out.values()].map((n) => { const c = JSON.parse(JSON.stringify(n)); delete c.private; return c; });
+  }
+
+  function renderLinkTab() {
+    const el = $("#tab-link");
+    if (!current) { el.innerHTML = ""; return; }
+    if (!connected()) {
+      el.innerHTML = `<p class="note">To make company links, connect this browser to your private master first: <b>Model settings → Private master on GitHub</b>.</p>`; return;
+    }
+    if (current.link?.url) {
+      el.innerHTML = `<div class="link-form">
+        <p>Link for <b>${esc(current.link.company || "this job")}</b>, code <code>${esc(current.link.id)}</code>, works until ${esc(current.link.expires || "you switch it off")}.</p>
+        <div class="link-out"><input id="link-url" readonly value="${esc(current.link.url)}"><button class="btn ink small" id="link-copy" type="button">Copy</button></div>
+        <label class="check" style="margin-top:12px"><input type="checkbox" id="link-in-cv" ${current.link.inCv ? "checked" : ""}> Add it to this CV as "Interactive version" (next to your email and LinkedIn)</label>
+        <p class="help">It goes live a minute or two after you made it. Manage, extend or switch it off under <b>Company links</b>.</p></div>`;
+      $("#link-copy").addEventListener("click", () => G.copyText(current.link.url).then(() => toast("Link copied")));
+      $("#link-in-cv").addEventListener("change", (e) => { current.link.inCv = e.target.checked; updateHistoryItem(); $("#cv-paper").innerHTML = renderCv(current.result); if (current.result.coverLetter) $("#cl-paper").innerHTML = renderLetter(current.result, current.input); });
+      return;
+    }
+    const reqs = current.result.fit?.requirements || [];
+    const evidence = new Set(reqs.filter((r) => r.strength !== "gap").flatMap((r) => r.evidence || []));
+    const items = allNodes.filter((n) => LINK_TYPES.includes(n.type));
+    const pub = publicIds();
+    const shownItems = items.filter((n) => pub.has(n.id)), hiddenItems = items.filter((n) => !pub.has(n.id) && n.type !== "Person");
+    const row = (n, name, checked) => `<label class="vis-row"><input type="checkbox" name="${name}" value="${esc(n.id)}" ${checked ? "checked" : ""}><span><span class="vis-label">${esc(n.label)}</span> <span class="vis-meta">${esc([G.dateRange(n), byId.get(n.org || n.school)?.short || byId.get(n.org || n.school)?.label].filter(Boolean).join(" · "))}</span></span></label>`;
+    const skillCount = [...evidence].filter((id) => byId.get(id)?.type === "Skill").length;
+    el.innerHTML = `<div class="link-form">
+      <p class="help" style="margin-top:0">A short link that opens your graph for this job: their company and the role at the top, your note, and the most relevant parts highlighted. Only people with the link can open it.</p>
+      <div class="field two">
+        <div><label for="link-company">Company</label><input id="link-company" type="text" maxlength="80" value="${esc(current.input.company || current.result.job?.company || "")}"></div>
+        <div><label for="link-role">Role</label><input id="link-role" type="text" maxlength="100" value="${esc(current.result.job?.title || "")}"></div>
+      </div>
+      <div class="field"><label for="link-note">A short note to them <span class="opt">optional</span></label>
+        <textarea id="link-note" rows="3" maxlength="500" placeholder="e.g. why this team, or what you'd like them to look at first"></textarea></div>
+      <div class="field"><label>Highlight</label>
+        <p class="help" style="margin-top:0">Ticked from the fit analysis${skillCount ? `, plus ${skillCount} matching skill${skillCount === 1 ? "" : "s"}` : ""}. Change as you like.</p>
+        ${shownItems.map((n) => row(n, "focus", evidence.has(n.id))).join("")}</div>
+      ${hiddenItems.length ? `<details><summary>Also show items hidden from visitors (${hiddenItems.length})</summary>${hiddenItems.map((n) => row(n, "add", false)).join("")}</details>` : ""}
+      <details><summary>Leave things out of this link</summary>${shownItems.map((n) => row(n, "omit", false)).join("")}</details>
+      <div class="field two" style="margin-top:16px">
+        <div><label for="link-expires">Works until</label><input id="link-expires" type="date" value="${plusMonths(6)}" min="${new Date().toISOString().slice(0, 10)}"></div>
+        <div style="align-self:end"><button class="btn ink wide" id="link-create" type="button">Create link</button></div>
+      </div>
+      <p class="help" id="link-status" role="status"></p></div>`;
+    $("#link-create").addEventListener("click", () => createLink(evidence));
+  }
+
+  function updateHistoryItem() {
+    const h = LS.get("history", []);
+    const i = h.findIndex((x) => x.at === current.at);
+    if (i >= 0) { h[i] = current; LS.set("history", h); }
+  }
+
+  async function readRegistry() {
+    const f = await ghGet("links.json");
+    return { sha: f?.sha, data: f ? JSON.parse(f.text) : { links: [] } };
+  }
+
+  async function createLink(evidence) {
+    const st = (t) => ($("#link-status").textContent = t);
+    const val = (sel) => $$(`#tab-link input[name="${sel}"]:checked`).map((b) => b.value);
+    const company = $("#link-company").value.trim(), role = $("#link-role").value.trim(), note = $("#link-note").value.trim();
+    const expires = $("#link-expires").value;
+    if (!expires) { st("Pick an end date. You can extend it or switch it off later."); return; }
+    const omit = val("omit"), addIds = val("add");
+    const skills = [...evidence].filter((id) => byId.get(id)?.type === "Skill");
+    const focus = [...new Set([...val("focus").filter((id) => !omit.includes(id)), ...addIds, ...skills])];
+    $("#link-create").disabled = true; st("Creating the link…");
+    try {
+      const id = linkCode(), keyBytes = rand(16), iv = rand(12);
+      const payload = { v: 1, company, role, note, focus, omit, add: withDependencies(addIds), created: new Date().toISOString().slice(0, 10) };
+      const key = await crypto.subtle.importKey("raw", keyBytes, "AES-GCM", false, ["encrypt"]);
+      const ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, new TextEncoder().encode(JSON.stringify(payload))));
+      await ghPut(`links/${id}.json`, JSON.stringify({ v: 1, iv: b64u(iv), ct: b64u(ct) }) + "\n", null, `Company link ${id}`);
+      const reg = await readRegistry();
+      const entry = { id, key: b64u(keyBytes), company, role, created: payload.created, expires, off: false };
+      reg.data.links.push(entry);
+      await ghPut("links.json", JSON.stringify(reg.data, null, 2) + "\n", reg.sha, `Company link ${id}: ${company || "no company"}`);
+      current.link = { id, url: linkUrl(entry), company, expires, inCv: false };
+      updateHistoryItem();
+      renderLinkTab();
+      toast("Link created");
+    } catch (e) { st(e.message); $("#link-create").disabled = false; }
+  }
+
+  async function openLinks() {
+    ["#gate", "#settings", "#workspace", "#visibility"].forEach((x) => ($(x).hidden = true));
+    $("#links").hidden = false;
+    const body = $("#links-body"), st = (t) => ($("#links-status").textContent = t);
+    if (!connected()) { body.innerHTML = `<p class="note">Connect this browser to your private master first: <b>Model settings → Private master on GitHub</b>.</p>`; return; }
+    body.innerHTML = `<p class="help">Loading…</p>`; st("");
+    let reg;
+    try { reg = await readRegistry(); } catch (e) { body.innerHTML = ""; st(e.message); return; }
+    const today = new Date().toISOString().slice(0, 10);
+    const links = reg.data.links.slice().reverse();
+    if (!links.length) { body.innerHTML = `<p class="help">No links yet. Make one from a job's result, in the <b>Company link</b> tab.</p>`; return; }
+    const state = (l) => (l.off ? "Switched off" : l.expires && l.expires < today ? "Ended" : "Active");
+    body.innerHTML = `<table class="links-table"><thead><tr><th>Company and role</th><th>Code</th><th>Made</th><th>Works until</th><th>State</th><th></th></tr></thead><tbody>${
+      links.map((l) => `<tr data-id="${esc(l.id)}" class="${state(l) === "Active" ? "" : "state-off"}">
+        <td><b>${esc(l.company || "—")}</b><br>${esc(l.role || "")}</td><td><code>${esc(l.id)}</code></td><td>${esc(l.created || "")}</td>
+        <td><input type="date" value="${esc(l.expires || "")}" aria-label="Works until"></td><td>${state(l)}</td>
+        <td><button class="btn ghost small" data-act="copy" type="button">Copy link</button>
+          <button class="btn ghost small" data-act="toggle" type="button">${l.off ? "Switch on" : "Switch off"}</button></td></tr>`).join("")
+    }</tbody></table>`;
+    const save = async (mutate, msg) => {
+      st("Saving…");
+      try { const r = await readRegistry(); mutate(r.data.links); await ghPut("links.json", JSON.stringify(r.data, null, 2) + "\n", r.sha, msg); st("Saved. Your site updates in a minute or two."); openLinks(); }
+      catch (e) { st(e.message); }
+    };
+    $$("#links-body tr[data-id]").forEach((tr) => {
+      const id = tr.dataset.id, l = reg.data.links.find((x) => x.id === id);
+      tr.querySelector('[data-act="copy"]').addEventListener("click", () => G.copyText(linkUrl(l)).then(() => toast("Link copied")));
+      tr.querySelector('[data-act="toggle"]').addEventListener("click", () => save((ls) => { const x = ls.find((y) => y.id === id); x.off = !x.off; }, `Company link ${id}: switched ${l.off ? "on" : "off"}`));
+      tr.querySelector('input[type="date"]').addEventListener("change", (e) => save((ls) => { ls.find((y) => y.id === id).expires = e.target.value; }, `Company link ${id}: works until ${e.target.value}`));
+    });
+  }
+  $("#studio-links-btn").addEventListener("click", openLinks);
+  $("#links-back").addEventListener("click", () => { $("#links").hidden = true; enterStudio(); });
 
   /* ---------------- what visitors see ---------------- */
   const VIS_GROUPS = [
@@ -135,7 +290,7 @@
   }
 
   function openVisibility() {
-    ["#gate", "#settings", "#workspace"].forEach((x) => ($(x).hidden = true));
+    ["#gate", "#settings", "#workspace", "#links"].forEach((x) => ($(x).hidden = true));
     $("#visibility").hidden = false;
     const O = window.GR_OWNER || {};
     if (!G.ownerView || !O.configured) {
@@ -622,12 +777,15 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
 
   function selectTab(t) {
     $$('#results [role="tab"]').forEach((b) => b.setAttribute("aria-selected", String(b.dataset.tab === t)));
-    $("#tab-fit").hidden = t !== "fit"; $("#tab-cv").hidden = t !== "cv"; $("#tab-letter").hidden = t !== "letter";
+    $("#tab-fit").hidden = t !== "fit"; $("#tab-cv").hidden = t !== "cv"; $("#tab-letter").hidden = t !== "letter"; $("#tab-link").hidden = t !== "link";
+    if (t === "link") renderLinkTab();
   }
   $$('#results [role="tab"]').forEach((b) => b.addEventListener("click", () => selectTab(b.dataset.tab)));
 
   function contactLine() {
-    return [me.location, LS.get("private", {}).phone, me.email, ...(me.links || []).map((l) => l.url.replace(/^https?:\/\/(www\.)?/, ""))].filter(Boolean).map(esc).join("  |  ");
+    const parts = [me.location, LS.get("private", {}).phone, me.email, ...(me.links || []).map((l) => l.url.replace(/^https?:\/\/(www\.)?/, ""))].filter(Boolean).map(esc);
+    if (current?.link?.inCv && current.link.url) parts.push(`<a href="${esc(current.link.url)}">Interactive version</a>`);
+    return parts.join("  |  ");
   }
   function renderCv(result) {
     const cv = result.cv || {};
@@ -705,6 +863,7 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
         else if (c.nodeName === "BR") out.push({ text: "\n" });
         else if (/^(B|STRONG)$/.test(c.nodeName)) runs(c).forEach((r) => out.push({ ...r, bold: true }));
         else if (/^(I|EM)$/.test(c.nodeName)) runs(c).forEach((r) => out.push({ ...r, italic: true }));
+        else if (c.nodeName === "A" && c.getAttribute("href")) runs(c).forEach((r) => out.push({ ...r, href: c.getAttribute("href") }));
         else out.push(...runs(c));
       });
       return out;
@@ -725,7 +884,7 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
   }
 
   function toMarkdown(root) {
-    const md = (rs) => rs.map((r) => (r.bold ? `**${r.text.trim()}** ` : r.italic ? `*${r.text}*` : r.text)).join("").replace(/\n/g, "  \n").trim();
+    const md = (rs) => rs.map((r) => (r.href ? `[${r.text}](${r.href})` : r.bold ? `**${r.text.trim()}** ` : r.italic ? `*${r.text}*` : r.text)).join("").replace(/\n/g, "  \n").trim();
     return toBlocks(root).map((b) => {
       switch (b.kind) {
         case "title": return `# ${md(b.runs)}`;
@@ -749,10 +908,13 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
   }
   async function toDocx(root, isLetter) {
     const d = await loadDocx();
-    const { Document, Packer, Paragraph, TextRun, TabStopType, BorderStyle, LevelFormat, AlignmentType } = d;
+    const { Document, Packer, Paragraph, TextRun, TabStopType, BorderStyle, LevelFormat, AlignmentType, ExternalHyperlink } = d;
     const font = isLetter ? "Georgia" : "Calibri";
     const textWidth = 11906 - 2 * 1080;
-    const mk = (rs, extra = {}) => rs.flatMap((r) => r.text.split("\n").map((t, i) => new TextRun({ text: t, bold: r.bold, italics: r.italic, break: i ? 1 : 0, ...extra })));
+    const mk = (rs, extra = {}) => rs.flatMap((r) => {
+      const t = r.text.split("\n").map((t, i) => new TextRun({ text: t, bold: r.bold, italics: r.italic, break: i ? 1 : 0, ...extra, ...(r.href ? { color: "1D4ED8", underline: {} } : {}) }));
+      return r.href && ExternalHyperlink ? [new ExternalHyperlink({ link: r.href, children: t })] : t;
+    });
     const children = toBlocks(root).map((b) => {
       switch (b.kind) {
         case "title": return new Paragraph({ children: mk(b.runs, { bold: true, size: isLetter ? 32 : 40, font }), spacing: { after: 40 } });

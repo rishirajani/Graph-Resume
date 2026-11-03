@@ -295,6 +295,25 @@ table.reqs td .chips { display: flex; flex-wrap: wrap; gap: 5px; }
 .linkish { border: 0; background: none; padding: 0; font: inherit; color: var(--ink); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .hidden-tag { border-style: dotted; }
 .visibility { max-width: 720px; }
+.for-card { margin: 14px 0 0; padding: 14px 16px; background: var(--surface); border: 1px solid var(--rule); border-left: 4px solid var(--hl); border-radius: 10px; max-width: 380px; }
+.for-card p { margin: 0; }
+.for-kicker { font: 600 12.5px/1.3 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.for-role { font: 600 18px/1.3 var(--sans); margin-top: 3px !important; }
+.for-note { font: 400 16px/1.45 var(--serif); color: var(--ink-2); margin-top: 8px !important; }
+.for-hint { font-size: 13px; color: var(--muted); margin-top: 8px !important; }
+.for-gone { font-size: 14px; color: var(--ink-2); }
+.for-read { max-width: none; margin: 18px 0 8px; }
+.link-form { max-width: 720px; }
+.link-form .vis-row { font-size: 14.5px; }
+.link-form details { margin-top: 14px; }
+.link-form details > summary { font: 600 14.5px/1.3 var(--sans); cursor: pointer; }
+.link-out { display: flex; gap: 8px; margin-top: 10px; }
+.link-out input { flex: 1; font: 13px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; }
+.links-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 8px; }
+.links-table th, .links-table td { text-align: left; padding: 8px 6px; border-top: 1px solid var(--rule); vertical-align: top; }
+.links-table th { font-weight: 600; color: var(--muted); font-size: 12.5px; border-top: 0; }
+.links-table .state-off { color: var(--muted); }
+.links-table input[type=date] { font-size: 13px; padding: 2px 4px; }
 .vis-group { margin: 18px 0 0; }
 .vis-group > summary, .vis-group h3 { font: 600 15px/1.3 var(--sans); margin: 0 0 6px; cursor: pointer; }
 .vis-row { display: flex; gap: 10px; align-items: baseline; padding: 6px 0; border-top: 1px solid var(--rule); font-size: 15px; }
@@ -334,7 +353,13 @@ table.reqs td .chips { display: flex; flex-wrap: wrap; gap: 5px; }
   }
   .drawer .grab::before { content: ""; display: block; width: 40px; height: 5px; margin: 9px auto 0; border-radius: 3px; background: var(--rule); }
   .drawer h2 { font-size: 21px; }
-  .lens-banner { bottom: 14px; }
+  .lens-banner { bottom: 14px; left: 14px; right: 14px; transform: none; padding: 6px 6px 6px 14px; }
+  .lens-banner p { font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 1; }
+  .intro .for-card { margin: 4px 0 8px; padding: 9px 12px; max-width: none; cursor: pointer; }
+  .intro .for-role { font-size: 15.5px; }
+  .intro .for-note { font-size: 14.5px; margin-top: 4px !important; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .intro .for-card.open .for-note { -webkit-line-clamp: unset; }
+  .intro .for-hint { display: none; }
   .field.two { grid-template-columns: 1fr; }
 }
 @keyframes sheet-in { from { transform: translateY(24px); opacity: 0; } }

@@ -29,6 +29,7 @@
       <input id="search" type="search" placeholder="Find a skill, role or project" autocomplete="off">
     </label>
     <ul id="search-results" class="search-results" hidden></ul>
+    <section id="for-card" class="for-card" hidden aria-label="About this link"></section>
   </header>
 
   <nav class="toolbar" aria-label="Views and actions">
@@ -75,6 +76,7 @@
       <p class="sub">Paste a job description. The CV and cover letter are written only from what's in your graph.</p>
     </div>
     <div class="studio-top-actions">
+      <button class="btn ghost" id="studio-links-btn">Company links</button>
       <button class="btn ghost" id="studio-vis-btn">What visitors see</button>
       <button class="btn ghost" id="studio-settings-btn">Model settings</button>
       <button class="btn ghost" data-view="graph">Back to graph</button>
@@ -181,6 +183,15 @@
     </div>
   </section>
 
+  <!-- company links -->
+  <section id="links" class="settings visibility" hidden>
+    <h2>Company links</h2>
+    <p class="help">Links you've made for specific jobs. Switching one off or letting it run out takes it off your site within a few minutes; the link then shows your public resume instead. In GoatCounter each link appears by its code, e.g. <code>#for/k3x9ab</code>.</p>
+    <div id="links-body"></div>
+    <p class="help" id="links-status" role="status"></p>
+    <div class="row end"><button class="btn ghost" id="links-back" type="button">Back</button></div>
+  </section>
+
   <!-- workspace -->
   <section id="workspace" class="workspace" hidden>
     <form id="jd-form" class="jd">
@@ -230,6 +241,7 @@
         <button role="tab" aria-selected="true" data-tab="fit">Fit</button>
         <button role="tab" aria-selected="false" data-tab="cv">CV</button>
         <button role="tab" aria-selected="false" data-tab="letter">Cover letter</button>
+        <button role="tab" aria-selected="false" data-tab="link">Company link</button>
       </div>
 
       <div class="tab" id="tab-fit"></div>
@@ -246,6 +258,8 @@
         </div>
         <div class="paper-wrap"><div id="cv-paper" class="paper cv" contenteditable="true" spellcheck="true"></div></div>
       </div>
+
+      <div class="tab" id="tab-link" hidden></div>
 
       <div class="tab" id="tab-letter" hidden>
         <div class="export-bar">
@@ -278,7 +292,6 @@
 <script src="resume.js"></script>
 <script src="owner.js"></script>
 <script src="lib/cytoscape.min.js"></script>
-<script src="app.js"></script>
-<script src="studio.js"></script>
+<script src="loader.js"></script>
 </body>
 </html>
