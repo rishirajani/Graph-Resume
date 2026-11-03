@@ -303,7 +303,7 @@
   function renderLinkTab() {
     const el = $("#tab-link");
     if (!current) { el.innerHTML = ""; return; }
-    const inCvBox = () => `<label class="check" style="margin-top:12px"><input type="checkbox" id="link-in-cv" ${current.link.inCv ? "checked" : ""}> Add it to this CV and cover letter as "Interactive version" (next to your email and LinkedIn)</label>`;
+    const inCvBox = () => `<label class="check" style="margin-top:12px"><input type="checkbox" id="link-in-cv" ${current.link.inCv ? "checked" : ""}> Add it to this CV and cover letter as “${esc(CVUI().linkLabel || "Portfolio")}”, next to your email and LinkedIn (the wording can be changed under Customize → CV and letter)</label>`;
     const wireInCv = () => $("#link-in-cv").addEventListener("change", (e) => { current.link.inCv = e.target.checked; updateHistoryItem(); paintDocs(current.result, current.input); });
     if (current.link?.url && current.link.pending) {
       // made here, still to be created on the live site
@@ -936,7 +936,7 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
   }
   function contactLine() {
     const parts = [me.location, LS.get("private", {}).phone, me.email, ...(me.links || []).map((l) => l.url.replace(/^https?:\/\/(www\.)?/, ""))].filter(Boolean).map(esc);
-    if (current?.link?.inCv && current.link.url) parts.push(`<a href="${esc(current.link.url)}">Interactive version</a>`);
+    if (current?.link?.inCv && current.link.url) parts.push(`<a href="${esc(current.link.url)}">${esc(CVUI().linkLabel || "Portfolio")}</a>`);
     return parts.join("  |  ");
   }
   function renderCv(result, cvui = CVUI()) {

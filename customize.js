@@ -152,6 +152,8 @@
           "Classic: ruled section headings. Modern: name and headings in your accent colour. Compact: tighter, fits more on one page.")}
         ${field("Accent colour", `<div class="cz-colors"><label><input type="color" id="cz-accent" value="${esc(draft.cv.accent || { classic: "#1D2A40", modern: "#2C46C7", compact: "#1D2A40" }[draft.cv.layout])}">Headings${draft.cv.accent ? " *" : ""}</label></div>
           <p style="margin:8px 0 0"><button type="button" class="btn ghost small" id="cz-accent-reset" ${draft.cv.accent ? "" : "disabled"}>Use the layout's colour</button></p>`)}
+        ${field("Tailored link in the contact line", `<input type="text" id="cz-link-label" maxlength="30" value="${esc(draft.cv.linkLabel)}" placeholder="Portfolio">`,
+          "The clickable text that stands for a tailored link on a CV, next to your email and LinkedIn.")}
         ${field("Sections: order and titles", `<ol class="cz-order">${order}</ol>`, "Leave a title empty to keep the standard one. Your titles are used on English CVs; CVs in other languages use translated titles.")}
       </details>`;
     wire();
@@ -193,6 +195,7 @@
       if (czTab === "site") showTab("cv");
       $(`#cz-body li[data-sec="${s}"] [data-move="${b.dataset.move}"]`)?.focus();
     }));
+    $("#cz-link-label").addEventListener("input", (e) => { draft.cv.linkLabel = e.target.value.trim().slice(0, 30) || "Portfolio"; changed("cv"); });
     $$("#cz-body [data-title]").forEach((t) => t.addEventListener("input", () => {
       const v = t.value.trim();
       if (v) draft.cv.titles[t.dataset.title] = v.slice(0, 40); else delete draft.cv.titles[t.dataset.title];

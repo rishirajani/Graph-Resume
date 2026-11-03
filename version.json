@@ -1,10 +1,8 @@
 {
-  "version": "1.4.0",
+  "version": "1.4.1",
   "date": "2026-11-03",
   "notes": [
-    "“Company links” are now called tailored links.",
-    "Tailored links follow your CV: what the CV contains is highlighted (or, per link, shown on its own).",
-    "Where links can't be saved (such as a claude.ai preview), Make tailored link fixes the address at once, so it can go into the CV and letter; a code then activates it under Tailored links → New link."
+    "A tailored link on a CV now reads “Portfolio” instead of “Interactive version”; change the wording under Customize → CV and letter."
   ],
   "files": [
     "index.html",

@@ -54,7 +54,7 @@
     startHidden: [],              // legend groups off at first: "exp", "edu", "proj", "other"
     labelSize: "normal",          // small | normal | large
     features: { search: true, textView: true, download: true, copyLink: true, counting: true },
-    cv: { layout: "classic", accent: "", order: CV_SECTIONS.slice(), titles: {} }   // layout: classic | modern | compact
+    cv: { layout: "classic", accent: "", order: CV_SECTIONS.slice(), titles: {}, linkLabel: "Portfolio" }   // layout: classic | modern | compact; linkLabel: the tailored link's text in the contact line
   };
   const COLOR_VARS = { person: "--c-person", role: "--c-role", org: "--c-org", edu: "--c-edu", project: "--c-project", skill: "--c-skill", other: "--c-other", highlight: "--hl" };
   const LABEL_SCALE = { small: 0.88, normal: 1, large: 1.16 };
@@ -81,7 +81,8 @@
       startHidden: (Array.isArray(u.startHidden) ? u.startHidden : []).filter((k) => ["exp", "edu", "proj", "other"].includes(k)),
       labelSize: pick(u.labelSize, Object.keys(LABEL_SCALE), DEFAULTS.labelSize),
       features: f,
-      cv: { layout: pick(u.cv?.layout, ["classic", "modern", "compact"], "classic"), accent: hex(u.cv?.accent), order, titles }
+      cv: { layout: pick(u.cv?.layout, ["classic", "modern", "compact"], "classic"), accent: hex(u.cv?.accent), order, titles,
+            linkLabel: typeof u.cv?.linkLabel === "string" && u.cv.linkLabel.trim() ? u.cv.linkLabel.trim().slice(0, 30) : DEFAULTS.cv.linkLabel }
     };
   }
 
@@ -98,6 +99,7 @@
     if (ui.cv.accent) cv.accent = ui.cv.accent;
     if (ui.cv.order.join() !== CV_SECTIONS.join()) cv.order = ui.cv.order;
     if (Object.keys(ui.cv.titles).length) cv.titles = ui.cv.titles;
+    if (ui.cv.linkLabel !== DEFAULTS.cv.linkLabel) cv.linkLabel = ui.cv.linkLabel;
     if (Object.keys(cv).length) d.cv = cv;
     return d;
   }
