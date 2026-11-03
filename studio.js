@@ -47,8 +47,29 @@
   }
   const usingClaude = () => runtime.inArtifact && runtime.isOwner && !!runtime.sample;
 
+  // copies of this code (a friend's site) learn about new versions from the original site
+  let updateChecked = false;
+  async function checkForUpdate() {
+    if (updateChecked) return; updateChecked = true;
+    const C = window.GRCORE;
+    if (!C?.UPSTREAM || location.href.startsWith(C.UPSTREAM) || runtime.inArtifact) return;
+    try {
+      const r = await fetch(C.UPSTREAM + "version.json", { cache: "no-store" });
+      if (!r.ok) return;
+      const v = await r.json();
+      const newer = (a, b) => { const x = String(a).split(".").map(Number), y = String(b).split(".").map(Number); for (let i = 0; i < 3; i++) if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) > (y[i] || 0); return false; };
+      if (!newer(v.version, C.VERSION)) return;
+      const el = $("#update-notice");
+      el.innerHTML = `<b>Version ${esc(v.version)} is available</b> (you have ${esc(C.VERSION)}).
+        ${(v.notes || []).length ? `<ul>${v.notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul>` : ""}
+        To update: in your repository on GitHub, open <b>Actions → Update Graph Resume → Run workflow</b>. Your resume.js and settings stay as they are.`;
+      el.hidden = false;
+    } catch {}
+  }
+
   async function enterStudio() {
     await ready;
+    checkForUpdate();
     ["#gate", "#settings", "#workspace", "#visibility", "#links", "#customize"].forEach((s) => ($(s).hidden = true));
     if (runtime.inArtifact && !runtime.isOwner) {
       $("#gate").hidden = false;

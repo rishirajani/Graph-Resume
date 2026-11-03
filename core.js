@@ -75,6 +75,10 @@
     Break: "gr:CareerBreak"
   };
 
+  // version of the shared code; must match release.json (checked when publishing)
+  const VERSION = "1.1.0";
+  // where released versions are announced (copies of the code check this for updates)
+  const UPSTREAM = "https://rishirajani.github.io/Graph-Resume/";
   // the gr: vocabulary lives at one fixed address, whichever site uses it
   const GR_NS = "https://rishirajani.github.io/Graph-Resume/vocab#";
   const PREFIXES = {
@@ -155,5 +159,5 @@
     return [me, ...R.nodes];
   }
 
-  root.GRCORE = { GR_NS, expand, matchLink, PRED, SCHEMA_TYPE, PREFIXES, isPlaceholder, clean, deriveEdges, REF_FIELDS, refsOf, publicSubset, toJsonLd, toTurtle, graphOf };
+  root.GRCORE = { VERSION, UPSTREAM, GR_NS, expand, matchLink, PRED, SCHEMA_TYPE, PREFIXES, isPlaceholder, clean, deriveEdges, REF_FIELDS, refsOf, publicSubset, toJsonLd, toTurtle, graphOf };
 })(typeof window !== "undefined" ? window : globalThis);

@@ -27,6 +27,10 @@ It's a static site: no server, no database, no build step. Hosting is free.
 
 The studio's **Customize** panel sets `site.ui` in `resume.js` with a live preview of the site (desktop and phone) and of a CV built from the graph: theme (Ink, Paper, Forest, Slate dark, or Auto), font pair, a colour per kind of item, graph label size; whether the site opens on the graph or the text, whether skills start folded, which groups show at first; search, text view, download, copy link and visit counting on or off; and the CV and letter layout (Classic, Modern, Compact), accent colour, section order and titles. With the private master connected it saves directly; otherwise it gives the `ui: { … }` block to paste into `site`. `ui.js` documents every setting.
 
+### Releasing a version (for copies on other sites)
+
+Copies of this code made from the template (a friend's site) update only when their owner runs **Actions → Update Graph Resume** in their repository. That copies the code files listed in this site's `version.json` from the public repository; their `resume.js`, README and settings are never touched. Their studio shows a notice when this site announces a newer version. To release: raise `VERSION` in `core.js` and `version` in `release.json` together (publishing stops if they differ), and write a line or two in `notes` about what's new. Keep changes backward compatible with existing `resume.js` files. Also bring the template repository up to date with the same code.
+
 ## The graph as data
 
 The site publishes its graph next to the page as [`resume.ttl`](resume.ttl) (Turtle) and [`resume.jsonld`](resume.jsonld) (JSON-LD), and links both from the page's `<head>`. Items use [schema.org](https://schema.org/) types, relations use a small `gr:` vocabulary (`gr:workedAs`, `gr:used`, `gr:inGroup`, …), and skills and languages point to the same concepts in [Wikidata](https://www.wikidata.org/) and the EU's [ESCO](https://esco.ec.europa.eu/) skills classification with `skos:exactMatch` (the same concept) or `skos:closeMatch` (closely related, or one part of a combined skill such as "HTML / CSS / JavaScript").
