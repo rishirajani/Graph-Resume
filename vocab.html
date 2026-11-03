@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Graph Resume vocabulary (gr:)</title>
+<meta name="description" content="Documentation of the gr: vocabulary used by Rishi Rajani's resume graph.">
+<link rel="alternate" type="text/turtle" href="vocab.ttl">
+<link rel="alternate" type="application/ld+json" href="vocab.jsonld">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400..800&family=Newsreader:opsz,wght@6..72,300..600&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+ "@context": {
+  "dcterms": "http://purl.org/dc/terms/",
+  "gr": "https://rishirajani.github.io/Graph-Resume/vocab#",
+  "owl": "http://www.w3.org/2002/07/owl#",
+  "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+  "schema": "https://schema.org/",
+  "xsd": "http://www.w3.org/2001/XMLSchema#"
+ },
+ "@graph": [
+  {
+   "@id": "gr:shows",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "A skill this certification is evidence of."
+   },
+   "rdfs:domain": {
+    "@id": "schema:EducationalOccupationalCredential"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "shows"
+   },
+   "rdfs:range": {
+    "@id": "schema:DefinedTerm"
+   },
+   "rdfs:seeAlso": {
+    "@id": "schema:competencyRequired"
+   }
+  },
+  {
+   "@id": "gr:workedAs",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "The person held this role in the past; the role has an end date."
+   },
+   "rdfs:domain": {
+    "@id": "schema:Person"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "worked as"
+   },
+   "rdfs:range": {
+    "@id": "schema:OrganizationRole"
+   },
+   "rdfs:subPropertyOf": {
+    "@id": "gr:heldRole"
+   }
+  },
+  {
+   "@id": "gr:promotedFrom",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "This role followed the earlier role through a promotion at the same organisation."
+   },
+   "rdfs:domain": {
+    "@id": "schema:OrganizationRole"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "promoted from"
+   },
+   "rdfs:range": {
+    "@id": "schema:OrganizationRole"
+   }
+  },
+  {
+   "@id": "gr:studied",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "The person studied for this degree or certificate, finished or still in progress. (schema:hasCredential would claim the credential is already held.)"
+   },
+   "rdfs:domain": {
+    "@id": "schema:Person"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "studied"
+   },
+   "rdfs:range": {
+    "@id": "schema:EducationalOccupationalCredential"
+   },
+   "rdfs:seeAlso": [
+    {
+     "@id": "schema:hasCredential"
+    },
+    {
+     "@id": "schema:alumniOf"
+    }
+   ]
+  },
+  {
+   "@id": "gr:awardedBy",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "The organisation that gave the award."
+   },
+   "rdfs:domain": {
+    "@id": "gr:Award"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "awarded by"
+   },
+   "rdfs:range": {
+    "@id": "schema:Organization"
+   },
+   "rdfs:seeAlso": {
+    "@id": "schema:recognizedBy"
+   }
+  },
+  {
+   "@id": "gr:highlight",
+   "@type": "owl:DatatypeProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "One achievement or responsibility in a role, degree or project, written as a CV bullet point. Order is not significant."
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "highlight"
+   },
+   "rdfs:range": {
+    "@id": "xsd:string"
+   }
+  },
+  {
+   "@id": "gr:runWith",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "An organisation that co-ran this programme with the school."
+   },
+   "rdfs:domain": {
+    "@id": "schema:EducationalOccupationalCredential"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "run with"
+   },
+   "rdfs:range": {
+    "@id": "schema:Organization"
+   }
+  },
+  {
+   "@id": "gr:inGroup",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "The skill area this skill is grouped under. Each skill belongs to exactly one."
+   },
+   "rdfs:domain": {
+    "@id": "schema:DefinedTerm"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "belongs to"
+   },
+   "rdfs:range": {
+    "@id": "schema:DefinedTermSet"
+   },
+   "rdfs:subPropertyOf": {
+    "@id": "schema:inDefinedTermSet"
+   }
+  },
+  {
+   "@id": "gr:CareerBreak",
+   "@type": "owl:Class",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "A period between roles, with what happened during it. Lets a gap be described honestly instead of left blank."
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "Career break"
+   },
+   "rdfs:subClassOf": {
+    "@id": "schema:Thing"
+   }
+  },
+  {
+   "@id": "gr:included",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "Something done during a career break, such as freelance work or a certification."
+   },
+   "rdfs:domain": {
+    "@id": "gr:CareerBreak"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "included"
+   },
+   "rdfs:range": {
+    "@id": "_:n6b795ec60e43438f8e34630f85830909b7"
+   }
+  },
+  {
+   "@id": "_:n6b795ec60e43438f8e34630f85830909b7",
+   "@type": "owl:Class",
+   "owl:unionOf": {
+    "@list": [
+     {
+      "@id": "schema:OrganizationRole"
+     },
+     {
+      "@id": "schema:EducationalOccupationalCredential"
+     },
+     {
+      "@id": "schema:CreativeWork"
+     }
+    ]
+   }
+  },
+  {
+   "@id": "gr:partOf",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "This project was done as part of a degree or a larger work, for example a thesis within a master's."
+   },
+   "rdfs:domain": {
+    "@id": "schema:CreativeWork"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "part of"
+   },
+   "rdfs:range": {
+    "@id": "_:n6b795ec60e43438f8e34630f85830909b4"
+   },
+   "rdfs:seeAlso": {
+    "@id": "schema:isPartOf"
+   }
+  },
+  {
+   "@id": "_:n6b795ec60e43438f8e34630f85830909b4",
+   "@type": "owl:Class",
+   "owl:unionOf": {
+    "@list": [
+     {
+      "@id": "schema:EducationalOccupationalCredential"
+     },
+     {
+      "@id": "schema:CreativeWork"
+     }
+    ]
+   }
+  },
+  {
+   "@id": "gr:heldRole",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "The person held this role. Use the more specific worked as (finished) or works as (current)."
+   },
+   "rdfs:domain": {
+    "@id": "schema:Person"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "held role"
+   },
+   "rdfs:range": {
+    "@id": "schema:OrganizationRole"
+   },
+   "rdfs:seeAlso": {
+    "@id": "schema:hasOccupation"
+   }
+  },
+  {
+   "@id": "gr:Award",
+   "@type": "owl:Class",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "A recognition given to the person, for example by an employer. schema.org only has award as a text property, so this makes awards nodes that can be linked to who gave them."
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "Award"
+   },
+   "rdfs:seeAlso": {
+    "@id": "schema:award"
+   },
+   "rdfs:subClassOf": {
+    "@id": "schema:Thing"
+   }
+  },
+  {
+   "@id": "gr:received",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "The person received this award."
+   },
+   "rdfs:domain": {
+    "@id": "schema:Person"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "received"
+   },
+   "rdfs:range": {
+    "@id": "gr:Award"
+   },
+   "rdfs:seeAlso": {
+    "@id": "schema:award"
+   }
+  },
+  {
+   "@id": "gr:wrote",
+   "@type": "owl:ObjectProperty",
+   "owl:inverseOf": {
+    "@id": "schema:author"
+   },
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "The person is an author of this publication."
+   },
+   "rdfs:domain": {
+    "@id": "schema:Person"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "wrote"
+   },
+   "rdfs:range": {
+    "@id": "schema:ScholarlyArticle"
+   }
+  },
+  {
+   "@id": "gr:used",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "A skill put to use in this role, project or career break, including a language used at work. Together with trained in and shows, it ties each skill to the work behind it."
+   },
+   "rdfs:domain": {
+    "@id": "_:n6b795ec60e43438f8e34630f85830909b11"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "used"
+   },
+   "rdfs:range": {
+    "@id": "_:n6b795ec60e43438f8e34630f85830909b16"
+   },
+   "rdfs:seeAlso": {
+    "@id": "schema:skills"
+   }
+  },
+  {
+   "@id": "_:n6b795ec60e43438f8e34630f85830909b11",
+   "@type": "owl:Class",
+   "owl:unionOf": {
+    "@list": [
+     {
+      "@id": "schema:OrganizationRole"
+     },
+     {
+      "@id": "schema:CreativeWork"
+     },
+     {
+      "@id": "gr:CareerBreak"
+     },
+     {
+      "@id": "gr:Award"
+     }
+    ]
+   }
+  },
+  {
+   "@id": "_:n6b795ec60e43438f8e34630f85830909b16",
+   "@type": "owl:Class",
+   "owl:unionOf": {
+    "@list": [
+     {
+      "@id": "schema:DefinedTerm"
+     },
+     {
+      "@id": "schema:Language"
+     }
+    ]
+   }
+  },
+  {
+   "@id": "gr:built",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "The person built or authored this project."
+   },
+   "rdfs:domain": {
+    "@id": "schema:Person"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "built"
+   },
+   "rdfs:range": {
+    "@id": "schema:CreativeWork"
+   },
+   "rdfs:seeAlso": {
+    "@id": "schema:creator"
+   }
+  },
+  {
+   "@id": "gr:took",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "The person took this career break."
+   },
+   "rdfs:domain": {
+    "@id": "schema:Person"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "took"
+   },
+   "rdfs:range": {
+    "@id": "gr:CareerBreak"
+   }
+  },
+  {
+   "@id": "gr:focusOn",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "One of the person's skill areas."
+   },
+   "rdfs:domain": {
+    "@id": "schema:Person"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "specialises in"
+   },
+   "rdfs:range": {
+    "@id": "schema:DefinedTermSet"
+   }
+  },
+  {
+   "@id": "gr:ledTo",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "A programme of study that led directly to this role, for example a certificate run with an employer."
+   },
+   "rdfs:domain": {
+    "@id": "schema:EducationalOccupationalCredential"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "led to"
+   },
+   "rdfs:range": {
+    "@id": "schema:OrganizationRole"
+   }
+  },
+  {
+   "@id": "gr:holds",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "The person holds this certification."
+   },
+   "rdfs:domain": {
+    "@id": "schema:Person"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "holds"
+   },
+   "rdfs:range": {
+    "@id": "schema:EducationalOccupationalCredential"
+   },
+   "rdfs:subPropertyOf": {
+    "@id": "schema:hasCredential"
+   }
+  },
+  {
+   "@id": "gr:location",
+   "@type": "owl:DatatypeProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "Where it took place, as written on a CV (city and country, or remote)."
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "location"
+   },
+   "rdfs:range": {
+    "@id": "xsd:string"
+   },
+   "rdfs:seeAlso": {
+    "@id": "schema:location"
+   }
+  },
+  {
+   "@id": "gr:at",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "Where a role was held (the employer) or where a degree or certificate was studied (the school)."
+   },
+   "rdfs:domain": {
+    "@id": "_:n6b795ec60e43438f8e34630f85830909b1"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "at"
+   },
+   "rdfs:range": {
+    "@id": "schema:Organization"
+   },
+   "rdfs:seeAlso": [
+    {
+     "@id": "schema:worksFor"
+    },
+    {
+     "@id": "schema:alumniOf"
+    }
+   ]
+  },
+  {
+   "@id": "_:n6b795ec60e43438f8e34630f85830909b1",
+   "@type": "owl:Class",
+   "owl:unionOf": {
+    "@list": [
+     {
+      "@id": "schema:OrganizationRole"
+     },
+     {
+      "@id": "schema:EducationalOccupationalCredential"
+     }
+    ]
+   }
+  },
+  {
+   "@id": "gr:speaks",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "The person speaks this language; how well is given by proficiency on the language."
+   },
+   "rdfs:domain": {
+    "@id": "schema:Person"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "speaks"
+   },
+   "rdfs:range": {
+    "@id": "schema:Language"
+   },
+   "rdfs:subPropertyOf": {
+    "@id": "schema:knowsLanguage"
+   }
+  },
+  {
+   "@id": "gr:proficiency",
+   "@type": "owl:DatatypeProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "How well a language is spoken: a CEFR level (A1 to C2) or Native, Fluent or Basic."
+   },
+   "rdfs:domain": {
+    "@id": "schema:Language"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "proficiency"
+   },
+   "rdfs:range": {
+    "@id": "xsd:string"
+   }
+  },
+  {
+   "@id": "gr:worksAs",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "The person holds this role now; the role has no end date."
+   },
+   "rdfs:domain": {
+    "@id": "schema:Person"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "works as"
+   },
+   "rdfs:range": {
+    "@id": "schema:OrganizationRole"
+   },
+   "rdfs:subPropertyOf": {
+    "@id": "gr:heldRole"
+   }
+  },
+  {
+   "@id": "gr:trainedIn",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "A skill taught or practised during this degree or course."
+   },
+   "rdfs:domain": {
+    "@id": "schema:EducationalOccupationalCredential"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "trained in"
+   },
+   "rdfs:range": {
+    "@id": "schema:DefinedTerm"
+   },
+   "rdfs:seeAlso": {
+    "@id": "schema:teaches"
+   }
+  },
+  {
+   "@id": "https://rishirajani.github.io/Graph-Resume/vocab",
+   "@type": "owl:Ontology",
+   "dcterms:created": {
+    "@type": "xsd:date",
+    "@value": "2026-11-03"
+   },
+   "dcterms:creator": "Rishi Rajani",
+   "dcterms:description": {
+    "@language": "en",
+    "@value": "A small vocabulary for describing a person's career as a knowledge graph:\nthe roles they held, what they studied and built, the skills each of those used, and how\nthe pieces connect. It builds on schema.org for the kinds of things (people, organisations,\ncredentials, creative works, defined terms) and adds the relations between them that\nschema.org doesn't have, or only has as plain text."
+   },
+   "dcterms:title": {
+    "@language": "en",
+    "@value": "Graph Resume vocabulary"
+   },
+   "http://purl.org/vocab/vann/preferredNamespacePrefix": "gr",
+   "http://purl.org/vocab/vann/preferredNamespaceUri": "https://rishirajani.github.io/Graph-Resume/vocab#",
+   "owl:versionIRI": {
+    "@id": "https://rishirajani.github.io/Graph-Resume/vocab/1.0"
+   },
+   "owl:versionInfo": "1.0",
+   "rdfs:seeAlso": [
+    {
+     "@id": "schema:"
+    },
+    {
+     "@id": "http://www.w3.org/2004/02/skos/core"
+    }
+   ]
+  },
+  {
+   "@id": "gr:kind",
+   "@type": "owl:DatatypeProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "What kind of item this is in the resume's own terms (Role, Education, Project, Skill, …). Several kinds share a schema.org type, for example Education and Certification are both schema:EducationalOccupationalCredential; kind keeps them apart."
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "kind"
+   },
+   "rdfs:range": {
+    "@id": "xsd:string"
+   }
+  }
+ ]
+}
+</script>
+<style>
+:root { --paper:#EEF1F4; --surface:#fff; --ink:#17202D; --ink-2:#3A4456; --muted:#5F687A; --rule:#D3D9E1;
+  --c-person:#17202D; --c-role:#2C46C7; --c-org:#5B6C86; --c-edu:#A86A12; --c-project:#A1275D; --c-skill:#0D7776; --c-other:#6A4DB8;
+  --sans:"Schibsted Grotesk",system-ui,sans-serif; --serif:"Newsreader",Georgia,serif; }
+* { box-sizing:border-box }
+body { margin:0; background:var(--paper); color:var(--ink); font:16px/1.55 var(--sans) }
+main { max-width:880px; margin:0 auto; padding:48px 24px 96px }
+a { color:var(--ink); text-underline-offset:3px }
+code { font:13.5px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace; background:#E3E8EE; padding:1px 5px; border-radius:4px }
+h1 { font-size:44px; letter-spacing:-.02em; line-height:1.05; margin:0 0 6px }
+.sub { font:400 21px/1.4 var(--serif); color:var(--ink-2); margin:0 0 28px }
+.lede p { font:400 18.5px/1.55 var(--serif); color:var(--ink-2); margin:0 0 12px; max-width:68ch }
+h2 { font-size:24px; margin:56px 0 14px; padding-top:12px; border-top:1px solid var(--rule) }
+.meta { display:grid; grid-template-columns:max-content 1fr; gap:6px 18px; margin:24px 0; font-size:15px }
+.meta dt { color:var(--muted) } .meta dd { margin:0 }
+.downloads a { display:inline-block; margin:0 8px 8px 0; padding:6px 14px; border:1px solid var(--rule); border-radius:999px; background:var(--surface); text-decoration:none; font-size:14.5px }
+table { width:100%; border-collapse:collapse; font-size:15px; background:var(--surface); border:1px solid var(--rule); border-radius:10px; overflow:hidden }
+th, td { text-align:left; padding:8px 12px; border-top:1px solid var(--rule); vertical-align:top }
+th { font-size:13px; color:var(--muted); font-weight:600; border-top:0; background:#F6F8FA }
+.term { background:var(--surface); border:1px solid var(--rule); border-radius:12px; padding:18px 20px 14px; margin:14px 0; scroll-margin-top:16px }
+.term:target { outline:3px solid #F6DE3D; outline-offset:2px }
+.term h3 { margin:0; font-size:20px; display:flex; gap:10px; align-items:baseline; flex-wrap:wrap }
+.term h3 .anchor { text-decoration:none }
+.curie { font-size:13px }
+.def { font:400 17px/1.5 var(--serif); color:var(--ink-2); margin:8px 0 12px }
+.term dl { display:grid; grid-template-columns:120px 1fr; gap:4px 14px; margin:0; font-size:14.5px }
+.term dt { color:var(--muted) } .term dd { margin:0; word-break:break-word }
+.ex { margin:10px 0 0; padding:10px 14px; list-style:none; background:#F6F8FA; border-radius:8px; font-size:14.5px }
+.ex li { margin:2px 0 } .ex .rel { color:var(--muted); font-style:italic; margin:0 4px }
+pre { background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:14px 16px; overflow:auto; font-size:13px }
+pre code { background:none; padding:0 }
+footer { margin-top:64px; color:var(--muted); font-size:14px }
+@media (max-width:640px) { h1 { font-size:32px } .term dl { grid-template-columns:1fr } .term dt { margin-top:6px } }
+</style>
+</head>
+<body>
+<main>
+<p><a href="https://rishirajani.github.io/Graph-Resume/">← Rishi Rajani's resume graph</a></p>
+<h1>Graph Resume vocabulary</h1>
+<p class="sub">The <code>gr:</code> terms behind the resume graph: what they mean and how they connect.</p>
+<div class="lede"><p>A small vocabulary for describing a person&#x27;s career as a knowledge graph:
+the roles they held, what they studied and built, the skills each of those used, and how
+the pieces connect. It builds on schema.org for the kinds of things (people, organisations,
+credentials, creative works, defined terms) and adds the relations between them that
+schema.org doesn&#x27;t have, or only has as plain text.</p></div>
+<dl class="meta">
+  <dt>Namespace</dt><dd><code>https://rishirajani.github.io/Graph-Resume/vocab#</code></dd>
+  <dt>Prefix</dt><dd><code>gr:</code></dd>
+  <dt>Version</dt><dd>1.0, 2026-11-03</dd>
+  <dt>Author</dt><dd>Rishi Rajani</dd>
+  <dt>Terms</dt><dd>2 classes, 22 relations, 4 value properties</dd>
+</dl>
+<p class="downloads"><a href="vocab.ttl">Turtle</a><a href="vocab.jsonld">JSON-LD</a><a href="resume.ttl">The resume itself (Turtle)</a><a href="resume.jsonld">(JSON-LD)</a></p>
+
+<h2 id="design">How it fits together</h2>
+<div class="lede">
+<p>The kinds of things come from <a href="https://schema.org/">schema.org</a>: the person is a <code>schema:Person</code>, each job a <code>schema:OrganizationRole</code>, each degree or certificate a <code>schema:EducationalOccupationalCredential</code>, each project a <code>schema:CreativeWork</code>, each skill a <code>schema:DefinedTerm</code> grouped into skill areas (<code>schema:DefinedTermSet</code>). Only awards and career breaks needed classes of their own.</p>
+<p>The relations are <code>gr:</code> terms, because schema.org mostly links a person straight to an organisation, or describes skills as plain text. Here every job, degree and project is its own node, linked to where it happened and to the skills it used, so each skill on the resume can be traced back to the work behind it. Where a <code>gr:</code> relation is a special case of a schema.org property, it says so (<code>rdfs:subPropertyOf</code>, <code>owl:inverseOf</code>); where it's only similar, it points to it under “Compare”.</p>
+<p>Skills and languages are matched to the same concepts in <a href="https://www.wikidata.org/">Wikidata</a> and the EU's <a href="https://esco.ec.europa.eu/">ESCO</a> classification with <code>skos:exactMatch</code> and <code>skos:closeMatch</code>. Before each publish, the resume is checked against this vocabulary (every relation connects the kinds of things it should) and against <a href="https://www.w3.org/TR/shacl/">SHACL</a> shapes.</p>
+</div>
+
+<h2 id="overview">All relations at a glance</h2>
+<table><thead><tr><th>From</th><th>Relation</th><th>To</th></tr></thead><tbody>
+<tr><td><a href="https://schema.org/Person"><code>schema:Person</code></a></td><td><a href='#heldRole'>held role</a></td><td><a href="https://schema.org/OrganizationRole"><code>schema:OrganizationRole</code></a></td></tr><tr><td><a href="https://schema.org/Person"><code>schema:Person</code></a></td><td><a href='#workedAs'>worked as</a></td><td><a href="https://schema.org/OrganizationRole"><code>schema:OrganizationRole</code></a></td></tr><tr><td><a href="https://schema.org/Person"><code>schema:Person</code></a></td><td><a href='#worksAs'>works as</a></td><td><a href="https://schema.org/OrganizationRole"><code>schema:OrganizationRole</code></a></td></tr><tr><td><a href="https://schema.org/Person"><code>schema:Person</code></a></td><td><a href='#studied'>studied</a></td><td><a href="https://schema.org/EducationalOccupationalCredential"><code>schema:EducationalOccupationalCredential</code></a></td></tr><tr><td><a href="https://schema.org/Person"><code>schema:Person</code></a></td><td><a href='#holds'>holds</a></td><td><a href="https://schema.org/EducationalOccupationalCredential"><code>schema:EducationalOccupationalCredential</code></a></td></tr><tr><td><a href="https://schema.org/Person"><code>schema:Person</code></a></td><td><a href='#built'>built</a></td><td><a href="https://schema.org/CreativeWork"><code>schema:CreativeWork</code></a></td></tr><tr><td><a href="https://schema.org/Person"><code>schema:Person</code></a></td><td><a href='#wrote'>wrote</a></td><td><a href="https://schema.org/ScholarlyArticle"><code>schema:ScholarlyArticle</code></a></td></tr><tr><td><a href="https://schema.org/Person"><code>schema:Person</code></a></td><td><a href='#speaks'>speaks</a></td><td><a href="https://schema.org/Language"><code>schema:Language</code></a></td></tr><tr><td><a href="https://schema.org/Person"><code>schema:Person</code></a></td><td><a href='#received'>received</a></td><td><a href="#Award"><code>gr:Award</code></a></td></tr><tr><td><a href="https://schema.org/Person"><code>schema:Person</code></a></td><td><a href='#focusOn'>specialises in</a></td><td><a href="https://schema.org/DefinedTermSet"><code>schema:DefinedTermSet</code></a></td></tr><tr><td><a href="https://schema.org/Person"><code>schema:Person</code></a></td><td><a href='#took'>took</a></td><td><a href="#CareerBreak"><code>gr:CareerBreak</code></a></td></tr><tr><td><a href="https://schema.org/OrganizationRole"><code>schema:OrganizationRole</code></a> or <a href="https://schema.org/EducationalOccupationalCredential"><code>schema:EducationalOccupationalCredential</code></a></td><td><a href='#at'>at</a></td><td><a href="https://schema.org/Organization"><code>schema:Organization</code></a></td></tr><tr><td><a href="https://schema.org/OrganizationRole"><code>schema:OrganizationRole</code></a></td><td><a href='#promotedFrom'>promoted from</a></td><td><a href="https://schema.org/OrganizationRole"><code>schema:OrganizationRole</code></a></td></tr><tr><td><a href="https://schema.org/EducationalOccupationalCredential"><code>schema:EducationalOccupationalCredential</code></a></td><td><a href='#ledTo'>led to</a></td><td><a href="https://schema.org/OrganizationRole"><code>schema:OrganizationRole</code></a></td></tr><tr><td><a href="https://schema.org/EducationalOccupationalCredential"><code>schema:EducationalOccupationalCredential</code></a></td><td><a href='#runWith'>run with</a></td><td><a href="https://schema.org/Organization"><code>schema:Organization</code></a></td></tr><tr><td><a href="https://schema.org/CreativeWork"><code>schema:CreativeWork</code></a></td><td><a href='#partOf'>part of</a></td><td><a href="https://schema.org/EducationalOccupationalCredential"><code>schema:EducationalOccupationalCredential</code></a> or <a href="https://schema.org/CreativeWork"><code>schema:CreativeWork</code></a></td></tr><tr><td><a href="#CareerBreak"><code>gr:CareerBreak</code></a></td><td><a href='#included'>included</a></td><td><a href="https://schema.org/OrganizationRole"><code>schema:OrganizationRole</code></a> or <a href="https://schema.org/EducationalOccupationalCredential"><code>schema:EducationalOccupationalCredential</code></a> or <a href="https://schema.org/CreativeWork"><code>schema:CreativeWork</code></a></td></tr><tr><td><a href="#Award"><code>gr:Award</code></a></td><td><a href='#awardedBy'>awarded by</a></td><td><a href="https://schema.org/Organization"><code>schema:Organization</code></a></td></tr><tr><td><a href="https://schema.org/OrganizationRole"><code>schema:OrganizationRole</code></a> or <a href="https://schema.org/CreativeWork"><code>schema:CreativeWork</code></a> or <a href="#CareerBreak"><code>gr:CareerBreak</code></a> or <a href="#Award"><code>gr:Award</code></a></td><td><a href='#used'>used</a></td><td><a href="https://schema.org/DefinedTerm"><code>schema:DefinedTerm</code></a> or <a href="https://schema.org/Language"><code>schema:Language</code></a></td></tr><tr><td><a href="https://schema.org/EducationalOccupationalCredential"><code>schema:EducationalOccupationalCredential</code></a></td><td><a href='#trainedIn'>trained in</a></td><td><a href="https://schema.org/DefinedTerm"><code>schema:DefinedTerm</code></a></td></tr><tr><td><a href="https://schema.org/EducationalOccupationalCredential"><code>schema:EducationalOccupationalCredential</code></a></td><td><a href='#shows'>shows</a></td><td><a href="https://schema.org/DefinedTerm"><code>schema:DefinedTerm</code></a></td></tr><tr><td><a href="https://schema.org/DefinedTerm"><code>schema:DefinedTerm</code></a></td><td><a href='#inGroup'>belongs to</a></td><td><a href="https://schema.org/DefinedTermSet"><code>schema:DefinedTermSet</code></a></td></tr>
+</tbody></table>
+
+<h2 id="classes">Classes</h2>
+<section class="term" id="Award">
+  <h3><a class="anchor" href="#Award">Award</a> <code class="curie">gr:Award</code></h3>
+  <p class="def">A recognition given to the person, for example by an employer. schema.org only has award as a text property, so this makes awards nodes that can be linked to who gave them.</p>
+  <dl><dt>IRI</dt><dd><code>https://rishirajani.github.io/Graph-Resume/vocab#Award</code></dd><dt>Subclass of</dt><dd><a href="https://schema.org/Thing"><code>schema:Thing</code></a></dd><dt>Compare</dt><dd><a href="https://schema.org/award"><code>schema:award</code></a></dd><dt>In this resume</dt><dd>used 1 time</dd></dl>
+  
+</section><section class="term" id="CareerBreak">
+  <h3><a class="anchor" href="#CareerBreak">Career break</a> <code class="curie">gr:CareerBreak</code></h3>
+  <p class="def">A period between roles, with what happened during it. Lets a gap be described honestly instead of left blank.</p>
+  <dl><dt>IRI</dt><dd><code>https://rishirajani.github.io/Graph-Resume/vocab#CareerBreak</code></dd><dt>Subclass of</dt><dd><a href="https://schema.org/Thing"><code>schema:Thing</code></a></dd><dt>In this resume</dt><dd>not used in the public resume</dd></dl>
+  
+</section>
+
+<h2 id="relations">Relations</h2>
+<section class="term" id="heldRole">
+  <h3><a class="anchor" href="#heldRole">held role</a> <code class="curie">gr:heldRole</code></h3>
+  <p class="def">The person held this role. Use the more specific worked as (finished) or works as (current).</p>
+  <dl><dt>IRI</dt><dd><code>https://rishirajani.github.io/Graph-Resume/vocab#heldRole</code></dd><dt>From</dt><dd><a href="https://schema.org/Person"><code>schema:Person</code></a></dd><dt>To</dt><dd><a href="https://schema.org/OrganizationRole"><code>schema:OrganizationRole</code></a></dd><dt>Compare</dt><dd><a href="https://schema.org/hasOccupation"><code>schema:hasOccupation</code></a></dd><dt>In this resume</dt><dd>not used in the public resume</dd></dl>
+  
+</section><section class="term" id="workedAs">
+  <h3><a class="anchor" href="#workedAs">worked as</a> <code class="curie">gr:workedAs</code></h3>
+  <p class="def">The person held this role in the past; the role has an end date.</p>
+  <dl><dt>IRI</dt><dd><code>https://rishirajani.github.io/Graph-Resume/vocab#workedAs</code></dd><dt>From</dt><dd><a href="https://schema.org/Person"><code>schema:Person</code></a></dd><dt>To</dt><dd><a href="https://schema.org/OrganizationRole"><code>schema:OrganizationRole</code></a></dd><dt>Narrower than</dt><dd><a href="#heldRole"><code>gr:heldRole</code></a></dd><dt>In this resume</dt><dd>used 7 times</dd></dl>
+  <ul class='ex'><li><a href="https://rishirajani.github.io/Graph-Resume/#me">Rishi Rajani</a> <span class='rel'>worked as</span> <a href="https://rishirajani.github.io/Graph-Resume/#r-nobel">Data Engineering Consultant</a></li><li><a href="https://rishirajani.github.io/Graph-Resume/#me">Rishi Rajani</a> <span class='rel'>worked as</span> <a href="https://rishirajani.github.io/Graph-Resume/#r-flexmoney">Executive – Marketing Analytics (data &amp; analytics engineering)</a></li><li><a href="https://rishirajani.github.io/Graph-Resume/#me">Rishi Rajani</a> <span class='rel'>worked as</span> <a href="https://rishirajani.github.io/Graph-Resume/#r-flexmoney-am">Assistant Manager – Marketing Analytics (data &amp; analytics engineering)</a></li></ul>
+</section><section class="term" id="worksAs">
+  <h3><a class="anchor" href="#worksAs">works as</a> <code class="curie">gr:worksAs</code></h3>
+  <p class="def">The person holds this role now; the role has no end date.</p>
+  <dl><dt>IRI</dt><dd><code>https://rishirajani.github.io/Graph-Resume/vocab#worksAs</code></dd><dt>From</dt><dd><a href="https://schema.org/Person"><code>schema:Person</code></a></dd><dt>To</dt><dd><a href="https://schema.org/OrganizationRole"><code>schema:OrganizationRole</code></a></dd><dt>Narrower than</dt><dd><a href="#heldRole"><code>gr:heldRole</code></a></dd><dt>In this resume</dt><dd>not used in the public resume</dd></dl>
+  
+</section><section class="term" id="studied">
+  <h3><a class="anchor" href="#studied">studied</a> <code class="curie">gr:studied</code></h3>
+  <p class="def">The person studied for this degree or certificate, finished or still in progress. (schema:hasCredential would claim the credential is already held.)</p>
+  <dl><dt>IRI</dt><dd><code>https://rishirajani.github.io/Graph-Resume/vocab#studied</code></dd><dt>From</dt><dd><a href="https://schema.org/Person"><code>schema:Person</code></a></dd><dt>To</dt><dd><a href="https://schema.org/EducationalOccupationalCredential"><code>schema:EducationalOccupationalCredential</code></a></dd><dt>Compare</dt><dd><a href="https://schema.org/hasCredential"><code>schema:hasCredential</code></a>, <a href="https://schema.org/alumniOf"><code>schema:alumniOf</code></a></dd><dt>In this resume</dt><dd>used 3 times</dd></dl>
+  <ul class='ex'><li><a href="https://rishirajani.github.io/Graph-Resume/#me">Rishi Rajani</a> <span class='rel'>studied</span> <a href="https://rishirajani.github.io/Graph-Resume/#e-msc">Master&#x27;s, Computer Science</a></li><li><a href="https://rishirajani.github.io/Graph-Resume/#me">Rishi Rajani</a> <span class='rel'>studied</span> <a href="https://rishirajani.github.io/Graph-Resume/#e-be">Bachelor&#x27;s, Computer Engineering</a></li><li><a href="https://rishirajani.github.io/Graph-Resume/#me">Rishi Rajani</a> <span class='rel'>studied</span> <a href="https://rishirajani.github.io/Graph-Resume/#e-rubika">Certificate, Game Testing in Quality Control</a></li></ul>
+</section><section class="term" id="holds">
+  <h3><a class="anchor" href="#holds">holds</a> <code class="curie">gr:holds</code></h3>
+  <p class="def">The person holds this certification.</p>
+  <dl><dt>IRI</dt><dd><code>https://rishirajani.github.io/Graph-Resume/vocab#holds</code></dd><dt>From</dt><dd><a href="https://schema.org/Person"><code>schema:Person</code></a></dd><dt>To</dt><dd><a href="https://schema.org/EducationalOccupationalCredential"><code>schema:EducationalOccupationalCredential</code></a></dd><dt>Narrower than</dt><dd><a href="https://schema.org/hasCredential"><code>schema:hasCredential</code></a></dd><dt>In this resume</dt><dd>used 2 times</dd></dl>
+  <ul class='ex'><li><a href="https://rishirajani.github.io/Graph-Resume/#me">Rishi Rajani</a> <span class='rel'>holds</span> <a href="https://rishirajani.github.io/Graph-Resume/#c-udemy-python">Complete Python Bootcamp: From Zero to Hero in Python</a></li><li><a href="https://rishirajani.github.io/Graph-Resume/#me">Rishi Rajani</a> <span class='rel'>holds</span> <a href="https://rishirajani.github.io/Graph-Resume/#c-hackerrank-python">Python (Basic) Certificate</a></li></ul>
+</section><section class="term" id="built">
+  <h3><a class="anchor" href="#built">built</a> <code class="curie">gr:built</code></h3>
+  <p class="def">The person built or authored this project.</p>
+  <dl><dt>IRI</dt><dd><code>https://rishirajani.github.io/Graph-Resume/vocab#built</code></dd><dt>From</dt><dd><a href="https://schema.org/Person"><code>schema:Person</code></a></dd><dt>To</dt><dd><a href="https://schema.org/CreativeWork"><code>schema:CreativeWork</code></a></dd><dt>Compare</dt><dd><a href="https://schema.org/creator"><code>schema:creator</code></a></dd><dt>In this resume</dt><dd>used 5 times</dd></dl>
+  <ul class='ex'><li><a href="https://rishirajani.github.io/Graph-Resume/#me">Rishi Rajani</a> <span class='rel'>built</span> <a href="https://rishirajani.github.io/Graph-Resume/#p-thesis">Semantic Concept Learning in EL++ Knowledge Graphs using Box Embeddings</a></li><li><a href="https://rishirajani.github.io/Graph-Resume/#me">Rishi Rajani</a> <span class='rel'>built</span> <a href="https://rishirajani.github.io/Graph-Resume/#p-loom">Loom: open-source CSV-to-RDF ontology mapping tool</a></li><li><a href="https://rishirajani.github.io/Graph-Resume/#me">Rishi Rajani</a> <span class='rel'>built</span> <a href="https://rishirajani.github.io/Graph-Resume/#p-heat">Urban Heat Risk Knowledge Graph</a></li></ul>
+</section><section class="term" id="wrote">
+  <h3><a class="anchor" href="#wrote">wrote</a> <code class="curie">gr:wrote</code></h3>
+  <p class="def">The person is an author of this publication.</p>
+  <dl><dt>IRI</dt><dd><code>https://rishirajani.github.io/Graph-Resume/vocab#wrote</code></dd><dt>From</dt><dd><a href="https://schema.org/Person"><code>schema:Person</code></a></dd><dt>To</dt><dd><a href="https://schema.org/ScholarlyArticle"><code>schema:ScholarlyArticle</code></a></dd><dt>Inverse of</dt><dd><a href="https://schema.org/author"><code>schema:author</code></a></dd><dt>In this resume</dt><dd>not used in the public resume</dd></dl>
+  
+</section><section class="term" id="speaks">
+  <h3><a class="anchor" href="#speaks">speaks</a> <code class="curie">gr:speaks</code></h3>
+  <p class="def">The person speaks this language; how well is given by proficiency on the language.</p>
+  <dl><dt>IRI</dt><dd><code>https://rishirajani.github.io/Graph-Resume/vocab#speaks</code></dd><dt>From</dt><dd><a href="https://schema.org/Person"><code>schema:Person</code></a></dd><dt>To</dt><dd><a href="https://schema.org/Language"><code>schema:Language</code></a></dd><dt>Narrower than</dt><dd><a href="https://schema.org/knowsLanguage"><code>schema:knowsLanguage</code></a></dd><dt>In this resume</dt><dd>used 5 times</dd></dl>
+  <ul class='ex'><li><a href="https://rishirajani.github.io/Graph-Resume/#me">Rishi Rajani</a> <span class='rel'>speaks</span> <a href="https://rishirajani.github.io/Graph-Resume/#l-en">English</a></li><li><a href="https://rishirajani.github.io/Graph-Resume/#me">Rishi Rajani</a> <span class='rel'>speaks</span> <a href="https://rishirajani.github.io/Graph-Resume/#l-de">German</a></li><li><a href="https://rishirajani.github.io/Graph-Resume/#me">Rishi Rajani</a> <span class='rel'>speaks</span> <a href="https://rishirajani.github.io/Graph-Resume/#l-hi">Hindi</a></li></ul>
+</section><section class="term" id="received">
+  <h3><a class="anchor" href="#received">received</a> <code class="curie">gr:received</code></h3>
+  <p class="def">The person received this award.</p>
+  <dl><dt>IRI</dt><dd><code>https://rishirajani.github.io/Graph-Resume/vocab#received</code></dd><dt>From</dt><dd><a href="https://schema.org/Person"><code>schema:Person</code></a></dd><dt>To</dt><dd><a href="#Award"><code>gr:Award</code></a></dd><dt>Compare</dt><dd><a href="https://schema.org/award"><code>schema:award</code></a></dd><dt>In this resume</dt><dd>used 1 time</dd></dl>
+  <ul class='ex'><li><a href="https://rishirajani.github.io/Graph-Resume/#me">Rishi Rajani</a> <span class='rel'>received</span> <a href="https://rishirajani.github.io/Graph-Resume/#a-ironman">“Iron Man” Award</a></li></ul>
+</section><section class="term" id="focusOn">
+  <h3><a class="anchor" href="#focusOn">specialises in</a> <code class="curie">gr:focusOn</code></h3>
+  <p class="def">One of the person&#x27;s skill areas.</p>
+  <dl><dt>IRI</dt><dd><code>https://rishirajani.github.io/Graph-Resume/vocab#focusOn</code></dd><dt>From</dt><dd><a href="https://schema.org/Person"><code>schema:Person</code></a></dd><dt>To</dt><dd><a href="https://schema.org/DefinedTermSet"><code>schema:DefinedTermSet</code></a></dd><dt>In this resume</dt><dd>used 7 times</dd></dl>
+  <ul class='ex'><li><a href="https://rishirajani.github.io/Graph-Resume/#me">Rishi Rajani</a> <span class='rel'>specialises in</span> <a href="https://rishirajani.github.io/Graph-Resume/#g-gov">Business semantics &amp; data governance</a></li><li><a href="https://rishirajani.github.io/Graph-Resume/#me">Rishi Rajani</a> <span class='rel'>specialises in</span> <a href="https://rishirajani.github.io/Graph-Resume/#g-kr">Knowledge representation &amp; ontologies</a></li><li><a href="https://rishirajani.github.io/Graph-Resume/#me">Rishi Rajani</a> <span class='rel'>specialises in</span> <a href="https://rishirajani.github.io/Graph-Resume/#g-de">Enterprise data engineering</a></li></ul>
+</section><section class="term" id="took">
+  <h3><a class="anchor" href="#took">took</a> <code class="curie">gr:took</code></h3>
+  <p class="def">The person took this career break.</p>
+  <dl><dt>IRI</dt><dd><code>https://rishirajani.github.io/Graph-Resume/vocab#took</code></dd><dt>From</dt><dd><a href="https://schema.org/Person"><code>schema:Person</code></a></dd><dt>To</dt><dd><a href="#CareerBreak"><code>gr:CareerBreak</code></a></dd><dt>In this resume</dt><dd>not used in the public resume</dd></dl>
+  
+</section><section class="term" id="at">
+  <h3><a class="anchor" href="#at">at</a> <code class="curie">gr:at</code></h3>
+  <p class="def">Where a role was held (the employer) or where a degree or certificate was studied (the school).</p>
+  <dl><dt>IRI</dt><dd><code>https://rishirajani.github.io/Graph-Resume/vocab#at</code></dd><dt>From</dt><dd><a href="https://schema.org/OrganizationRole"><code>schema:OrganizationRole</code></a> or <a href="https://schema.org/EducationalOccupationalCredential"><code>schema:EducationalOccupationalCredential</code></a></dd><dt>To</dt><dd><a href="https://schema.org/Organization"><code>schema:Organization</code></a></dd><dt>Compare</dt><dd><a href="https://schema.org/worksFor"><code>schema:worksFor</code></a>, <a href="https://schema.org/alumniOf"><code>schema:alumniOf</code></a></dd><dt>In this resume</dt><dd>used 10 times</dd></dl>
+  <ul class='ex'><li><a href="https://rishirajani.github.io/Graph-Resume/#r-nobel">Data Engineering Consultant</a> <span class='rel'>at</span> <a href="https://rishirajani.github.io/Graph-Resume/#o-nobel">Nobel Hygiene Pvt. Ltd.</a></li><li><a href="https://rishirajani.github.io/Graph-Resume/#r-flexmoney">Executive – Marketing Analytics (data &amp; analytics engineering)</a> <span class='rel'>at</span> <a href="https://rishirajani.github.io/Graph-Resume/#o-flexmoney">Flexmoney Technologies Pvt. Ltd.</a></li><li><a href="https://rishirajani.github.io/Graph-Resume/#r-flexmoney-am">Assistant Manager – Marketing Analytics (data &amp; analytics engineering)</a> <span class='rel'>at</span> <a href="https://rishirajani.github.io/Graph-Resume/#o-flexmoney">Flexmoney Technologies Pvt. Ltd.</a></li></ul>
+</section><section class="term" id="promotedFrom">
+  <h3><a class="anchor" href="#promotedFrom">promoted from</a> <code class="curie">gr:promotedFrom</code></h3>
+  <p class="def">This role followed the earlier role through a promotion at the same organisation.</p>
+  <dl><dt>IRI</dt><dd><code>https://rishirajani.github.io/Graph-Resume/vocab#promotedFrom</code></dd><dt>From</dt><dd><a href="https://schema.org/OrganizationRole"><code>schema:OrganizationRole</code></a></dd><dt>To</dt><dd><a href="https://schema.org/OrganizationRole"><code>schema:OrganizationRole</code></a></dd><dt>In this resume</dt><dd>used 1 time</dd></dl>
+  <ul class='ex'><li><a href="https://rishirajani.github.io/Graph-Resume/#r-flexmoney-am">Assistant Manager – Marketing Analytics (data &amp; analytics engineering)</a> <span class='rel'>promoted from</span> <a href="https://rishirajani.github.io/Graph-Resume/#r-flexmoney">Executive – Marketing Analytics (data &amp; analytics engineering)</a></li></ul>
+</section><section class="term" id="ledTo">
+  <h3><a class="anchor" href="#ledTo">led to</a> <code class="curie">gr:ledTo</code></h3>
+  <p class="def">A programme of study that led directly to this role, for example a certificate run with an employer.</p>
+  <dl><dt>IRI</dt><dd><code>https://rishirajani.github.io/Graph-Resume/vocab#ledTo</code></dd><dt>From</dt><dd><a href="https://schema.org/EducationalOccupationalCredential"><code>schema:EducationalOccupationalCredential</code></a></dd><dt>To</dt><dd><a href="https://schema.org/OrganizationRole"><code>schema:OrganizationRole</code></a></dd><dt>In this resume</dt><dd>used 1 time</dd></dl>
+  <ul class='ex'><li><a href="https://rishirajani.github.io/Graph-Resume/#e-rubika">Certificate, Game Testing in Quality Control</a> <span class='rel'>led to</span> <a href="https://rishirajani.github.io/Graph-Resume/#r-ubisoft">Intern Game Tester</a></li></ul>
+</section><section class="term" id="runWith">
+  <h3><a class="anchor" href="#runWith">run with</a> <code class="curie">gr:runWith</code></h3>
+  <p class="def">An organisation that co-ran this programme with the school.</p>
+  <dl><dt>IRI</dt><dd><code>https://rishirajani.github.io/Graph-Resume/vocab#runWith</code></dd><dt>From</dt><dd><a href="https://schema.org/EducationalOccupationalCredential"><code>schema:EducationalOccupationalCredential</code></a></dd><dt>To</dt><dd><a href="https://schema.org/Organization"><code>schema:Organization</code></a></dd><dt>In this resume</dt><dd>used 1 time</dd></dl>
+  <ul class='ex'><li><a href="https://rishirajani.github.io/Graph-Resume/#e-rubika">Certificate, Game Testing in Quality Control</a> <span class='rel'>run with</span> <a href="https://rishirajani.github.io/Graph-Resume/#o-ubisoft">Ubisoft Entertainment India Pvt. Ltd.</a></li></ul>
+</section><section class="term" id="partOf">
+  <h3><a class="anchor" href="#partOf">part of</a> <code class="curie">gr:partOf</code></h3>
+  <p class="def">This project was done as part of a degree or a larger work, for example a thesis within a master&#x27;s.</p>
+  <dl><dt>IRI</dt><dd><code>https://rishirajani.github.io/Graph-Resume/vocab#partOf</code></dd><dt>From</dt><dd><a href="https://schema.org/CreativeWork"><code>schema:CreativeWork</code></a></dd><dt>To</dt><dd><a href="https://schema.org/EducationalOccupationalCredential"><code>schema:EducationalOccupationalCredential</code></a> or <a href="https://schema.org/CreativeWork"><code>schema:CreativeWork</code></a></dd><dt>Compare</dt><dd><a href="https://schema.org/isPartOf"><code>schema:isPartOf</code></a></dd><dt>In this resume</dt><dd>used 2 times</dd></dl>
+  <ul class='ex'><li><a href="https://rishirajani.github.io/Graph-Resume/#p-thesis">Semantic Concept Learning in EL++ Knowledge Graphs using Box Embeddings</a> <span class='rel'>part of</span> <a href="https://rishirajani.github.io/Graph-Resume/#e-msc">Master&#x27;s, Computer Science</a></li><li><a href="https://rishirajani.github.io/Graph-Resume/#p-rossmann">Rossmann Store Sales Prediction</a> <span class='rel'>part of</span> <a href="https://rishirajani.github.io/Graph-Resume/#e-be">Bachelor&#x27;s, Computer Engineering</a></li></ul>
+</section><section class="term" id="included">
+  <h3><a class="anchor" href="#included">included</a> <code class="curie">gr:included</code></h3>
+  <p class="def">Something done during a career break, such as freelance work or a certification.</p>
+  <dl><dt>IRI</dt><dd><code>https://rishirajani.github.io/Graph-Resume/vocab#included</code></dd><dt>From</dt><dd><a href="#CareerBreak"><code>gr:CareerBreak</code></a></dd><dt>To</dt><dd><a href="https://schema.org/OrganizationRole"><code>schema:OrganizationRole</code></a> or <a href="https://schema.org/EducationalOccupationalCredential"><code>schema:EducationalOccupationalCredential</code></a> or <a href="https://schema.org/CreativeWork"><code>schema:CreativeWork</code></a></dd><dt>In this resume</dt><dd>not used in the public resume</dd></dl>
+  
+</section><section class="term" id="awardedBy">
+  <h3><a class="anchor" href="#awardedBy">awarded by</a> <code class="curie">gr:awardedBy</code></h3>
+  <p class="def">The organisation that gave the award.</p>
+  <dl><dt>IRI</dt><dd><code>https://rishirajani.github.io/Graph-Resume/vocab#awardedBy</code></dd><dt>From</dt><dd><a href="#Award"><code>gr:Award</code></a></dd><dt>To</dt><dd><a href="https://schema.org/Organization"><code>schema:Organization</code></a></dd><dt>Compare</dt><dd><a href="https://schema.org/recognizedBy"><code>schema:recognizedBy</code></a></dd><dt>In this resume</dt><dd>used 1 time</dd></dl>
+  <ul class='ex'><li><a href="https://rishirajani.github.io/Graph-Resume/#a-ironman">“Iron Man” Award</a> <span class='rel'>awarded by</span> <a href="https://rishirajani.github.io/Graph-Resume/#o-flexmoney">Flexmoney Technologies Pvt. Ltd.</a></li></ul>
+</section><section class="term" id="used">
+  <h3><a class="anchor" href="#used">used</a> <code class="curie">gr:used</code></h3>
+  <p class="def">A skill put to use in this role, project or career break, including a language used at work. Together with trained in and shows, it ties each skill to the work behind it.</p>
+  <dl><dt>IRI</dt><dd><code>https://rishirajani.github.io/Graph-Resume/vocab#used</code></dd><dt>From</dt><dd><a href="https://schema.org/OrganizationRole"><code>schema:OrganizationRole</code></a> or <a href="https://schema.org/CreativeWork"><code>schema:CreativeWork</code></a> or <a href="#CareerBreak"><code>gr:CareerBreak</code></a> or <a href="#Award"><code>gr:Award</code></a></dd><dt>To</dt><dd><a href="https://schema.org/DefinedTerm"><code>schema:DefinedTerm</code></a> or <a href="https://schema.org/Language"><code>schema:Language</code></a></dd><dt>Compare</dt><dd><a href="https://schema.org/skills"><code>schema:skills</code></a></dd><dt>In this resume</dt><dd>used 84 times</dd></dl>
+  <ul class='ex'><li><a href="https://rishirajani.github.io/Graph-Resume/#r-nobel">Data Engineering Consultant</a> <span class='rel'>used</span> <a href="https://rishirajani.github.io/Graph-Resume/#s-python">Python</a></li><li><a href="https://rishirajani.github.io/Graph-Resume/#r-flexmoney">Executive – Marketing Analytics (data &amp; analytics engineering)</a> <span class='rel'>used</span> <a href="https://rishirajani.github.io/Graph-Resume/#s-python">Python</a></li><li><a href="https://rishirajani.github.io/Graph-Resume/#p-rossmann">Rossmann Store Sales Prediction</a> <span class='rel'>used</span> <a href="https://rishirajani.github.io/Graph-Resume/#s-python">Python</a></li></ul>
+</section><section class="term" id="trainedIn">
+  <h3><a class="anchor" href="#trainedIn">trained in</a> <code class="curie">gr:trainedIn</code></h3>
+  <p class="def">A skill taught or practised during this degree or course.</p>
+  <dl><dt>IRI</dt><dd><code>https://rishirajani.github.io/Graph-Resume/vocab#trainedIn</code></dd><dt>From</dt><dd><a href="https://schema.org/EducationalOccupationalCredential"><code>schema:EducationalOccupationalCredential</code></a></dd><dt>To</dt><dd><a href="https://schema.org/DefinedTerm"><code>schema:DefinedTerm</code></a></dd><dt>Compare</dt><dd><a href="https://schema.org/teaches"><code>schema:teaches</code></a></dd><dt>In this resume</dt><dd>used 5 times</dd></dl>
+  <ul class='ex'><li><a href="https://rishirajani.github.io/Graph-Resume/#e-msc">Master&#x27;s, Computer Science</a> <span class='rel'>trained in</span> <a href="https://rishirajani.github.io/Graph-Resume/#s-ontology">Ontology engineering</a></li><li><a href="https://rishirajani.github.io/Graph-Resume/#e-msc">Master&#x27;s, Computer Science</a> <span class='rel'>trained in</span> <a href="https://rishirajani.github.io/Graph-Resume/#s-dl">Description logics</a></li><li><a href="https://rishirajani.github.io/Graph-Resume/#e-msc">Master&#x27;s, Computer Science</a> <span class='rel'>trained in</span> <a href="https://rishirajani.github.io/Graph-Resume/#s-kge">Knowledge graph embeddings</a></li></ul>
+</section><section class="term" id="shows">
+  <h3><a class="anchor" href="#shows">shows</a> <code class="curie">gr:shows</code></h3>
+  <p class="def">A skill this certification is evidence of.</p>
+  <dl><dt>IRI</dt><dd><code>https://rishirajani.github.io/Graph-Resume/vocab#shows</code></dd><dt>From</dt><dd><a href="https://schema.org/EducationalOccupationalCredential"><code>schema:EducationalOccupationalCredential</code></a></dd><dt>To</dt><dd><a href="https://schema.org/DefinedTerm"><code>schema:DefinedTerm</code></a></dd><dt>Compare</dt><dd><a href="https://schema.org/competencyRequired"><code>schema:competencyRequired</code></a></dd><dt>In this resume</dt><dd>used 2 times</dd></dl>
+  <ul class='ex'><li><a href="https://rishirajani.github.io/Graph-Resume/#c-udemy-python">Complete Python Bootcamp: From Zero to Hero in Python</a> <span class='rel'>shows</span> <a href="https://rishirajani.github.io/Graph-Resume/#s-python">Python</a></li><li><a href="https://rishirajani.github.io/Graph-Resume/#c-hackerrank-python">Python (Basic) Certificate</a> <span class='rel'>shows</span> <a href="https://rishirajani.github.io/Graph-Resume/#s-python">Python</a></li></ul>
+</section><section class="term" id="inGroup">
+  <h3><a class="anchor" href="#inGroup">belongs to</a> <code class="curie">gr:inGroup</code></h3>
+  <p class="def">The skill area this skill is grouped under. Each skill belongs to exactly one.</p>
+  <dl><dt>IRI</dt><dd><code>https://rishirajani.github.io/Graph-Resume/vocab#inGroup</code></dd><dt>From</dt><dd><a href="https://schema.org/DefinedTerm"><code>schema:DefinedTerm</code></a></dd><dt>To</dt><dd><a href="https://schema.org/DefinedTermSet"><code>schema:DefinedTermSet</code></a></dd><dt>Narrower than</dt><dd><a href="https://schema.org/inDefinedTermSet"><code>schema:inDefinedTermSet</code></a></dd><dt>In this resume</dt><dd>used 72 times</dd></dl>
+  <ul class='ex'><li><a href="https://rishirajani.github.io/Graph-Resume/#s-kpi">Business-term &amp; KPI definitions</a> <span class='rel'>belongs to</span> <a href="https://rishirajani.github.io/Graph-Resume/#g-gov">Business semantics &amp; data governance</a></li><li><a href="https://rishirajani.github.io/Graph-Resume/#s-metricstd">Metric standardization</a> <span class='rel'>belongs to</span> <a href="https://rishirajani.github.io/Graph-Resume/#g-gov">Business semantics &amp; data governance</a></li><li><a href="https://rishirajani.github.io/Graph-Resume/#s-s2t">Source-to-target mapping</a> <span class='rel'>belongs to</span> <a href="https://rishirajani.github.io/Graph-Resume/#g-gov">Business semantics &amp; data governance</a></li></ul>
+</section>
+
+<h2 id="values">Value properties</h2>
+<section class="term" id="highlight">
+  <h3><a class="anchor" href="#highlight">highlight</a> <code class="curie">gr:highlight</code></h3>
+  <p class="def">One achievement or responsibility in a role, degree or project, written as a CV bullet point. Order is not significant.</p>
+  <dl><dt>IRI</dt><dd><code>https://rishirajani.github.io/Graph-Resume/vocab#highlight</code></dd><dt>To</dt><dd><a href="http://www.w3.org/2001/XMLSchema#string"><code>xsd:string</code></a></dd><dt>In this resume</dt><dd>used 52 times</dd></dl>
+  <ul class='ex'><li><a href="https://rishirajani.github.io/Graph-Resume/#r-nobel">Data Engineering Consultant</a> <span class='rel'>highlight</span> “Built a data integration and reporting proof of concept around existing SAP HANA and API…”</li></ul>
+</section><section class="term" id="kind">
+  <h3><a class="anchor" href="#kind">kind</a> <code class="curie">gr:kind</code></h3>
+  <p class="def">What kind of item this is in the resume&#x27;s own terms (Role, Education, Project, Skill, …). Several kinds share a schema.org type, for example Education and Certification are both schema:EducationalOccupationalCredential; kind keeps them apart.</p>
+  <dl><dt>IRI</dt><dd><code>https://rishirajani.github.io/Graph-Resume/vocab#kind</code></dd><dt>To</dt><dd><a href="http://www.w3.org/2001/XMLSchema#string"><code>xsd:string</code></a></dd><dt>In this resume</dt><dd>used 112 times</dd></dl>
+  <ul class='ex'><li><a href="https://rishirajani.github.io/Graph-Resume/#me">Rishi Rajani</a> <span class='rel'>kind</span> “Person”</li></ul>
+</section><section class="term" id="location">
+  <h3><a class="anchor" href="#location">location</a> <code class="curie">gr:location</code></h3>
+  <p class="def">Where it took place, as written on a CV (city and country, or remote).</p>
+  <dl><dt>IRI</dt><dd><code>https://rishirajani.github.io/Graph-Resume/vocab#location</code></dd><dt>To</dt><dd><a href="http://www.w3.org/2001/XMLSchema#string"><code>xsd:string</code></a></dd><dt>Compare</dt><dd><a href="https://schema.org/location"><code>schema:location</code></a></dd><dt>In this resume</dt><dd>used 12 times</dd></dl>
+  <ul class='ex'><li><a href="https://rishirajani.github.io/Graph-Resume/#me">Rishi Rajani</a> <span class='rel'>location</span> “Stuttgart, Germany (open to relocation)”</li></ul>
+</section><section class="term" id="proficiency">
+  <h3><a class="anchor" href="#proficiency">proficiency</a> <code class="curie">gr:proficiency</code></h3>
+  <p class="def">How well a language is spoken: a CEFR level (A1 to C2) or Native, Fluent or Basic.</p>
+  <dl><dt>IRI</dt><dd><code>https://rishirajani.github.io/Graph-Resume/vocab#proficiency</code></dd><dt>From</dt><dd><a href="https://schema.org/Language"><code>schema:Language</code></a></dd><dt>To</dt><dd><a href="http://www.w3.org/2001/XMLSchema#string"><code>xsd:string</code></a></dd><dt>In this resume</dt><dd>used 5 times</dd></dl>
+  <ul class='ex'><li><a href="https://rishirajani.github.io/Graph-Resume/#l-en">English</a> <span class='rel'>proficiency</span> “Fluent”</li></ul>
+</section>
+
+<h2 id="example">Example</h2>
+<p>A role, where it was, and a skill it used, as they appear in <a href="resume.ttl">resume.ttl</a>:</p>
+<pre><code>@prefix cv: &lt;https://rishirajani.github.io/Graph-Resume/#&gt; .
+@prefix gr: &lt;https://rishirajani.github.io/Graph-Resume/vocab#&gt; .
+@prefix schema: &lt;https://schema.org/&gt; .
+@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .
+
+cv:me gr:workedAs cv:r-nobel .
+
+cv:o-nobel a schema:Organization ;
+    schema:name &quot;Nobel Hygiene Pvt. Ltd.&quot; .
+
+cv:r-nobel a schema:OrganizationRole ;
+    gr:at cv:o-nobel ;
+    gr:used cv:s-python ;
+    schema:endDate &quot;2024-03&quot; ;
+    schema:name &quot;Data Engineering Consultant&quot; ;
+    schema:startDate &quot;2023-10&quot; .
+
+cv:s-python a schema:DefinedTerm ;
+    skos:exactMatch &lt;http://data.europa.eu/esco/skill/ccd0a1d9-afda-43d9-b901-96344886e14d&gt;,
+        &lt;http://www.wikidata.org/entity/Q28865&gt; ;
+    schema:name &quot;Python&quot; .</code></pre>
+
+<footer>Generated from <code>vocab.ttl</code>. Term IRIs resolve to their sections on this page.</footer>
+</main>
+</body>
+</html>

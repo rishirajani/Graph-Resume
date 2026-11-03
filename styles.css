@@ -323,7 +323,8 @@ table.reqs td .chips { display: flex; flex-wrap: wrap; gap: 5px; }
 .vis-row .vis-meta { color: var(--muted); font-size: 13px; }
 .vis-row.off .vis-label { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--rule); }
 .vis-row.changed { background: color-mix(in srgb, var(--hl) 28%, transparent); }
-.read-foot { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--rule); }
+.read-foot { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--rule); display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; }
+.read-vocab { font-size: 14.5px; color: var(--ink-2); }
 
 /* ---------- phones: header stacked above a full-height graph, details in a bottom sheet ---------- */
 @media (max-width: 640px) {

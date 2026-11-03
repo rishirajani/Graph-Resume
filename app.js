@@ -590,7 +590,7 @@
       ${section("Education", "--c-edu", edu)}
       ${section("Skills", "--c-skill", groups || ungrouped.length ? `<div class="skills-grid">${groups}${ungrouped.length ? `<div><h3>Other</h3><div class="links">${ungrouped.map((s) => chip(s.id)).join("")}</div></div>` : ""}</div>` : "")}
       ${section("Languages and more", "--c-other", more)}
-      ${R.site?.allowPublicGraphExport !== false ? '<p class="read-foot"><button class="btn ghost small" type="button" id="read-download">Download this graph as JSON-LD or Turtle</button></p>' : ""}
+      ${R.site?.allowPublicGraphExport !== false ? '<p class="read-foot"><button class="btn ghost small" type="button" id="read-download">Download this graph as JSON-LD or Turtle</button> <a class="read-vocab" href="vocab">How the graph is described: the gr: vocabulary</a></p>' : ""}
     `;
     $("#read-download")?.addEventListener("click", () => $("#export-graph-btn").click());
     $$("#read-body [data-goto]").forEach((b) => b.addEventListener("click", () => go(b.dataset.goto)));

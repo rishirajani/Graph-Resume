@@ -1,0 +1,231 @@
+@prefix gr:      <https://rishirajani.github.io/Graph-Resume/vocab#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:    <http://www.w3.org/2004/02/skos/core#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix vann:    <http://purl.org/vocab/vann/> .
+@prefix schema:  <https://schema.org/> .
+
+# ---------------------------------------------------------------------------
+# The ontology
+# ---------------------------------------------------------------------------
+
+<https://rishirajani.github.io/Graph-Resume/vocab>
+  a owl:Ontology ;
+  dcterms:title "Graph Resume vocabulary"@en ;
+  dcterms:description """A small vocabulary for describing a person's career as a knowledge graph:
+the roles they held, what they studied and built, the skills each of those used, and how
+the pieces connect. It builds on schema.org for the kinds of things (people, organisations,
+credentials, creative works, defined terms) and adds the relations between them that
+schema.org doesn't have, or only has as plain text."""@en ;
+  dcterms:creator "Rishi Rajani" ;
+  dcterms:created "2026-11-03"^^xsd:date ;
+  owl:versionInfo "1.0" ;
+  owl:versionIRI <https://rishirajani.github.io/Graph-Resume/vocab/1.0> ;
+  vann:preferredNamespacePrefix "gr" ;
+  vann:preferredNamespaceUri "https://rishirajani.github.io/Graph-Resume/vocab#" ;
+  rdfs:seeAlso <https://schema.org/> , <http://www.w3.org/2004/02/skos/core> .
+
+# ---------------------------------------------------------------------------
+# Classes
+# The resume mostly uses schema.org classes; these two have no schema.org equivalent.
+# ---------------------------------------------------------------------------
+
+gr:Award a owl:Class ;
+  rdfs:label "Award"@en ;
+  rdfs:comment "A recognition given to the person, for example by an employer. schema.org only has award as a text property, so this makes awards nodes that can be linked to who gave them."@en ;
+  rdfs:subClassOf schema:Thing ;
+  rdfs:seeAlso schema:award .
+
+gr:CareerBreak a owl:Class ;
+  rdfs:label "Career break"@en ;
+  rdfs:comment "A period between roles, with what happened during it. Lets a gap be described honestly instead of left blank."@en ;
+  rdfs:subClassOf schema:Thing .
+
+# ---------------------------------------------------------------------------
+# Relations from the person
+# ---------------------------------------------------------------------------
+
+gr:heldRole a owl:ObjectProperty ;
+  rdfs:label "held role"@en ;
+  rdfs:comment "The person held this role. Use the more specific worked as (finished) or works as (current)."@en ;
+  rdfs:domain schema:Person ;
+  rdfs:range schema:OrganizationRole ;
+  rdfs:seeAlso schema:hasOccupation .
+
+gr:workedAs a owl:ObjectProperty ;
+  rdfs:label "worked as"@en ;
+  rdfs:comment "The person held this role in the past; the role has an end date."@en ;
+  rdfs:subPropertyOf gr:heldRole ;
+  rdfs:domain schema:Person ;
+  rdfs:range schema:OrganizationRole .
+
+gr:worksAs a owl:ObjectProperty ;
+  rdfs:label "works as"@en ;
+  rdfs:comment "The person holds this role now; the role has no end date."@en ;
+  rdfs:subPropertyOf gr:heldRole ;
+  rdfs:domain schema:Person ;
+  rdfs:range schema:OrganizationRole .
+
+gr:studied a owl:ObjectProperty ;
+  rdfs:label "studied"@en ;
+  rdfs:comment "The person studied for this degree or certificate, finished or still in progress. (schema:hasCredential would claim the credential is already held.)"@en ;
+  rdfs:domain schema:Person ;
+  rdfs:range schema:EducationalOccupationalCredential ;
+  rdfs:seeAlso schema:hasCredential , schema:alumniOf .
+
+gr:holds a owl:ObjectProperty ;
+  rdfs:label "holds"@en ;
+  rdfs:comment "The person holds this certification."@en ;
+  rdfs:subPropertyOf schema:hasCredential ;
+  rdfs:domain schema:Person ;
+  rdfs:range schema:EducationalOccupationalCredential .
+
+gr:built a owl:ObjectProperty ;
+  rdfs:label "built"@en ;
+  rdfs:comment "The person built or authored this project."@en ;
+  rdfs:domain schema:Person ;
+  rdfs:range schema:CreativeWork ;
+  rdfs:seeAlso schema:creator .
+
+gr:wrote a owl:ObjectProperty ;
+  rdfs:label "wrote"@en ;
+  rdfs:comment "The person is an author of this publication."@en ;
+  owl:inverseOf schema:author ;
+  rdfs:domain schema:Person ;
+  rdfs:range schema:ScholarlyArticle .
+
+gr:speaks a owl:ObjectProperty ;
+  rdfs:label "speaks"@en ;
+  rdfs:comment "The person speaks this language; how well is given by proficiency on the language."@en ;
+  rdfs:subPropertyOf schema:knowsLanguage ;
+  rdfs:domain schema:Person ;
+  rdfs:range schema:Language .
+
+gr:received a owl:ObjectProperty ;
+  rdfs:label "received"@en ;
+  rdfs:comment "The person received this award."@en ;
+  rdfs:domain schema:Person ;
+  rdfs:range gr:Award ;
+  rdfs:seeAlso schema:award .
+
+gr:focusOn a owl:ObjectProperty ;
+  rdfs:label "specialises in"@en ;
+  rdfs:comment "One of the person's skill areas."@en ;
+  rdfs:domain schema:Person ;
+  rdfs:range schema:DefinedTermSet .
+
+gr:took a owl:ObjectProperty ;
+  rdfs:label "took"@en ;
+  rdfs:comment "The person took this career break."@en ;
+  rdfs:domain schema:Person ;
+  rdfs:range gr:CareerBreak .
+
+# ---------------------------------------------------------------------------
+# Relations between experience, education and projects
+# ---------------------------------------------------------------------------
+
+gr:at a owl:ObjectProperty ;
+  rdfs:label "at"@en ;
+  rdfs:comment "Where a role was held (the employer) or where a degree or certificate was studied (the school)."@en ;
+  rdfs:domain [ a owl:Class ; owl:unionOf ( schema:OrganizationRole schema:EducationalOccupationalCredential ) ] ;
+  rdfs:range schema:Organization ;
+  rdfs:seeAlso schema:worksFor , schema:alumniOf .
+
+gr:promotedFrom a owl:ObjectProperty ;
+  rdfs:label "promoted from"@en ;
+  rdfs:comment "This role followed the earlier role through a promotion at the same organisation."@en ;
+  rdfs:domain schema:OrganizationRole ;
+  rdfs:range schema:OrganizationRole .
+
+gr:ledTo a owl:ObjectProperty ;
+  rdfs:label "led to"@en ;
+  rdfs:comment "A programme of study that led directly to this role, for example a certificate run with an employer."@en ;
+  rdfs:domain schema:EducationalOccupationalCredential ;
+  rdfs:range schema:OrganizationRole .
+
+gr:runWith a owl:ObjectProperty ;
+  rdfs:label "run with"@en ;
+  rdfs:comment "An organisation that co-ran this programme with the school."@en ;
+  rdfs:domain schema:EducationalOccupationalCredential ;
+  rdfs:range schema:Organization .
+
+gr:partOf a owl:ObjectProperty ;
+  rdfs:label "part of"@en ;
+  rdfs:comment "This project was done as part of a degree or a larger work, for example a thesis within a master's."@en ;
+  rdfs:domain schema:CreativeWork ;
+  rdfs:range [ a owl:Class ; owl:unionOf ( schema:EducationalOccupationalCredential schema:CreativeWork ) ] ;
+  rdfs:seeAlso schema:isPartOf .
+
+gr:included a owl:ObjectProperty ;
+  rdfs:label "included"@en ;
+  rdfs:comment "Something done during a career break, such as freelance work or a certification."@en ;
+  rdfs:domain gr:CareerBreak ;
+  rdfs:range [ a owl:Class ; owl:unionOf ( schema:OrganizationRole schema:EducationalOccupationalCredential schema:CreativeWork ) ] .
+
+gr:awardedBy a owl:ObjectProperty ;
+  rdfs:label "awarded by"@en ;
+  rdfs:comment "The organisation that gave the award."@en ;
+  rdfs:domain gr:Award ;
+  rdfs:range schema:Organization ;
+  rdfs:seeAlso schema:recognizedBy .
+
+# ---------------------------------------------------------------------------
+# Skills
+# ---------------------------------------------------------------------------
+
+gr:used a owl:ObjectProperty ;
+  rdfs:label "used"@en ;
+  rdfs:comment "A skill put to use in this role, project or career break, including a language used at work. Together with trained in and shows, it ties each skill to the work behind it."@en ;
+  rdfs:domain [ a owl:Class ; owl:unionOf ( schema:OrganizationRole schema:CreativeWork gr:CareerBreak gr:Award ) ] ;
+  rdfs:range [ a owl:Class ; owl:unionOf ( schema:DefinedTerm schema:Language ) ] ;
+  rdfs:seeAlso schema:skills .
+
+gr:trainedIn a owl:ObjectProperty ;
+  rdfs:label "trained in"@en ;
+  rdfs:comment "A skill taught or practised during this degree or course."@en ;
+  rdfs:domain schema:EducationalOccupationalCredential ;
+  rdfs:range schema:DefinedTerm ;
+  rdfs:seeAlso schema:teaches .
+
+gr:shows a owl:ObjectProperty ;
+  rdfs:label "shows"@en ;
+  rdfs:comment "A skill this certification is evidence of."@en ;
+  rdfs:domain schema:EducationalOccupationalCredential ;
+  rdfs:range schema:DefinedTerm ;
+  rdfs:seeAlso schema:competencyRequired .
+
+gr:inGroup a owl:ObjectProperty ;
+  rdfs:label "belongs to"@en ;
+  rdfs:comment "The skill area this skill is grouped under. Each skill belongs to exactly one."@en ;
+  rdfs:subPropertyOf schema:inDefinedTermSet ;
+  rdfs:domain schema:DefinedTerm ;
+  rdfs:range schema:DefinedTermSet .
+
+# ---------------------------------------------------------------------------
+# Plain values
+# ---------------------------------------------------------------------------
+
+gr:kind a owl:DatatypeProperty ;
+  rdfs:label "kind"@en ;
+  rdfs:comment "What kind of item this is in the resume's own terms (Role, Education, Project, Skill, …). Several kinds share a schema.org type, for example Education and Certification are both schema:EducationalOccupationalCredential; kind keeps them apart."@en ;
+  rdfs:range xsd:string .
+
+gr:highlight a owl:DatatypeProperty ;
+  rdfs:label "highlight"@en ;
+  rdfs:comment "One achievement or responsibility in a role, degree or project, written as a CV bullet point. Order is not significant."@en ;
+  rdfs:range xsd:string .
+
+gr:location a owl:DatatypeProperty ;
+  rdfs:label "location"@en ;
+  rdfs:comment "Where it took place, as written on a CV (city and country, or remote)."@en ;
+  rdfs:range xsd:string ;
+  rdfs:seeAlso schema:location .
+
+gr:proficiency a owl:DatatypeProperty ;
+  rdfs:label "proficiency"@en ;
+  rdfs:comment "How well a language is spoken: a CEFR level (A1 to C2) or Native, Fluent or Basic."@en ;
+  rdfs:domain schema:Language ;
+  rdfs:range xsd:string .
