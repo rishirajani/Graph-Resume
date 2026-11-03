@@ -33,75 +33,19 @@
     { key: "other", label: "More",       types: ["Language", "Certification", "Award", "Publication"], color: "--c-other" }
   ];
   // predicate -> [forward phrase, inverse phrase]
-  const PRED = {
-    workedAs:   ["worked as", "held by"],
-    worksAs:    ["works as", "held by"],
-    at:         ["at", "where"],
-    studied:    ["studied", "studied by"],
-    built:      ["built", "built by"],
-    partOf:     ["part of", "includes"],
-    used:       ["used", "used in"],
-    trainedIn:  ["trained in", "practised in"],
-    inGroup:    ["belongs to", "includes"],
-    focusOn:    ["specialises in", "specialism of"],
-    speaks:     ["speaks", "spoken by"],
-    holds:      ["holds", "held by"],
-    received:   ["received", "received by"],
-    wrote:      ["wrote", "written by"],
-    shows:      ["shows", "shown by"],
-    awardedBy:  ["from", "awarded"],
-    promotedFrom: ["promoted from", "promoted to"],
-    ledTo:      ["led to", "came through"],
-    runWith:    ["run with", "co-ran"],
-    took:       ["took", "taken by"],
-    included:   ["included", "during"]
-  };
+  const { PRED, deriveEdges, isPlaceholder, clean, publicSubset, toJsonLd: coreJsonLd, toTurtle: coreTurtle } = window.GRCORE;
 
   /* ---------------- build the graph model ---------------- */
   const me = Object.assign({ type: "Person", label: R.person.name }, R.person);
   const allNodes = [me, ...R.nodes];
   const byId = new Map(allNodes.map((n) => [n.id, n]));
 
-  function deriveEdges(nodes) {
-    const ids = new Set(nodes.map((n) => n.id));
-    const E = [];
-    const add = (s, p, o) => { if (ids.has(s) && ids.has(o)) E.push({ id: `${s}__${p}__${o}`, source: s, target: o, pred: p }); };
-    for (const n of nodes) {
-      switch (n.type) {
-        case "Role": add("me", n.end || !n.start ? "workedAs" : "worksAs", n.id); add(n.id, "at", n.org); if (n.promotedFrom) add(n.id, "promotedFrom", n.promotedFrom); if (n.via) add(n.via, "ledTo", n.id); break;
-        case "Education": add("me", "studied", n.id); add(n.id, "at", n.school); if (n.partner) add(n.id, "runWith", n.partner); break;
-        case "Project": add("me", "built", n.id); if (n.partOf) add(n.id, "partOf", n.partOf); break;
-        case "Skill": add(n.id, "inGroup", n.group); break;
-        case "SkillGroup": add("me", "focusOn", n.id); break;
-        case "Language": add("me", "speaks", n.id); break;
-        case "Certification": add("me", "holds", n.id); break;
-        case "Award": add("me", "received", n.id); if (n.org) add(n.id, "awardedBy", n.org); break;
-        case "Publication": add("me", "wrote", n.id); break;
-        case "Break": add("me", "took", n.id); (n.includes || []).forEach((x) => add(n.id, "included", x)); break;
-      }
-      for (const s of n.skills || []) add(n.id, n.type === "Education" ? "trainedIn" : n.type === "Certification" ? "shows" : "used", s);
-    }
-    return E;
-  }
 
   const showDrafts = () => { try { return localStorage.getItem("gr.showDrafts") === "1"; } catch { return false; } };
-  const isPlaceholder = (t) => /^replace with/i.test(String(t || "").trim()) || /^add one line/i.test(String(t || "").trim());
-  const clean = (arr) => (arr || []).filter((t) => t && !isPlaceholder(t));
 
   // What visitors get: no private nodes, and no organisations, schools or skills that only
   // private nodes used (the same rule tools/publish.mjs applies to the public file).
-  const publicNodes = (() => {
-    const REF = ["org", "school", "skills", "group", "partOf", "promotedFrom", "via", "partner", "includes"];
-    const refs = (n) => REF.flatMap((f) => [].concat(n[f] ?? []));
-    const out = new Set(allNodes.filter((n) => n.private).map((n) => n.id));
-    for (let changed = true; changed; ) {
-      changed = false;
-      const kept = allNodes.filter((n) => !out.has(n.id)), used = new Set(kept.flatMap(refs));
-      const cand = new Set(allNodes.filter((n) => out.has(n.id)).flatMap(refs));
-      for (const n of kept) if (["Organization", "School", "Skill"].includes(n.type) && cand.has(n.id) && !used.has(n.id)) { out.add(n.id); changed = true; }
-    }
-    return allNodes.filter((n) => !out.has(n.id));
-  })();
+  const publicNodes = publicSubset(allNodes);
   const publicEdges = deriveEdges(publicNodes);
   const fullEdges = deriveEdges(allNodes);
   // On your own devices (private master loaded) the graph and text view also show hidden
@@ -509,6 +453,15 @@
     return out.sort((a, b) => a.order - b.order || (rank[byId.get(a.other)?.type] ?? 9) - (rank[byId.get(b.other)?.type] ?? 9));
   }
 
+  // the same concept in Wikidata / ESCO, as small links under the description
+  function matchesHtml(n) {
+    const ex = n.exactMatch || [], cl = n.closeMatch || [];
+    if (!ex.length && !cl.length) return "";
+    const link = (x) => { const m = window.GRCORE.matchLink(x); return `<a href="${esc(m.url)}" target="_blank" rel="noopener">${esc(m.label)}</a>`; };
+    const ids = (xs) => xs.map((x) => window.GRCORE.expand(x).split("/").pop()).map((x) => (x.length > 12 ? "" : ` ${x}`));
+    const fmt = (xs) => xs.map((x, i) => link(x) + `<span class="muted">${esc(ids(xs)[i])}</span>`).join(", ");
+    return `<p class="matches">${ex.length ? `Same as ${fmt(ex)}` : ""}${ex.length && cl.length ? "; related: " : cl.length ? "Related: " : ""}${cl.length ? fmt(cl) : ""}</p>`;
+  }
   function renderDrawer(id) {
     const n = byId.get(id);
     if (!n || (n.private && !ownerView)) return closeDrawer();
@@ -526,6 +479,7 @@
       ${summary ? `<p class="summary">${esc(summary)}</p>` : ""}
       ${hls.length ? `<ul class="hl-list">${hls.map((h) => `<li>${esc(h)}</li>`).join("")}</ul>` : ""}
       ${n.url ? `<p><a href="${esc(n.url)}" target="_blank" rel="noopener">Open link</a></p>` : ""}
+      ${matchesHtml(n)}
       ${triples.length ? `<h3>How it connects</h3><ul class="triples">${triples.map((t) => {
         const o = byId.get(t.other);
         return `<li><button type="button" data-goto="${esc(t.other)}"><span class="pred">${esc(t.pred)}</span><span class="obj" style="--c:${colorOf(o)}"><span class="dot"></span>${esc(o.label || o.name)}${o.type === "Role" && byId.get(o.org) ? `, ${esc(byId.get(o.org).label)}` : ""}</span></button></li>`;
@@ -667,66 +621,10 @@
   $("#lens-clear").addEventListener("click", clearLens);
 
   /* ---------------- graph export (JSON-LD + Turtle) ---------------- */
-  const SCHEMA_TYPE = {
-    Person: "Person", Role: "OrganizationRole", Organization: "Organization", Education: "EducationalOccupationalCredential",
-    School: "CollegeOrUniversity", Project: "CreativeWork", Skill: "DefinedTerm", SkillGroup: "DefinedTermSet",
-    Language: "Language", Certification: "EducationalOccupationalCredential", Award: "gr:Award", Publication: "ScholarlyArticle",
-    Break: "gr:CareerBreak"
-  };
   function baseIri() { return (R.site?.baseIri || location.href.split("#")[0]).replace(/[?].*$/, "") + "#"; }
-
-  function toJsonLd(includePrivate = false) {
-    const nodes = includePrivate ? allNodes : publicNodes;
-    const edges = includePrivate ? fullEdges : publicEdges;
-    const base = baseIri();
-    const graph = nodes.map((n) => {
-      const o = { "@id": "cv:" + n.id, "@type": SCHEMA_TYPE[n.type] || "Thing", name: n.label || n.name, "gr:kind": n.type };
-      const summary = n.summary || n.description;
-      if (summary && !isPlaceholder(summary)) o.description = summary;
-      if (n.headline) o.disambiguatingDescription = n.headline;
-      if (n.email) o.email = n.email;
-      if (n.start) o.startDate = n.start;
-      if (n.end) o.endDate = n.end;
-      if (n.location) o["gr:location"] = n.location;
-      if (n.status) o.creativeWorkStatus = n.status;
-      if (n.level) o["gr:proficiency"] = n.level;
-      if (n.url) o.url = n.url;
-      const hls = clean(n.highlights);
-      if (hls.length) o["gr:highlight"] = hls;
-      for (const e of edges.filter((e) => e.source === n.id)) {
-        const k = "gr:" + e.pred;
-        (o[k] = o[k] || []).push({ "@id": "cv:" + e.target });
-      }
-      return o;
-    });
-    const root = base.replace(/#$/, "").replace(/[^/]*$/, "");
-    return {
-      "@context": { "@vocab": "https://schema.org/", cv: base, gr: root + "vocab#" },
-      "@graph": graph
-    };
-  }
-  function toTurtle(includePrivate = false) {
-    const doc = toJsonLd(includePrivate);
-    const lit = (s) => `"${String(s).replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\n/g, "\\n")}"`;
-    const term = (k) => (k.startsWith("gr:") ? k : `schema:${k}`);
-    const typ = (t) => (t.startsWith("gr:") ? t : `schema:${t}`);
-    const lines = [
-      `@prefix schema: <https://schema.org/> .`,
-      `@prefix gr: <${doc["@context"].gr}> .`,
-      `@prefix cv: <${doc["@context"].cv}> .`, ""
-    ];
-    for (const o of doc["@graph"]) {
-      const po = [`a ${typ(o["@type"])}`];
-      for (const [k, v] of Object.entries(o)) {
-        if (k.startsWith("@")) continue;
-        const vals = Array.isArray(v) ? v : [v];
-        const objs = vals.map((x) => (x && typeof x === "object" && x["@id"] ? x["@id"] : lit(x)));
-        po.push(`${term(k)} ${objs.join(", ")}`);
-      }
-      lines.push(`${o["@id"]} ${po.join(" ;\n    ")} .`, "");
-    }
-    return lines.join("\n");
-  }
+  // downloads are always the public part; see core.js
+  const toJsonLd = (includePrivate = false) => coreJsonLd(includePrivate ? allNodes : publicNodes, includePrivate ? fullEdges : publicEdges, baseIri());
+  const toTurtle = (includePrivate = false) => coreTurtle(toJsonLd(includePrivate));
 
   $("#export-graph-btn").addEventListener("click", () => {
     modal("Download the graph", `

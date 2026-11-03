@@ -470,49 +470,80 @@ window.RESUME = {
       "id": "s-kpi",
       "type": "Skill",
       "label": "Business-term & KPI definitions",
-      "group": "g-gov"
+      "group": "g-gov",
+      "closeMatch": [
+        "wd:Q860554",
+        "wd:Q61314299",
+        "esco:8dcbcabe-09f7-4d11-940d-125af57bbc40"
+      ]
     },
     {
       "id": "s-metricstd",
       "type": "Skill",
       "label": "Metric standardization",
-      "group": "g-gov"
+      "group": "g-gov",
+      "closeMatch": [
+        "wd:Q860554"
+      ]
     },
     {
       "id": "s-s2t",
       "type": "Skill",
       "label": "Source-to-target mapping",
-      "group": "g-gov"
+      "group": "g-gov",
+      "closeMatch": [
+        "wd:Q2330408"
+      ]
     },
     {
       "id": "s-dq",
       "type": "Skill",
       "label": "Data-quality rules",
-      "group": "g-gov"
+      "group": "g-gov",
+      "closeMatch": [
+        "wd:Q1757694",
+        "esco:54c9c155-9293-4329-8ed2-2e76e8b519d4"
+      ]
     },
     {
       "id": "s-mdm",
       "type": "Skill",
       "label": "Master-data validation",
-      "group": "g-gov"
+      "group": "g-gov",
+      "closeMatch": [
+        "wd:Q190349"
+      ]
     },
     {
       "id": "s-reconcile",
       "type": "Skill",
       "label": "Data reconciliation",
-      "group": "g-gov"
+      "group": "g-gov",
+      "exactMatch": [
+        "wd:Q48719515"
+      ]
     },
     {
       "id": "s-docs",
       "type": "Skill",
       "label": "Technical documentation",
-      "group": "g-gov"
+      "group": "g-gov",
+      "exactMatch": [
+        "wd:Q1413406",
+        "esco:04dfd9fb-e0cf-40f6-96c6-9d2280c4347e"
+      ]
     },
     {
       "id": "s-privacy",
       "type": "Skill",
       "label": "Data privacy (PII handling)",
-      "group": "g-gov"
+      "group": "g-gov",
+      "exactMatch": [
+        "esco:5d5ba629-0b4c-424f-8803-000c3736f3f7"
+      ],
+      "closeMatch": [
+        "wd:Q1076693"
+      ]
     },
     {
       "id": "g-kr",
@@ -524,73 +555,117 @@ window.RESUME = {
       "id": "s-rdf",
       "type": "Skill",
       "label": "RDF",
-      "group": "g-kr"
+      "group": "g-kr",
+      "exactMatch": [
+        "wd:Q54872"
+      ]
     },
     {
       "id": "s-rdfs",
       "type": "Skill",
       "label": "RDFS",
-      "group": "g-kr"
+      "group": "g-kr",
+      "exactMatch": [
+        "wd:Q1751819"
+      ]
     },
     {
       "id": "s-owl",
       "type": "Skill",
       "label": "OWL",
-      "group": "g-kr"
+      "group": "g-kr",
+      "exactMatch": [
+        "wd:Q826165"
+      ]
     },
     {
       "id": "s-sparql",
       "type": "Skill",
       "label": "SPARQL",
-      "group": "g-kr"
+      "group": "g-kr",
+      "exactMatch": [
+        "wd:Q54871",
+        "esco:5da8018b-ae85-4cde-ad93-0394369018f3"
+      ],
+      "closeMatch": [
+        "esco:99207709-d076-4cce-ba38-e90d3bb28806"
+      ]
     },
     {
       "id": "s-shacl",
       "type": "Skill",
       "label": "SHACL",
-      "group": "g-kr"
+      "group": "g-kr",
+      "exactMatch": [
+        "wd:Q29377821"
+      ]
     },
     {
       "id": "s-turtle",
       "type": "Skill",
       "label": "Turtle",
-      "group": "g-kr"
+      "group": "g-kr",
+      "exactMatch": [
+        "wd:Q114409"
+      ]
     },
     {
       "id": "s-ontology",
       "type": "Skill",
       "label": "Ontology engineering",
-      "group": "g-kr"
+      "group": "g-kr",
+      "exactMatch": [
+        "wd:Q1027508"
+      ]
     },
     {
       "id": "s-dl",
       "type": "Skill",
       "label": "Description logics",
-      "group": "g-kr"
+      "group": "g-kr",
+      "exactMatch": [
+        "wd:Q387196"
+      ]
     },
     {
       "id": "s-semmodel",
       "type": "Skill",
       "label": "Semantic modeling",
-      "group": "g-kr"
+      "group": "g-kr",
+      "closeMatch": [
+        "wd:Q7449052",
+        "esco:fbafa41f-cd05-4109-a649-8b44d306d779"
+      ]
     },
     {
       "id": "s-neo4j",
       "type": "Skill",
       "label": "Neo4j",
-      "group": "g-kr"
+      "group": "g-kr",
+      "exactMatch": [
+        "wd:Q1628290"
+      ]
     },
     {
       "id": "s-cypher",
       "type": "Skill",
       "label": "Cypher",
-      "group": "g-kr"
+      "group": "g-kr",
+      "exactMatch": [
+        "wd:Q16834355"
+      ],
+      "closeMatch": [
+        "esco:75f839c2-fd9a-4ad3-8921-6e734608568d"
+      ]
     },
     {
       "id": "s-n10s",
       "type": "Skill",
       "label": "neosemantics",
-      "group": "g-kr"
+      "group": "g-kr",
+      "exactMatch": [
+        "wd:Q140676801"
+      ]
     },
     {
       "id": "g-de",
@@ -602,103 +677,162 @@ window.RESUME = {
       "id": "s-python",
       "type": "Skill",
       "label": "Python",
-      "group": "g-de"
+      "group": "g-de",
+      "exactMatch": [
+        "wd:Q28865",
+        "esco:ccd0a1d9-afda-43d9-b901-96344886e14d"
+      ]
     },
     {
       "id": "s-sql",
       "type": "Skill",
       "label": "SQL",
-      "group": "g-de"
+      "group": "g-de",
+      "exactMatch": [
+        "wd:Q47607",
+        "esco:598de5b0-5b58-4ea7-8058-a4bc4d18c742"
+      ]
     },
     {
       "id": "s-etl",
       "type": "Skill",
       "label": "ETL / ELT",
-      "group": "g-de"
+      "group": "g-de",
+      "exactMatch": [
+        "wd:Q1276130"
+      ],
+      "closeMatch": [
+        "esco:9d0d89be-bffa-4393-b6f6-8d05bea49051"
+      ]
     },
     {
       "id": "s-integration",
       "type": "Skill",
       "label": "Data integration",
-      "group": "g-de"
+      "group": "g-de",
+      "exactMatch": [
+        "wd:Q386824"
+      ]
     },
     {
       "id": "s-postgres",
       "type": "Skill",
       "label": "PostgreSQL",
-      "group": "g-de"
+      "group": "g-de",
+      "exactMatch": [
+        "wd:Q192490",
+        "esco:a8d07b5a-c1a1-42c6-9d53-db9c7a2ca996"
+      ]
     },
     {
       "id": "s-sap",
       "type": "Skill",
       "label": "SAP HANA integration",
-      "group": "g-de"
+      "group": "g-de",
+      "closeMatch": [
+        "wd:Q951374"
+      ]
     },
     {
       "id": "s-redshift",
       "type": "Skill",
       "label": "Redshift",
-      "group": "g-de"
+      "group": "g-de",
+      "exactMatch": [
+        "wd:Q17012109"
+      ]
     },
     {
       "id": "s-dbt",
       "type": "Skill",
       "label": "dbt",
-      "group": "g-de"
+      "group": "g-de",
+      "exactMatch": [
+        "wd:Q107610347"
+      ]
     },
     {
       "id": "s-docker",
       "type": "Skill",
       "label": "Docker",
-      "group": "g-de"
+      "group": "g-de",
+      "exactMatch": [
+        "wd:Q15206305"
+      ]
     },
     {
       "id": "s-sqlite",
       "type": "Skill",
       "label": "SQLite",
-      "group": "g-de"
+      "group": "g-de",
+      "exactMatch": [
+        "wd:Q319417"
+      ]
     },
     {
       "id": "s-athena",
       "type": "Skill",
       "label": "AWS Athena",
-      "group": "g-de"
+      "group": "g-de",
+      "exactMatch": [
+        "wd:Q65203360"
+      ]
     },
     {
       "id": "s-jdbc",
       "type": "Skill",
       "label": "JDBC",
-      "group": "g-de"
+      "group": "g-de",
+      "exactMatch": [
+        "wd:Q722772"
+      ]
     },
     {
       "id": "s-oracledb",
       "type": "Skill",
       "label": "Oracle Database",
-      "group": "g-de"
+      "group": "g-de",
+      "exactMatch": [
+        "wd:Q185524",
+        "esco:de9f85ba-e77f-48fd-8c66-f5ebaf32d655"
+      ]
     },
     {
       "id": "s-mssql",
       "type": "Skill",
       "label": "Microsoft SQL Server",
-      "group": "g-de"
+      "group": "g-de",
+      "exactMatch": [
+        "wd:Q215819",
+        "esco:c062bab3-3ea0-4291-9220-a2d8fef4bead"
+      ]
     },
     {
       "id": "s-sqlalchemy",
       "type": "Skill",
       "label": "SQLAlchemy",
-      "group": "g-de"
+      "group": "g-de",
+      "exactMatch": [
+        "wd:Q1092514"
+      ]
     },
     {
       "id": "s-pandas",
       "type": "Skill",
       "label": "pandas",
-      "group": "g-de"
+      "group": "g-de",
+      "exactMatch": [
+        "wd:Q15967387"
+      ]
     },
     {
       "id": "s-cron",
       "type": "Skill",
       "label": "Job scheduling (cron)",
-      "group": "g-de"
+      "group": "g-de",
+      "exactMatch": [
+        "wd:Q300864"
+      ]
     },
     {
       "id": "g-an",
@@ -710,25 +844,40 @@ window.RESUME = {
       "id": "s-superset",
       "type": "Skill",
       "label": "Apache Superset",
-      "group": "g-an"
+      "group": "g-an",
+      "exactMatch": [
+        "wd:Q68705831"
+      ]
     },
     {
       "id": "s-powerbi",
       "type": "Skill",
       "label": "Power BI",
-      "group": "g-an"
+      "group": "g-an",
+      "exactMatch": [
+        "wd:Q23542287"
+      ]
     },
     {
       "id": "s-clevertap",
       "type": "Skill",
       "label": "CleverTap",
-      "group": "g-an"
+      "group": "g-an",
+      "closeMatch": [
+        "wd:Q48966378"
+      ]
     },
     {
       "id": "s-funnel",
       "type": "Skill",
       "label": "Funnel analytics",
-      "group": "g-an"
+      "group": "g-an",
+      "exactMatch": [
+        "wd:Q18356622"
+      ],
+      "closeMatch": [
+        "wd:Q5166474"
+      ]
     },
     {
       "id": "s-attribution",
@@ -740,7 +889,12 @@ window.RESUME = {
       "id": "s-kpifw",
       "type": "Skill",
       "label": "KPI frameworks",
-      "group": "g-an"
+      "group": "g-an",
+      "closeMatch": [
+        "wd:Q860554",
+        "wd:Q1771949",
+        "esco:8dcbcabe-09f7-4d11-940d-125af57bbc40"
+      ]
     },
     {
       "id": "s-alerting",
@@ -753,19 +907,33 @@ window.RESUME = {
       "id": "s-segment",
       "type": "Skill",
       "label": "Customer segmentation",
-      "group": "g-an"
+      "group": "g-an",
+      "exactMatch": [
+        "esco:136e0cab-0b19-48f7-9086-745d615f416b"
+      ],
+      "closeMatch": [
+        "wd:Q363057"
+      ]
     },
     {
       "id": "s-survey",
       "type": "Skill",
       "label": "Survey analysis & user personas",
-      "group": "g-an"
+      "group": "g-an",
+      "closeMatch": [
+        "wd:Q814232",
+        "esco:6b30644d-bdc5-4bca-b1af-edbf5c6b15ee"
+      ]
     },
     {
       "id": "s-market",
       "type": "Skill",
       "label": "Market research",
-      "group": "g-an"
+      "group": "g-an",
+      "exactMatch": [
+        "wd:Q913709",
+        "esco:8770350e-746f-4adb-9556-18ca68104be6"
+      ]
     },
     {
       "id": "g-sw",
@@ -777,109 +945,179 @@ window.RESUME = {
       "id": "s-ts",
       "type": "Skill",
       "label": "TypeScript",
-      "group": "g-sw"
+      "group": "g-sw",
+      "exactMatch": [
+        "wd:Q978185",
+        "esco:867137fb-ff1b-4ca3-99f3-cb6969aa2c68"
+      ]
     },
     {
       "id": "s-react",
       "type": "Skill",
       "label": "React",
-      "group": "g-sw"
+      "group": "g-sw",
+      "exactMatch": [
+        "wd:Q19399674"
+      ]
     },
     {
       "id": "s-n3",
       "type": "Skill",
       "label": "N3.js",
-      "group": "g-sw"
+      "group": "g-sw",
+      "exactMatch": [
+        "wd:Q140704882"
+      ]
     },
     {
       "id": "s-java",
       "type": "Skill",
       "label": "Java",
-      "group": "g-sw"
+      "group": "g-sw",
+      "exactMatch": [
+        "wd:Q251",
+        "esco:19a8293b-8e95-4de3-983f-77484079c389"
+      ]
     },
     {
       "id": "s-git",
       "type": "Skill",
       "label": "Git",
-      "group": "g-sw"
+      "group": "g-sw",
+      "exactMatch": [
+        "wd:Q186055"
+      ],
+      "closeMatch": [
+        "esco:9d2e926f-53d9-41f5-98f3-19dfaa687f3f"
+      ]
     },
     {
       "id": "s-cicd",
       "type": "Skill",
       "label": "CI / CD",
-      "group": "g-sw"
+      "group": "g-sw",
+      "exactMatch": [
+        "wd:Q28136854"
+      ],
+      "closeMatch": [
+        "wd:Q965769",
+        "wd:Q2507377"
+      ]
     },
     {
       "id": "s-pytorch",
       "type": "Skill",
       "label": "PyTorch",
-      "group": "g-sw"
+      "group": "g-sw",
+      "exactMatch": [
+        "wd:Q47509047"
+      ]
     },
     {
       "id": "s-sklearn",
       "type": "Skill",
       "label": "scikit-learn",
-      "group": "g-sw"
+      "group": "g-sw",
+      "exactMatch": [
+        "wd:Q1026367"
+      ]
     },
     {
       "id": "s-kge",
       "type": "Skill",
       "label": "Knowledge graph embeddings",
-      "group": "g-sw"
+      "group": "g-sw",
+      "exactMatch": [
+        "wd:Q33003557"
+      ]
     },
     {
       "id": "s-xgboost",
       "type": "Skill",
       "label": "XGBoost",
-      "group": "g-sw"
+      "group": "g-sw",
+      "exactMatch": [
+        "wd:Q23793561"
+      ]
     },
     {
       "id": "s-regression",
       "type": "Skill",
       "label": "Regression modelling",
-      "group": "g-sw"
+      "group": "g-sw",
+      "exactMatch": [
+        "wd:Q208042"
+      ]
     },
     {
       "id": "s-featsel",
       "type": "Skill",
       "label": "Feature selection",
-      "group": "g-sw"
+      "group": "g-sw",
+      "exactMatch": [
+        "wd:Q446488"
+      ]
     },
     {
       "id": "s-django",
       "type": "Skill",
       "label": "Django",
-      "group": "g-sw"
+      "group": "g-sw",
+      "exactMatch": [
+        "wd:Q842014"
+      ]
     },
     {
       "id": "s-web",
       "type": "Skill",
       "label": "HTML / CSS / JavaScript",
-      "group": "g-sw"
+      "group": "g-sw",
+      "closeMatch": [
+        "wd:Q8811",
+        "wd:Q46441",
+        "wd:Q2005",
+        "esco:3cd569a2-4f88-4c1e-9995-8dce8c5e51a7",
+        "esco:e5d1f825-60ed-4bdd-872a-e748c387f777",
+        "esco:0af062de-eb43-41e9-9b96-249e2cd22d26"
+      ]
     },
     {
       "id": "s-rest",
       "type": "Skill",
       "label": "REST APIs",
-      "group": "g-sw"
+      "group": "g-sw",
+      "exactMatch": [
+        "wd:Q749568"
+      ]
     },
     {
       "id": "s-servlets",
       "type": "Skill",
       "label": "Java Servlets & JSP",
-      "group": "g-sw"
+      "group": "g-sw",
+      "closeMatch": [
+        "wd:Q375673",
+        "wd:Q183169"
+      ]
     },
     {
       "id": "s-unittest",
       "type": "Skill",
       "label": "Unit testing",
-      "group": "g-sw"
+      "group": "g-sw",
+      "exactMatch": [
+        "wd:Q907375",
+        "esco:7961413f-61d0-4722-9cd9-20a050a29899"
+      ]
     },
     {
       "id": "s-jira",
       "type": "Skill",
       "label": "JIRA",
-      "group": "g-sw"
+      "group": "g-sw",
+      "exactMatch": [
+        "wd:Q1359246"
+      ]
     },
     {
       "id": "g-games",
@@ -890,19 +1128,28 @@ window.RESUME = {
       "id": "s-gameqa",
       "type": "Skill",
       "label": "Game QA testing",
-      "group": "g-games"
+      "group": "g-games",
+      "exactMatch": [
+        "wd:Q1093030"
+      ]
     },
     {
       "id": "s-gamedesign",
       "type": "Skill",
       "label": "Game design fundamentals",
-      "group": "g-games"
+      "group": "g-games",
+      "exactMatch": [
+        "wd:Q858057"
+      ]
     },
     {
       "id": "s-esports",
       "type": "Skill",
       "label": "Esports operations",
-      "group": "g-games"
+      "group": "g-games",
+      "closeMatch": [
+        "wd:Q300920"
+      ]
     },
     {
       "id": "g-collab",
@@ -914,14 +1161,24 @@ window.RESUME = {
       "type": "Skill",
       "label": "Cross-functional stakeholder alignment",
       "short": "Stakeholder alignment",
-      "group": "g-collab"
+      "group": "g-collab",
+      "closeMatch": [
+        "wd:Q59751"
+      ]
     },
     {
       "id": "s-requirements",
       "type": "Skill",
       "label": "Business requirements analysis",
       "short": "Requirements analysis",
-      "group": "g-collab"
+      "group": "g-collab",
+      "exactMatch": [
+        "esco:b04f377b-ee80-4b38-aca1-19d266a23b17"
+      ],
+      "closeMatch": [
+        "wd:Q187147",
+        "wd:Q5001932"
+      ]
     },
     {
       "id": "s-enablement",
@@ -933,37 +1190,57 @@ window.RESUME = {
       "id": "s-agile",
       "type": "Skill",
       "label": "Agile / Scrum",
-      "group": "g-collab"
+      "group": "g-collab",
+      "closeMatch": [
+        "wd:Q30232",
+        "wd:Q460387",
+        "esco:dba46f87-0831-49cd-a1c7-340a653c0221"
+      ]
     },
     {
       "id": "l-en",
       "type": "Language",
       "label": "English",
-      "level": "Fluent"
+      "level": "Fluent",
+      "exactMatch": [
+        "wd:Q1860"
+      ]
     },
     {
       "id": "l-de",
       "type": "Language",
       "label": "German",
-      "level": "B1"
+      "level": "B1",
+      "exactMatch": [
+        "wd:Q188"
+      ]
     },
     {
       "id": "l-hi",
       "type": "Language",
       "label": "Hindi",
-      "level": "Native"
+      "level": "Native",
+      "exactMatch": [
+        "wd:Q1568"
+      ]
     },
     {
       "id": "l-mr",
       "type": "Language",
       "label": "Marathi",
-      "level": "Basic"
+      "level": "Basic",
+      "exactMatch": [
+        "wd:Q1571"
+      ]
     },
     {
       "id": "l-sd",
       "type": "Language",
       "label": "Sindhi",
-      "level": "Basic"
+      "level": "Basic",
+      "exactMatch": [
+        "wd:Q33997"
+      ]
     }
   ]
 };

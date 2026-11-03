@@ -303,6 +303,8 @@ table.reqs td .chips { display: flex; flex-wrap: wrap; gap: 5px; }
 .for-hint { font-size: 13px; color: var(--muted); margin-top: 8px !important; }
 .for-gone { font-size: 14px; color: var(--ink-2); }
 .for-read { max-width: none; margin: 18px 0 8px; }
+.drawer .matches { font-size: 13.5px; color: var(--ink-2); margin: 10px 0 0; }
+.drawer .matches a { color: var(--ink); }
 .link-form { max-width: 720px; }
 .link-form .vis-row { font-size: 14.5px; }
 .link-form details { margin-top: 14px; }

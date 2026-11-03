@@ -17,10 +17,17 @@ It's a static site: no server, no database, no build step. Hosting is free.
 | --- | --- |
 | `resume.js` | **Your data. The only file you normally edit.** |
 | `index.html`, `styles.css` | Page structure and design |
+| `core.js` | Shared by the site and the publishing script: edges, what visitors see, RDF export |
 | `app.js` | Graph explorer, text view, graph export |
 | `studio.js` | Owner studio: prompt, model calls, grounding check, exports |
 | `lib/` | Bundled libraries (Cytoscape.js for the graph, docx for Word export), both MIT-licensed |
 
+
+## The graph as data
+
+The site publishes its graph next to the page as [`resume.ttl`](resume.ttl) (Turtle) and [`resume.jsonld`](resume.jsonld) (JSON-LD), and links both from the page's `<head>`. Items use [schema.org](https://schema.org/) types, relations use a small `gr:` vocabulary (`gr:workedAs`, `gr:used`, `gr:inGroup`, …), and skills and languages point to the same concepts in [Wikidata](https://www.wikidata.org/) and the EU's [ESCO](https://esco.ec.europa.eu/) skills classification with `skos:exactMatch` (the same concept) or `skos:closeMatch` (closely related, or one part of a combined skill such as "HTML / CSS / JavaScript").
+
+Before every publish the graph is checked against light [SHACL](https://www.w3.org/TR/shacl/) shapes (`shapes/resume.shacl.ttl`, run with pySHACL): every item has one name and a known kind, dates are `YYYY` or `YYYY-MM` and never end before they start, roles have a start date and exactly one organisation and are linked from the person, education is at a school, each skill sits in exactly one skill area, matches point to Wikidata items or ESCO skills, and every link points at something in the graph. If a check fails, nothing is published.
 
 ## Put it online for free (GitHub Pages)
 
