@@ -49,7 +49,7 @@
 
   async function enterStudio() {
     await ready;
-    ["#gate", "#settings", "#workspace", "#visibility", "#links"].forEach((s) => ($(s).hidden = true));
+    ["#gate", "#settings", "#workspace", "#visibility", "#links", "#customize"].forEach((s) => ($(s).hidden = true));
     if (runtime.inArtifact && !runtime.isOwner) {
       $("#gate").hidden = false;
       $("#gate").innerHTML = "<h2>Owner only</h2><p>The studio is available to the owner of this page.</p>";
@@ -111,7 +111,7 @@
   });
   ["#model", "#base-url"].forEach((s) => $(s).addEventListener("input", () => ($("#preset").value = "")));
   $("#base-url").addEventListener("change", () => ($("#api-key").value = getKey($("#provider").value, $("#base-url").value)));
-  $("#studio-settings-btn").addEventListener("click", () => { $("#visibility").hidden = true; $("#links").hidden = true; openSettings(); });
+  $("#studio-settings-btn").addEventListener("click", () => { ["#visibility", "#links", "#customize"].forEach((x) => ($(x).hidden = true)); openSettings(); });
 
   /* ---------------- GitHub (private master) ---------------- */
   const ghHeaders = () => { const gh = LS.get("gh", {}) || {}; return { Authorization: `Bearer ${gh.token}`, Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" }; };
@@ -165,7 +165,7 @@
         <label class="check" style="margin-top:12px"><input type="checkbox" id="link-in-cv" ${current.link.inCv ? "checked" : ""}> Add it to this CV as "Interactive version" (next to your email and LinkedIn)</label>
         <p class="help">It goes live a minute or two after you made it. Manage, extend or switch it off under <b>Company links</b>.</p></div>`;
       $("#link-copy").addEventListener("click", () => G.copyText(current.link.url).then(() => toast("Link copied")));
-      $("#link-in-cv").addEventListener("change", (e) => { current.link.inCv = e.target.checked; updateHistoryItem(); $("#cv-paper").innerHTML = renderCv(current.result); if (current.result.coverLetter) $("#cl-paper").innerHTML = renderLetter(current.result, current.input); });
+      $("#link-in-cv").addEventListener("change", (e) => { current.link.inCv = e.target.checked; updateHistoryItem(); paintDocs(current.result, current.input); });
       return;
     }
     const reqs = current.result.fit?.requirements || [];
@@ -235,7 +235,7 @@
   }
 
   async function openLinks() {
-    ["#gate", "#settings", "#workspace", "#visibility"].forEach((x) => ($(x).hidden = true));
+    ["#gate", "#settings", "#workspace", "#visibility", "#customize"].forEach((x) => ($(x).hidden = true));
     $("#links").hidden = false;
     const body = $("#links-body"), st = (t) => ($("#links-status").textContent = t);
     if (!connected()) { body.innerHTML = `<p class="note">Connect this browser to your private master first: <b>Model settings → Private master on GitHub</b>.</p>`; return; }
@@ -290,7 +290,7 @@
   }
 
   function openVisibility() {
-    ["#gate", "#settings", "#workspace", "#links"].forEach((x) => ($(x).hidden = true));
+    ["#gate", "#settings", "#workspace", "#links", "#customize"].forEach((x) => ($(x).hidden = true));
     $("#visibility").hidden = false;
     const O = window.GR_OWNER || {};
     if (!G.ownerView || !O.configured) {
@@ -752,11 +752,10 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     $("#lens-btn").addEventListener("click", () => showLens(result));
     $$("#tab-fit [data-node]").forEach((b) => b.addEventListener("click", () => { showLens(result, b.dataset.node); }));
 
-    $("#cv-paper").innerHTML = renderCv(result);
     const letter = result.coverLetter;
     $("#tab-letter").hidden = true;
     $('[data-tab="letter"]').hidden = !letter;
-    if (letter) $("#cl-paper").innerHTML = renderLetter(result, input);
+    paintDocs(result, input);
     selectTab("fit");
     $("#results").scrollIntoView({ behavior: "smooth", block: "start" });
   }
@@ -782,14 +781,28 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
   }
   $$('#results [role="tab"]').forEach((b) => b.addEventListener("click", () => selectTab(b.dataset.tab)));
 
+  // CV and letter style from the site settings (ui.js): layout, accent, section order, titles
+  const CVUI = () => (window.GRUI ? window.GRUI.ui.cv : { layout: "classic", accent: "", order: ["profile", "experience", "projects", "education", "skills", "awards", "certifications", "languages"], titles: {} });
+  const CV_ACCENT = { classic: "#1D2A40", modern: "#2C46C7", compact: "#1D2A40" };
+  function styleCv(el, cvui = CVUI()) {
+    el.classList.remove("cv-classic", "cv-modern", "cv-compact");
+    el.classList.add("cv-" + cvui.layout);
+    el.style.setProperty("--cv-accent", cvui.accent || CV_ACCENT[cvui.layout]);
+  }
+  function paintDocs(result, input) {
+    $("#cv-paper").innerHTML = renderCv(result); styleCv($("#cv-paper"));
+    if (result.coverLetter) { $("#cl-paper").innerHTML = renderLetter(result, input); styleCv($("#cl-paper")); }
+  }
   function contactLine() {
     const parts = [me.location, LS.get("private", {}).phone, me.email, ...(me.links || []).map((l) => l.url.replace(/^https?:\/\/(www\.)?/, ""))].filter(Boolean).map(esc);
     if (current?.link?.inCv && current.link.url) parts.push(`<a href="${esc(current.link.url)}">Interactive version</a>`);
     return parts.join("  |  ");
   }
-  function renderCv(result) {
+  function renderCv(result, cvui = CVUI()) {
     const cv = result.cv || {};
-    const T = Object.assign({}, TITLES_EN, cv.sectionTitles || {});
+    // your own section titles apply to English CVs; for other languages the model's titles win
+    const english = !result.job?.languageCode || /^en/i.test(result.job.languageCode);
+    const T = english ? Object.assign({}, TITLES_EN, cv.sectionTitles || {}, cvui.titles) : Object.assign({}, TITLES_EN, cvui.titles, cv.sectionTitles || {});
     const sec = (title, body) => (body ? `<h2>${esc(title)}</h2>${body}` : "");
     const row = (left, right) => `<div class="p-row"><span class="p-title">${left}</span><span class="p-dates">${esc(right || "")}</span></div>`;
     const bullets = (b) => ((b || []).length ? `<ul>${b.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : "");
@@ -818,18 +831,21 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     }).join("");
     const langs = (cv.languages || []).map((id) => { const n = byId.get(id); return esc(n.label + (n.level ? ` (${n.level})` : "")); }).join(", ");
 
+    const SECTIONS = {
+      profile: () => sec(T.profile, cv.summary ? `<p class="p-summary">${esc(cv.summary)}</p>` : ""),
+      experience: () => sec(T.experience, exp),
+      projects: () => sec(T.projects, proj),
+      education: () => sec(T.education, edu),
+      skills: () => sec(T.skills, skills ? `<div class="p-skills">${skills}</div>` : ""),
+      awards: () => sec(T.awards, awards),
+      certifications: () => sec(T.certifications, certs),
+      languages: () => sec(T.languages, langs ? `<p class="p-summary">${langs}</p>` : "")
+    };
     return `
       <h1>${esc(me.name)}</h1>
       <p class="p-headline">${esc(cv.headline || me.headline || "")}</p>
       <p class="p-contact">${contactLine()}</p>
-      ${sec(T.profile, cv.summary ? `<p class="p-summary">${esc(cv.summary)}</p>` : "")}
-      ${sec(T.experience, exp)}
-      ${sec(T.projects, proj)}
-      ${sec(T.education, edu)}
-      ${sec(T.skills, skills ? `<div class="p-skills">${skills}</div>` : "")}
-      ${sec(T.awards, awards)}
-      ${sec(T.certifications, certs)}
-      ${sec(T.languages, langs ? `<p class="p-summary">${langs}</p>` : "")}`;
+      ${cvui.order.map((k) => (SECTIONS[k] ? SECTIONS[k]() : "")).join("\n")}`;
   }
 
   function renderLetter(result, input) {
@@ -908,6 +924,9 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
   }
   async function toDocx(root, isLetter) {
     const d = await loadDocx();
+    const cvui = CVUI(), layout = cvui.layout;
+    const accent = (cvui.accent || CV_ACCENT[layout]).replace("#", "").toUpperCase();
+    const compact = layout === "compact", modern = layout === "modern";
     const { Document, Packer, Paragraph, TextRun, TabStopType, BorderStyle, LevelFormat, AlignmentType, ExternalHyperlink } = d;
     const font = isLetter ? "Georgia" : "Calibri";
     const textWidth = 11906 - 2 * 1080;
@@ -917,33 +936,37 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     });
     const children = toBlocks(root).map((b) => {
       switch (b.kind) {
-        case "title": return new Paragraph({ children: mk(b.runs, { bold: true, size: isLetter ? 32 : 40, font }), spacing: { after: 40 } });
-        case "lead": return new Paragraph({ children: mk(b.runs, { size: 22 }), spacing: { after: 40 } });
+        case "title": return new Paragraph({ children: mk(b.runs, { bold: true, size: isLetter ? (compact ? 30 : 32) : compact ? 34 : modern ? 44 : 40, font, ...(modern ? { color: accent } : {}) }), spacing: { after: 40 } });
+        case "lead": return new Paragraph({ children: mk(b.runs, { size: compact ? 20 : 22, ...(modern ? { color: accent } : {}) }), spacing: { after: 40 } });
         case "contact": return new Paragraph({ children: mk(b.runs, { size: 18, color: "444444" }), spacing: { after: 160 } });
-        case "heading": return new Paragraph({ children: mk(b.runs, { bold: true, size: 20, color: "1D2A40" }), spacing: { before: 220, after: 80 },
-          border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: "BFC6CF", space: 2 } } });
-        case "row": return new Paragraph({ tabStops: [{ type: TabStopType.RIGHT, position: textWidth }], spacing: { before: 100, after: 20 },
+        case "heading": return modern
+          ? new Paragraph({ children: mk(b.runs, { bold: true, size: 17, color: accent, allCaps: true, characterSpacing: 40 }), spacing: { before: 240, after: 80 } })
+          : new Paragraph({ children: mk(b.runs, { bold: true, size: compact ? 19 : 20, color: accent }), spacing: { before: compact ? 140 : 220, after: compact ? 50 : 80 },
+            border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: "BFC6CF", space: 2 } } });
+        case "row": return new Paragraph({ tabStops: [{ type: TabStopType.RIGHT, position: textWidth }], spacing: { before: compact ? 60 : 100, after: 20 },
           children: [new TextRun({ text: b.left.trim(), bold: true }), new TextRun({ text: b.right.trim() ? `\t${b.right.trim()}` : "", color: "444444", size: 19 })] });
         case "sub": return new Paragraph({ children: mk(b.runs, { color: "444444", size: 19 }), spacing: { after: 20 } });
-        case "bullet": return new Paragraph({ children: mk(b.runs), numbering: { reference: "bul", level: 0 }, spacing: { after: 30 } });
+        case "bullet": return new Paragraph({ children: mk(b.runs), numbering: { reference: "bul", level: 0 }, spacing: { after: compact ? 10 : 30 } });
         default: return new Paragraph({ children: mk(b.runs), spacing: { after: isLetter ? 200 : 60 } });
       }
     });
     const doc = new Document({
       creator: me.name, title: fileBase(isLetter ? "Cover-letter" : "CV"),
-      styles: { default: { document: { run: { font, size: isLetter ? 22 : 20 } } } },
+      styles: { default: { document: { run: { font, size: isLetter ? (compact ? 21 : 22) : compact ? 19 : 20 } } } },
       numbering: { config: [{ reference: "bul", levels: [{ level: 0, format: LevelFormat.BULLET, text: "•", alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 300, hanging: 200 } } } }] }] },
-      sections: [{ properties: { page: { size: { width: 11906, height: 16838 }, margin: { top: 1000, bottom: 1000, left: 1080, right: 1080 } } }, children }]
+      sections: [{ properties: { page: { size: { width: 11906, height: 16838 }, margin: compact ? { top: 760, bottom: 760, left: 900, right: 900 } : { top: 1000, bottom: 1000, left: 1080, right: 1080 } } }, children }]
     });
     return Packer.toBlob(doc);
   }
 
+  const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  const fontLink = () => { const f = window.GRUI?.FONTS[window.GRUI.ui.fonts]; return f?.href ? `<link href="${esc(f.href)}" rel="stylesheet">` : ""; };
   function standaloneHtml(root, title) {
     const cssText = [...document.styleSheets].flatMap((s) => { try { return [...s.cssRules].map((r) => r.cssText); } catch { return []; } })
       .filter((t) => /\.paper|:root|@page/.test(t)).join("\n");
     return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${esc(title)}</title>
-<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400..800&family=Newsreader:opsz,wght@6..72,300..600&display=swap" rel="stylesheet">
-<style>${cssText}\nbody{margin:0;background:#fff}.paper{margin:0 auto}@media print{@page{size:A4;margin:0}}</style></head>
+${fontLink()}
+<style>${cssText}\n:root{--sans:${css("--sans")};--serif:${css("--serif")}}\nbody{margin:0;background:#fff}.paper{margin:0 auto}@media print{@page{size:A4;margin:0}}</style></head>
 <body>${root.outerHTML.replace(/contenteditable="true"/g, "")}<script>document.fonts.ready.then(()=>setTimeout(()=>print(),300))<\/script></body></html>`;
   }
 
@@ -976,5 +999,7 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
   }));
 
   // test hook: lets the test suite render a result without calling a model
-  window.GR.studio = { renderResult: (x) => { x.result.warnings = groundingCheck(x.result); current = x; renderResult(x); }, buildPrompt, groundingCheck, toMarkdown, toBlocks };
+  window.GR.studio = { renderResult: (x) => { x.result.warnings = groundingCheck(x.result); current = x; renderResult(x); }, buildPrompt, groundingCheck, toMarkdown, toBlocks,
+    // for customize.js
+    renderCv, renderLetter, styleCv, getCurrent: () => current, ghGet, ghPut, connected, enterStudio };
 })();

@@ -9,11 +9,13 @@
   const set = (k, v) => { try { localStorage.setItem(k, v); } catch {} };
   let cfg = null; try { cfg = JSON.parse(get("gr.gh") || "null"); } catch {}
   let asVisitor = false; try { asVisitor = sessionStorage.getItem("gr.asVisitor") === "1"; } catch {}
+  // the Customize panel's preview shows the site as visitors see it
+  if (/[?&]uipreview\b/.test(location.search)) asVisitor = true;
 
   const O = (window.GR_OWNER = { configured: !!(cfg && cfg.repo && cfg.token), source: "public", asVisitor, error: "" });
 
   // A file that still holds private nodes is the master itself (the claude.ai preview, or a local copy).
-  if ((window.RESUME?.nodes || []).some((n) => n.private)) O.source = "master";
+  if (!asVisitor && (window.RESUME?.nodes || []).some((n) => n.private)) O.source = "master";
   if (!O.configured) return;
 
   const evalMaster = (text) => {

@@ -39,5 +39,5 @@
     }
   }
 
-  window.GR_SCRIPTS = prepare().then(() => load("app.js")).then(() => load("studio.js"));
+  window.GR_SCRIPTS = prepare().then(() => load("app.js")).then(() => load("studio.js")).then(() => load("customize.js"));
 })();

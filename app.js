@@ -149,14 +149,16 @@
   $("#name").textContent = me.name;
   $("#headline").textContent = me.headline || "";
 
-  const hiddenTypes = new Set();
-  let showSkills = false; // individual skills stay folded into their areas until asked for
+  // look and behaviour settings (ui.js, from site.ui in resume.js)
+  const UI = window.GRUI ? window.GRUI.ui : { startView: "graph", skills: "folded", startHidden: [], features: { search: true, textView: true, download: true, copyLink: true, counting: true } };
+  const hiddenTypes = new Set(FILTERS.filter((f) => UI.startHidden.includes(f.key)).flatMap((f) => f.types));
+  let showSkills = UI.skills === "shown"; // by default individual skills stay folded into their areas until asked for
   function renderLegend() {
     $("#legend").innerHTML = FILTERS.map((f) => {
       const isSkill = f.key === "skill";
       const count = shownNodes.filter((n) => (isSkill ? n.type === "Skill" : f.types.includes(n.type))).length;
       if (!count) return "";
-      const pressed = isSkill ? showSkills : true;
+      const pressed = isSkill ? showSkills : !f.types.some((t) => hiddenTypes.has(t));
       const title = isSkill ? ' title="Show every skill, not just skill areas"' : "";
       return `<button type="button" data-filter="${f.key}" aria-pressed="${pressed}"${title} style="--c:var(${f.color})"><span class="dot"></span>${f.label} <span class="count">${count}</span></button>`;
     }).join("");
@@ -188,7 +190,7 @@
     const base = [
         { selector: "node", style: {
           "background-color": "data(color)", width: "data(size)", height: "data(size)",
-          label: "data(label)", color: ink, "font-family": "Schibsted Grotesk, system-ui, sans-serif",
+          label: "data(label)", color: ink, "font-family": css("--sans") || "system-ui, sans-serif",
           "font-size": 12, "font-weight": 500, "text-valign": "bottom", "text-margin-y": 5,
           "text-wrap": "wrap", "text-max-width": 130, "text-background-color": paper, "text-background-opacity": 0.85,
           "text-background-padding": 2, "text-background-shape": "roundrectangle",
@@ -217,6 +219,9 @@
         { selector: "node.hl", style: { "border-width": 6, "border-style": "solid", "border-color": hl, "border-opacity": 1 } },
         { selector: "node.hl.strong", style: { "border-width": 9 } }
       ];
+    // label size setting: scale every font size
+    const k = parseFloat(css("--label-scale")) || 1;
+    if (k !== 1) base.forEach((r) => { if (typeof r.style["font-size"] === "number") r.style = { ...r.style, "font-size": r.style["font-size"] * k }; });
     if (!phone) return base;
     // phones: the overview labels only you and the skill areas; everything else appears
     // when you pinch to zoom, or when it is part of the selected node's neighbourhood
@@ -590,7 +595,7 @@
       ${section("Education", "--c-edu", edu)}
       ${section("Skills", "--c-skill", groups || ungrouped.length ? `<div class="skills-grid">${groups}${ungrouped.length ? `<div><h3>Other</h3><div class="links">${ungrouped.map((s) => chip(s.id)).join("")}</div></div>` : ""}</div>` : "")}
       ${section("Languages and more", "--c-other", more)}
-      ${R.site?.allowPublicGraphExport !== false ? `<p class="read-foot"><button class="btn ghost small" type="button" id="read-download">Download this graph as JSON-LD or Turtle</button> <a class="read-vocab" href="${esc(window.GRCORE.GR_NS.replace(/#$/, ""))}">How the graph is described: the gr: vocabulary</a></p>` : ""}
+      ${R.site?.allowPublicGraphExport !== false && UI.features.download ? `<p class="read-foot"><button class="btn ghost small" type="button" id="read-download">Download this graph as JSON-LD or Turtle</button> <a class="read-vocab" href="${esc(window.GRCORE.GR_NS.replace(/#$/, ""))}">How the graph is described: the gr: vocabulary</a></p>` : ""}
     `;
     $("#read-download")?.addEventListener("click", () => $("#export-graph-btn").click());
     $$("#read-body [data-goto]").forEach((b) => b.addEventListener("click", () => go(b.dataset.goto)));
@@ -656,6 +661,7 @@
     if (!code || runtime.inArtifact) return;            // not configured, or inside claude.ai
     let owner = !!window.GR_OWNER?.configured; try { owner = owner || localStorage.getItem("gr.owner") === "true"; } catch {}
     if (owner) return;                                    // never count the owner's own browser
+    if (!UI.features.counting || window.GRUI?.previewMode) return;   // switched off, or a Customize preview
     window.goatcounter = { no_onload: true };
     gc.ready = new Promise((resolve) => {
       const s = document.createElement("script");
@@ -690,8 +696,13 @@
     if (view === "graph" && cy) { cy.resize(); }
     window.dispatchEvent(new CustomEvent("gr:view", { detail: view }));
   }
+  let firstRoute = true;
   function route() {
-    const h = currentHash();
+    let h = currentHash();
+    // the site can open on the text instead of the graph
+    if (firstRoute && h === "" && UI.startView === "text" && UI.features.textView) h = "read";
+    if (!UI.features.textView && h === "read") h = "";
+    firstRoute = false;
     countView(h);
     if (h === "read") { renderRead(); show("read"); window.scrollTo(0, 0); return; }
     if (h === "studio") { show("studio"); return; }
@@ -734,7 +745,7 @@
   /* ---------------- owner bar ---------------- */
   function renderOwnerBar() {
     const bar = $("#owner-bar");
-    if (!bar || runtime.inArtifact) return;
+    if (!bar || runtime.inArtifact || window.GRUI?.previewMode) return;
     if (!(ownerView || owner.asVisitor || owner.error)) { if (owner.refreshed && !renderOwnerBar.waited) { renderOwnerBar.waited = true; owner.refreshed.then(() => owner.error && renderOwnerBar()); } return; }
     const label = owner.asVisitor ? "You're seeing what visitors see."
       : ownerView ? `Your full view: ${hiddenCount} ${hiddenCount === 1 ? "item" : "items"} hidden from visitors.`
@@ -751,7 +762,18 @@
 
   /* ---------------- boot ---------------- */
   renderLegend();
-  if (R.site?.allowPublicGraphExport !== false) $("#export-graph-btn").hidden = false;
+  const canDownload = R.site?.allowPublicGraphExport !== false && UI.features.download;
+  if (canDownload) $("#export-graph-btn").hidden = false;
+  if (!UI.features.search) $(".intro .search").hidden = true;
+  if (!UI.features.copyLink) $("#share-btn").hidden = true;
+  if (!UI.features.textView) { $$('[data-view="read"]').forEach((b) => (b.hidden = true)); const skip = $(".skip"); if (skip) skip.hidden = true; }
+  // a theme change from the Customize panel's preview: recolour without rebuilding
+  window.addEventListener("gr:ui", () => {
+    if (!cy) return;
+    cy.batch(() => cy.nodes().forEach((n) => { const d = byId.get(n.id()); if (d) n.data("color", colorOf(d)); }));
+    cy.style(graphStyle(isPhone()));
+    renderLegend();
+  });
   const boot = () => { renderForCard(); initGraph(); applyForLens(); route(); };
   // wait until every script (including studio.js, which loader.js adds after this one) has run, then for the web fonts
   const afterScripts = new Promise((r) => (document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", r) : r()))
