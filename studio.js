@@ -49,7 +49,7 @@
 
   async function enterStudio() {
     await ready;
-    ["#gate", "#settings", "#workspace"].forEach((s) => ($(s).hidden = true));
+    ["#gate", "#settings", "#workspace", "#visibility"].forEach((s) => ($(s).hidden = true));
     if (runtime.inArtifact && !runtime.isOwner) {
       $("#gate").hidden = false;
       $("#gate").innerHTML = "<h2>Owner only</h2><p>The studio is available to the owner of this page.</p>";
@@ -111,7 +111,121 @@
   });
   ["#model", "#base-url"].forEach((s) => $(s).addEventListener("input", () => ($("#preset").value = "")));
   $("#base-url").addEventListener("change", () => ($("#api-key").value = getKey($("#provider").value, $("#base-url").value)));
-  $("#studio-settings-btn").addEventListener("click", openSettings);
+  $("#studio-settings-btn").addEventListener("click", () => { $("#visibility").hidden = true; openSettings(); });
+
+  /* ---------------- what visitors see ---------------- */
+  const VIS_GROUPS = [
+    ["Experience", ["Role", "Break"]], ["Education", ["Education"]], ["Projects", ["Project"]],
+    ["Certificates, awards and publications", ["Certification", "Award", "Publication"]], ["Languages", ["Language"]], ["Skills", ["Skill"]]
+  ];
+  const REF = ["org", "school", "skills", "group", "partOf", "promotedFrom", "via", "partner", "includes"];
+  const refsOf = (n) => REF.flatMap((f) => [].concat(n[f] ?? []));
+  let visWant = null; // id -> hidden?
+
+  // same rule as tools/publish.mjs: what else drops out when these are hidden
+  function cascadeOf(hiddenIds) {
+    const out = new Set(hiddenIds);
+    for (let changed = true; changed; ) {
+      changed = false;
+      const kept = allNodes.filter((n) => !out.has(n.id)), used = new Set(kept.flatMap(refsOf));
+      const cand = new Set(allNodes.filter((n) => out.has(n.id)).flatMap(refsOf));
+      for (const n of kept) if (["Organization", "School", "Skill"].includes(n.type) && cand.has(n.id) && !used.has(n.id)) { out.add(n.id); changed = true; }
+    }
+    return [...out].filter((id) => !hiddenIds.has(id));
+  }
+
+  function openVisibility() {
+    ["#gate", "#settings", "#workspace"].forEach((x) => ($(x).hidden = true));
+    $("#visibility").hidden = false;
+    const O = window.GR_OWNER || {};
+    if (!G.ownerView || !O.configured) {
+      $("#vis-body").innerHTML = `<p class="note">Connect this browser to your private master first: <b>Model settings → Private master on GitHub</b>. Changes are saved there and published from there.</p>`;
+      $("#vis-save").disabled = true; $("#vis-cascade").hidden = true; return;
+    }
+    visWant = Object.fromEntries(allNodes.map((n) => [n.id, !!n.private]));
+    const row = (n) => {
+      const sub = n.type === "Skill" ? "" : [G.dateRange?.(n) || "", n.org ? byId.get(n.org)?.short || byId.get(n.org)?.label : n.school ? byId.get(n.school)?.short || byId.get(n.school)?.label : ""].filter(Boolean).join(" · ");
+      return `<label class="vis-row" data-id="${esc(n.id)}"><input type="checkbox" ${n.private ? "" : "checked"} aria-label="Show ${esc(n.label)} to visitors">
+        <span><span class="vis-label">${esc(n.label)}</span>${sub ? ` <span class="vis-meta">${esc(sub)}</span>` : ""}</span></label>`;
+    };
+    $("#vis-body").innerHTML = VIS_GROUPS.map(([title, types]) => {
+      const newest = (x, y) => String(y.end || "9999").localeCompare(String(x.end || "9999")) || String(y.start || "").localeCompare(String(x.start || ""));
+      const ns = allNodes.filter((n) => types.includes(n.type)).sort((x, y) => (types[0] === "Skill" || types[0] === "Language" ? 0 : newest(x, y)));
+      if (!ns.length) return "";
+      if (types[0] === "Skill") {
+        // skills by area, folded
+        const areas = allNodes.filter((n) => n.type === "SkillGroup");
+        return `<details class="vis-group"><summary>${title} <span class="vis-meta">${ns.filter((n) => !n.private).length} of ${ns.length} shown</span></summary>${
+          areas.map((a) => { const xs = ns.filter((n) => n.group === a.id); return xs.length ? `<p class="vis-meta" style="margin:12px 0 2px">${esc(a.label)}</p>${xs.map(row).join("")}` : ""; }).join("")
+        }${ns.filter((n) => !n.group).map(row).join("")}</details>`;
+      }
+      return `<div class="vis-group"><h3>${title}</h3>${ns.map(row).join("")}</div>`;
+    }).join("");
+    $$("#vis-body .vis-row").forEach((r) => {
+      r.classList.toggle("off", !r.querySelector("input").checked);
+      r.querySelector("input").addEventListener("change", (e) => { visWant[r.dataset.id] = !e.target.checked; updateVis(); });
+    });
+    $("#vis-status").textContent = "";
+    updateVis();
+  }
+  function visChanges() { return allNodes.filter((n) => visWant && visWant[n.id] !== !!n.private); }
+  function updateVis() {
+    const changes = visChanges();
+    $$("#vis-body .vis-row").forEach((r) => {
+      r.classList.toggle("off", visWant[r.dataset.id]);
+      r.classList.toggle("changed", visWant[r.dataset.id] !== !!byId.get(r.dataset.id).private);
+    });
+    const hidden = new Set(Object.keys(visWant).filter((id) => visWant[id]));
+    const extra = cascadeOf(hidden).map((id) => byId.get(id)?.label).filter(Boolean);
+    $("#vis-cascade").hidden = !extra.length;
+    $("#vis-cascade").textContent = extra.length ? `Also left out, because only hidden items use them: ${extra.join(", ")}.` : "";
+    $("#vis-save").disabled = !changes.length;
+    $("#vis-save").textContent = changes.length ? `Save and publish (${changes.length} ${changes.length === 1 ? "change" : "changes"})` : "Save and publish";
+  }
+
+  const b64ToText = (b) => new TextDecoder().decode(Uint8Array.from(atob(b.replace(/\s/g, "")), (c) => c.charCodeAt(0)));
+  const textToB64 = (t) => { const u = new TextEncoder().encode(t); let s = ""; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode(...u.subarray(i, i + 0x8000)); return btoa(s); };
+  const reEsc = (x) => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+  // flip `private: true` on the node's own line, keeping the rest of the file as you wrote it
+  function applyVisibility(text, changes) {
+    for (const n of changes) {
+      const head = `(id:\\s*"${reEsc(n.id)}",\\s*type:\\s*"[^"]+")`;
+      const hide = visWant[n.id];
+      const re = hide ? new RegExp(head + "(?!,\\s*private:\\s*true)") : new RegExp(head + ",\\s*private:\\s*true");
+      if (!re.test(text)) throw new Error(`Couldn't find "${n.label}" in your resume.js in the usual form, so nothing was saved. Ask Claude to change it, or edit the file.`);
+      text = text.replace(re, hide ? "$1, private: true" : "$1");
+    }
+    // check the result says exactly what was asked
+    const w = {}; new Function("window", text)(w);
+    for (const m of w.RESUME.nodes) if (!!m.private !== !!visWant[m.id] && visWant[m.id] !== undefined) throw new Error(`"${m.label}" came out differently than asked, so nothing was saved.`);
+    return text;
+  }
+
+  $("#vis-save").addEventListener("click", async () => {
+    const changes = visChanges(); if (!changes.length) return;
+    const gh = LS.get("gh", {}) || {};
+    const api = `https://api.github.com/repos/${gh.repo}/contents/resume.js`;
+    const headers = { Authorization: `Bearer ${gh.token}`, Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" };
+    $("#vis-save").disabled = true; $("#vis-status").textContent = "Saving to your private repository…";
+    try {
+      const r = await fetch(api, { headers, cache: "no-store" });
+      if (!r.ok) throw new Error(r.status === 401 ? "GitHub didn't accept the token." : `Couldn't read resume.js (GitHub answered ${r.status}).`);
+      const cur = await r.json();
+      const text = applyVisibility(b64ToText(cur.content), changes);
+      const hid = changes.filter((n) => visWant[n.id]).map((n) => n.label), shown = changes.filter((n) => !visWant[n.id]).map((n) => n.label);
+      const message = [hid.length && `Hide from visitors: ${hid.join(", ")}`, shown.length && `Show to visitors: ${shown.join(", ")}`].filter(Boolean).join("; ");
+      const put = await fetch(api, { method: "PUT", headers, body: JSON.stringify({ message, content: textToB64(text), sha: cur.sha }) });
+      if (put.status === 409 || put.status === 422) throw new Error("resume.js changed on GitHub in the meantime. Reload the page and try again.");
+      if (put.status === 403 || put.status === 404) throw new Error("The token can read but not save. Give it Contents: Read and write on your private repository.");
+      if (!put.ok) throw new Error(`GitHub answered ${put.status} when saving.`);
+      try { localStorage.setItem("gr.masterCache", text); } catch {}
+      $("#vis-status").textContent = "Saved. Your public site updates in a minute or two. Reloading…";
+      setTimeout(() => { location.hash = "studio"; location.reload(); }, 1200);
+    } catch (e) { $("#vis-status").textContent = e.message; $("#vis-save").disabled = false; }
+  });
+  $("#studio-vis-btn").addEventListener("click", openVisibility);
+  $("#vis-cancel").addEventListener("click", () => { $("#visibility").hidden = true; enterStudio(); });
   $("#settings-save").addEventListener("click", () => {
     const p = $("#provider").value;
     LS.set("provider", p);

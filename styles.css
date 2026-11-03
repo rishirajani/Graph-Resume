@@ -294,6 +294,14 @@ table.reqs td .chips { display: flex; flex-wrap: wrap; gap: 5px; }
 .owner-bar .owner-err { color: #9b2c2c; }
 .linkish { border: 0; background: none; padding: 0; font: inherit; color: var(--ink); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .hidden-tag { border-style: dotted; }
+.visibility { max-width: 720px; }
+.vis-group { margin: 18px 0 0; }
+.vis-group > summary, .vis-group h3 { font: 600 15px/1.3 var(--sans); margin: 0 0 6px; cursor: pointer; }
+.vis-row { display: flex; gap: 10px; align-items: baseline; padding: 6px 0; border-top: 1px solid var(--rule); font-size: 15px; }
+.vis-row input { flex: none; transform: translateY(2px); }
+.vis-row .vis-meta { color: var(--muted); font-size: 13px; }
+.vis-row.off .vis-label { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--rule); }
+.vis-row.changed { background: color-mix(in srgb, var(--hl) 28%, transparent); }
 .read-foot { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--rule); }
 
 /* ---------- phones: header stacked above a full-height graph, details in a bottom sheet ---------- */

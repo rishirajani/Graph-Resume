@@ -75,6 +75,7 @@
       <p class="sub">Paste a job description. The CV and cover letter are written only from what's in your graph.</p>
     </div>
     <div class="studio-top-actions">
+      <button class="btn ghost" id="studio-vis-btn">What visitors see</button>
       <button class="btn ghost" id="studio-settings-btn">Model settings</button>
       <button class="btn ghost" data-view="graph">Back to graph</button>
     </div>
@@ -164,6 +165,19 @@
     <div class="row end">
       <button class="btn ghost" id="settings-forget" type="button">Remove keys from this browser</button>
       <button class="btn ink" id="settings-save" type="button">Save settings</button>
+    </div>
+  </section>
+
+  <!-- what visitors see -->
+  <section id="visibility" class="settings visibility" hidden>
+    <h2>What visitors see</h2>
+    <p class="help">Untick anything you want to keep off your public site. You'll still see it here and on your own devices, and the studio can still use it. Companies, schools and skills that only hidden items use are left out automatically.</p>
+    <div id="vis-body"></div>
+    <p class="help" id="vis-cascade" hidden></p>
+    <p class="help" id="vis-status" role="status"></p>
+    <div class="row end">
+      <button class="btn ghost" id="vis-cancel" type="button">Back</button>
+      <button class="btn ink" id="vis-save" type="button" disabled>Save and publish</button>
     </div>
   </section>
 
