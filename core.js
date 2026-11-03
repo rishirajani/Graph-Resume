@@ -75,6 +75,8 @@
     Break: "gr:CareerBreak"
   };
 
+  // the gr: vocabulary lives at one fixed address, whichever site uses it
+  const GR_NS = "https://rishirajani.github.io/Graph-Resume/vocab#";
   const PREFIXES = {
     schema: "https://schema.org/",
     skos: "http://www.w3.org/2004/02/skos/core#",
@@ -117,9 +119,8 @@
       }
       return o;
     });
-    const rootIri = base.replace(/#$/, "").replace(/[^/]*$/, "");
     return {
-      "@context": { "@vocab": PREFIXES.schema, cv: base, gr: rootIri + "vocab#", skos: PREFIXES.skos },
+      "@context": { "@vocab": PREFIXES.schema, cv: base, gr: GR_NS, skos: PREFIXES.skos },
       "@graph": graph
     };
   }
@@ -154,5 +155,5 @@
     return [me, ...R.nodes];
   }
 
-  root.GRCORE = { expand, matchLink, PRED, SCHEMA_TYPE, PREFIXES, isPlaceholder, clean, deriveEdges, REF_FIELDS, refsOf, publicSubset, toJsonLd, toTurtle, graphOf };
+  root.GRCORE = { GR_NS, expand, matchLink, PRED, SCHEMA_TYPE, PREFIXES, isPlaceholder, clean, deriveEdges, REF_FIELDS, refsOf, publicSubset, toJsonLd, toTurtle, graphOf };
 })(typeof window !== "undefined" ? window : globalThis);
