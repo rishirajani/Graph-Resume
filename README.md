@@ -23,6 +23,10 @@ It's a static site: no server, no database, no build step. Hosting is free.
 | `lib/` | Bundled libraries (Cytoscape.js for the graph, docx for Word export), both MIT-licensed |
 
 
+## Make it yours
+
+The studio's **Customize** panel sets `site.ui` in `resume.js` with a live preview of the site (desktop and phone) and of a CV built from the graph: theme (Ink, Paper, Forest, Slate dark, or Auto), font pair, a colour per kind of item, graph label size; whether the site opens on the graph or the text, whether skills start folded, which groups show at first; search, text view, download, copy link and visit counting on or off; and the CV and letter layout (Classic, Modern, Compact), accent colour, section order and titles. With the private master connected it saves directly; otherwise it gives the `ui: { … }` block to paste into `site`. `ui.js` documents every setting.
+
 ## The graph as data
 
 The site publishes its graph next to the page as [`resume.ttl`](resume.ttl) (Turtle) and [`resume.jsonld`](resume.jsonld) (JSON-LD), and links both from the page's `<head>`. Items use [schema.org](https://schema.org/) types, relations use a small `gr:` vocabulary (`gr:workedAs`, `gr:used`, `gr:inGroup`, …), and skills and languages point to the same concepts in [Wikidata](https://www.wikidata.org/) and the EU's [ESCO](https://esco.ec.europa.eu/) skills classification with `skos:exactMatch` (the same concept) or `skos:closeMatch` (closely related, or one part of a combined skill such as "HTML / CSS / JavaScript").
