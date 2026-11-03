@@ -564,6 +564,11 @@
         {
           "@id": "cv:sch-tsec"
         }
+      ],
+      "gr:trainedIn": [
+        {
+          "@id": "cv:s-agile"
+        }
       ]
     },
     {

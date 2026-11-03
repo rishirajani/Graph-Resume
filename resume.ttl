@@ -150,7 +150,8 @@ cv:e-be a schema:EducationalOccupationalCredential ;
     gr:kind "Education" ;
     schema:startDate "2015-08" ;
     schema:endDate "2019-07" ;
-    gr:at cv:sch-tsec .
+    gr:at cv:sch-tsec ;
+    gr:trainedIn cv:s-agile .
 
 cv:sch-rubika a schema:CollegeOrUniversity ;
     schema:name "Rubika Supinfogame India" ;

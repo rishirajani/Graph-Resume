@@ -307,7 +307,10 @@ window.RESUME = {
       "label": "Bachelor's, Computer Engineering",
       "school": "sch-tsec",
       "start": "2015-08",
-      "end": "2019-07"
+      "end": "2019-07",
+      "skills": [
+        "s-agile"
+      ]
     },
     {
       "id": "sch-rubika",
