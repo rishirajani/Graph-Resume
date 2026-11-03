@@ -58,7 +58,7 @@
     if (usingClaude()) { $("#workspace").hidden = false; renderHistory(); return; }
     const hash = (G.R.site?.ownerPassphraseSha256 || "").trim().toLowerCase();
     if (hash && SS.get("unlocked") !== hash) { $("#gate").hidden = false; $("#gate-pass").focus(); return; }
-    if (!LS.get("apiKey", "")) { openSettings(); return; }
+    if (!getKey(LS.get("provider", "anthropic"), LS.get("baseUrl", ""))) { openSettings(); return; }
     $("#workspace").hidden = false; renderHistory();
   }
   window.addEventListener("gr:view", (e) => { if (e.detail === "studio") enterStudio(); });
