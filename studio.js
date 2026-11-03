@@ -972,54 +972,95 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     el.classList.add("cv-" + cvui.layout);
     el.style.setProperty("--cv-accent", cvui.accent || CV_ACCENT[cvui.layout]);
   }
-  // Where each printed A4 page ends, measured on the page itself (or on a hidden copy when its tab
-  // isn't open), so the tabs can show page counts before you open them.
+  // The preview is drawn as separate A4 sheets, broken where the printed PDF breaks.
+  // Breaks are measured on an invisible copy laid out exactly like the printed page
+  // (210 mm wide, print margins), so the window's width can't skew them.
+  const SHEET_GAP = 18; // px of grey between sheets on screen
+  const BLOCKS = "h1, h2, .p-item, .p-skills > p, .p-summary, .l-head, .l-meta, p, ul > li";
+  const pageMargin = (el) => (el.classList.contains("cv-compact") ? 11 : 15);
+  // a copy of the page without the on-screen sheet spacing, for exports and measuring
+  function cleanCopy(paper) {
+    const c = paper.cloneNode(true);
+    c.removeAttribute("contenteditable"); c.style.removeProperty("min-height"); c.classList.remove("sheets");
+    c.querySelectorAll(".pg-start").forEach((e) => { e.classList.remove("pg-start"); e.style.removeProperty("margin-top"); if (!e.getAttribute("class")) e.removeAttribute("class"); if (!e.getAttribute("style")) e.removeAttribute("style"); });
+    return c;
+  }
   function pageCuts(paper) {
-    let el = paper, probe = null;
-    if (!paper.offsetHeight) {
-      probe = document.createElement("div");
-      probe.style.cssText = "position:absolute;left:-10000px;top:0;visibility:hidden;pointer-events:none";
-      el = paper.cloneNode(true); el.removeAttribute("id"); el.removeAttribute("contenteditable");
-      probe.appendChild(el); document.body.appendChild(probe);
-    }
+    const probe = document.createElement("div");
+    probe.style.cssText = "position:absolute;left:-10000px;top:0;visibility:hidden;pointer-events:none";
+    const el = cleanCopy(paper); el.removeAttribute("id");
+    const side = el.classList.contains("cv-compact") ? 14 : 17;
+    el.style.cssText += `;width:210mm !important;min-height:0 !important;padding:0 ${side}mm !important;margin:0 !important;box-sizing:border-box !important`;
+    probe.appendChild(el); document.body.appendChild(probe);
     const pr = el.getBoundingClientRect(), mm = pr.width / 210;
-    const margin = (el.classList.contains("cv-compact") ? 11 : 15) * mm, perPage = 297 * mm - 2 * margin;
-    const cs = getComputedStyle(el), top = parseFloat(cs.paddingTop), end = pr.height - parseFloat(cs.paddingBottom);
+    const perPage = (297 - 2 * pageMargin(el)) * mm;
     const y = (n) => n.getBoundingClientRect().top - pr.top, yb = (n) => n.getBoundingClientRect().bottom - pr.top;
+    const blocks = [...el.querySelectorAll(BLOCKS)];
     const keep = [...el.querySelectorAll(".p-item, h2")];
+    const last = blocks.reduce((m, n) => Math.max(m, yb(n)), 0);
     const cuts = [];
-    let from = top;
-    // the last line of text, not the page's minimum height, decides where the document ends
-    const last = [...el.querySelectorAll("p, li, .p-row, h1, h2")].reduce((m, n) => Math.max(m, yb(n)), 0);
-    while (from + perPage < Math.min(end, last) - 2 && cuts.length < 10) {
+    let from = 0;
+    while (from + perPage < last - 2 && cuts.length < 10) {
       let cut = from + perPage;
       // an entry isn't split across pages, and a heading stays with what follows it
       const item = keep.find((n) => n.classList.contains("p-item") && y(n) < cut && yb(n) > cut && y(n) > from);
       if (item) cut = y(item);
       const head = keep.find((n) => n.nodeName === "H2" && y(n) < cut && (!n.nextElementSibling || y(n.nextElementSibling) >= cut - 1) && y(n) > from);
       if (head) cut = y(head);
-      cuts.push(cut); from = cut;
+      // the block that starts the next page, by its place in the page (same order on screen)
+      let at = blocks.findIndex((n) => y(n) >= cut - 1 && y(n) > from + 1);
+      let inside = null;
+      if (at < 0 || y(blocks[at]) > cut + 2) {
+        // the break falls inside a paragraph (long letters): it breaks between lines there
+        const i = blocks.findIndex((n) => y(n) < cut && yb(n) > cut && !n.querySelector("p, li"));
+        if (i >= 0) { const lh = parseFloat(getComputedStyle(blocks[i]).lineHeight) || 16; cut = y(blocks[i]) + Math.max(1, Math.floor((cut - y(blocks[i])) / lh)) * lh; inside = { index: i, offset: (cut - y(blocks[i])) / (yb(blocks[i]) - y(blocks[i])) }; at = -1; }
+      }
+      cuts.push({ cut, at, inside }); from = cut;
     }
-    probe?.remove();
+    probe.remove();
     return cuts;
   }
-  // A dashed line where each printed page ends (beside the page, never in it, so it's not exported),
-  // plus the page count on the CV and Cover letter tabs and buttons to jump to a page.
   function markPages(paper) {
     const wrap = paper?.parentElement; if (!wrap) return;
     const tab = paper.id === "cv-paper" ? "cv" : paper.id === "cl-paper" ? "letter" : null;
+    // clear the previous sheets
+    wrap.querySelectorAll(".page-guide").forEach((e) => e.remove());
+    paper.querySelectorAll(".pg-start").forEach((e) => { e.classList.remove("pg-start"); e.style.removeProperty("margin-top"); });
+    paper.style.removeProperty("min-height"); paper.classList.remove("sheets");
     const empty = !paper.textContent.trim();
     const cuts = empty ? [] : pageCuts(paper), pages = empty ? 0 : cuts.length + 1;
-    if (paper.offsetHeight) {
-      wrap.querySelectorAll(".page-guide").forEach((e) => e.remove());
-      const pr = paper.getBoundingClientRect();
-      cuts.forEach((cut, i) => {
+    if (paper.offsetHeight && pages) {
+      const mm = paper.getBoundingClientRect().width / 210;
+      // on a narrow screen the page isn't drawn at A4 width, so sheets wouldn't be true to size: mark the breaks with a line instead
+      const trueSize = Math.abs(paper.getBoundingClientRect().width - 210 * 96 / 25.4) < 4;
+      const sheet = 297 * mm, margin = pageMargin(paper) * mm;
+      const blocks = [...paper.querySelectorAll(BLOCKS)];
+      const top = () => paper.getBoundingClientRect().top;
+      if (trueSize) paper.classList.add("sheets");
+      cuts.forEach((c, k) => {
+        const n = k + 1; // sheets before this break
+        const el = c.at >= 0 ? blocks[c.at] : null;
+        let lineY;
+        if (el && trueSize) {
+          const m0 = parseFloat(getComputedStyle(el).marginTop) || 0;
+          const yNoMargin = el.getBoundingClientRect().top - top() - m0;
+          const want = n * (sheet + SHEET_GAP) + margin;
+          el.classList.add("pg-start"); el.style.marginTop = `${Math.max(0, want - yNoMargin)}px`;
+          lineY = n * sheet + (n - 1) * SHEET_GAP;
+        } else if (el) {
+          lineY = el.getBoundingClientRect().top - top() - 4;
+        } else if (c.inside && blocks[c.inside.index]) {
+          const r = blocks[c.inside.index].getBoundingClientRect();
+          lineY = r.top - top() + c.inside.offset * r.height;
+        } else return;
         const g = document.createElement("div");
-        g.className = "page-guide"; g.setAttribute("aria-hidden", "true"); g.dataset.page = i + 2;
-        g.style.top = `${paper.offsetTop + cut}px`; g.style.left = `${paper.offsetLeft}px`; g.style.width = `${pr.width}px`;
-        g.innerHTML = `<span>Page ${i + 2}</span>`;
+        g.className = "page-guide" + (el && trueSize ? " gap" : ""); g.setAttribute("aria-hidden", "true"); g.dataset.page = n + 1;
+        g.style.top = `${paper.offsetTop + lineY}px`; g.style.left = `${paper.offsetLeft}px`; g.style.width = `${paper.offsetWidth}px`;
+        if (el && trueSize) g.style.height = `${SHEET_GAP}px`;
+        g.innerHTML = `<span>Page ${n + 1}</span>`;
         wrap.appendChild(g);
       });
+      if (trueSize) paper.style.minHeight = `${pages * sheet + (pages - 1) * SHEET_GAP}px`;
     }
     if (!tab) return;
     const want = tab === "cv" ? Number(current?.input?.length) || 0 : 1;
@@ -1338,7 +1379,7 @@ ${fontLink()}
 @media print{.paper{width:auto;min-height:0;margin:0;padding-top:0!important;padding-bottom:0!important}.paper.cv-compact{page:compact}.print-hint{display:none}}
 .print-hint{font:14px/1.45 system-ui,sans-serif;background:#FFF6D6;border-bottom:1px solid #E8D48A;padding:10px 16px;text-align:center}
 @media screen{body{background:#DCE1E7}.paper{margin:20px auto;box-shadow:0 1px 4px rgba(0,0,0,.15)}}</style></head>
-<body><div class="print-hint">This is a print-ready page, not the PDF yet. Press <b>Ctrl+P</b> (<b>⌘P</b> on a Mac), choose <b>Save as PDF</b> and paper size <b>A4</b>, with margins left at default.</div>${root.outerHTML.replace(/contenteditable="true"/g, "")}<script>document.fonts.ready.then(()=>setTimeout(()=>print(),300))<\/script></body></html>`;
+<body><div class="print-hint">This is a print-ready page, not the PDF yet. Press <b>Ctrl+P</b> (<b>⌘P</b> on a Mac), choose <b>Save as PDF</b> and paper size <b>A4</b>, with margins left at default.</div>${cleanCopy(root).outerHTML}<script>document.fonts.ready.then(()=>setTimeout(()=>print(),300))<\/script></body></html>`;
   }
 
   async function doPrint(root, title) {
@@ -1350,7 +1391,7 @@ ${fontLink()}
       return;
     }
     const pr = $("#print-root");
-    pr.innerHTML = ""; const clone = root.cloneNode(true); clone.removeAttribute("contenteditable"); pr.appendChild(clone);
+    pr.innerHTML = ""; pr.appendChild(cleanCopy(root));
     const old = document.title; document.title = title;
     setTimeout(() => { window.print(); document.title = old; pr.innerHTML = ""; }, 60);
   }
