@@ -1,9 +1,8 @@
 {
-  "version": "1.5.7",
+  "version": "1.5.8",
   "date": "2026-11-04",
   "notes": [
-    "An Open button next to every tailored link shows it as the company sees it.",
-    "In the claude.ai preview, a link you've already activated on your live site can be marked as activated."
+    "After an update, browsers load the new files straight away instead of an older cached copy (each file is fingerprinted when the site is published)."
   ],
   "files": [
     "index.html",

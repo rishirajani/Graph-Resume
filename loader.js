@@ -6,7 +6,7 @@
   const m = location.hash.match(/^#for\/([A-Za-z0-9_-]{4,16})\.([A-Za-z0-9_-]{16,64})/);
   const b64u = (s) => Uint8Array.from(atob(s.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(s.length / 4) * 4, "=")), (c) => c.charCodeAt(0));
   const load = (src) => new Promise((resolve, reject) => {
-    const s = document.createElement("script"); s.src = src; s.async = false;
+    const s = document.createElement("script"); s.src = window.GR_V?.[src] ? `${src}?v=${window.GR_V[src]}` : src; s.async = false;
     s.onload = resolve; s.onerror = () => reject(new Error("Couldn't load " + src));
     document.body.appendChild(s);
   });

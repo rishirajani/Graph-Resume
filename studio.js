@@ -1344,7 +1344,7 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
   function loadDocx() {
     if (window.docx) return Promise.resolve(window.docx);
     return (docxLoading ||= new Promise((res, rej) => {
-      const s = document.createElement("script"); s.src = "lib/docx.js";
+      const s = document.createElement("script"); s.src = window.GR_V?.["lib/docx.js"] ? `lib/docx.js?v=${window.GR_V["lib/docx.js"]}` : "lib/docx.js";
       s.onload = () => res(window.docx); s.onerror = () => rej(new Error("Couldn't load the Word exporter."));
       document.head.appendChild(s);
     }));
