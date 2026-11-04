@@ -81,7 +81,7 @@ window.RESUME = {
       "type": "Organization",
       "label": "Flexmoney Technologies Pvt. Ltd.",
       "short": "Flexmoney",
-      "description": "Checkout-financing network connecting merchants, lenders and customers. Lenders share pre-approved customer bases, either through API-based pre-approval checks or as encrypted files. At checkout, customers can see which lenders pre-approve them for the cart amount, and some merchants run the check automatically for larger purchases. Customers who aren't pre-approved can open a new credit line with a partner lender."
+      "description": "Fintech company that runs InstaCred, a checkout-financing network connecting merchants, lenders and customers. Lenders share pre-approved customer bases, either through API-based pre-approval checks or as encrypted files. At checkout, customers can see which lenders pre-approve them for the cart amount, and some merchants run the check automatically for larger purchases. Customers who aren't pre-approved can open a new credit line with a partner lender."
     },
     {
       "id": "r-flexmoney",
