@@ -782,7 +782,9 @@
     const card = $("#for-card");
     if (!forLink) return;
     if (!forOK) {
-      card.innerHTML = `<p class="for-gone">${forLink.status === "gone" ? "This link is no longer active." : "This link couldn't be opened."} You're seeing the public version of the resume.</p>`;
+      // the owner gets the likely reason: a link goes live a minute or two after it's created
+      const owner = !!window.GR_OWNER?.configured;
+      card.innerHTML = `<p class="for-gone">${forLink.status === "gone" ? "This link isn't active." : "This link couldn't be opened."} You're seeing the public version of the resume.</p>${owner && forLink.status === "gone" ? `<p class="help" style="margin:8px 0 0">Only you see this: if you just created or switched on this link, it goes live a minute or two later. Reload then. If it still shows this, check it under <b>Studio → Tailored links</b>.</p>` : ""}`;
       card.hidden = false;
       history.replaceState(null, "", location.pathname + location.search);
       return;

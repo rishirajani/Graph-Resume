@@ -1,9 +1,8 @@
 {
-  "version": "1.6.0",
+  "version": "1.6.1",
   "date": "2026-11-04",
   "notes": [
-    "Your edits to a CV or cover letter are saved as you type, with that CV in your history; they survive reloads, updates, reordering sections and adding a tailored link.",
-    "“Restore generated text” brings back the model's version if you want to start over."
+    "Opening a tailored link that isn't live yet tells you, as the owner, that new links go live a minute or two after they're created."
   ],
   "files": [
     "index.html",
