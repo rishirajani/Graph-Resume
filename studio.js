@@ -373,10 +373,10 @@
     const state = (l) => (l.off ? "Switched off" : l.expires && l.expires < today ? "Ended" : "Active");
     body.innerHTML = `<table class="links-table"><thead><tr><th>Company and role</th><th>Code</th><th>Made</th><th>Works until</th><th>State</th><th></th></tr></thead><tbody>${
       links.map((l) => `<tr data-id="${esc(l.id)}" class="${state(l) === "Active" ? "" : "state-off"}">
-        <td><b>${esc(l.company || "—")}</b><br>${esc(l.role || "")}</td><td><code>${esc(l.id)}</code></td><td>${esc(l.created || "")}</td>
+        <td><b>${esc(l.company || "—")}</b><br>${esc(l.role || "")}</td><td><code>${esc(l.id)}</code></td><td class="nowrap">${esc(l.created || "")}</td>
         <td><input type="date" value="${esc(l.expires || "")}" aria-label="Works until"></td><td>${state(l)}</td>
-        <td><button class="btn ghost small" data-act="copy" type="button">Copy link</button> ${openBtn(linkUrl(l))}
-          <button class="btn ghost small" data-act="toggle" type="button">${l.off ? "Switch on" : "Switch off"}</button></td></tr>`).join("")
+        <td><div class="link-actions"><button class="btn ghost small" data-act="copy" type="button">Copy link</button>${openBtn(linkUrl(l))}
+          <button class="btn ghost small" data-act="toggle" type="button">${l.off ? "Switch on" : "Switch off"}</button></div></td></tr>`).join("")
     }</tbody></table>`;
     const save = async (mutate, msg) => {
       st("Saving…");
