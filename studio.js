@@ -295,10 +295,14 @@
       } catch (e) { st(e.message); q("create").disabled = false; }
     });
   }
+  // opens the link as the company sees it, in a new tab
+  const openBtn = (url) => `<a class="btn ghost small" href="${esc(url)}" target="_blank" rel="noopener">Open</a>`;
+  const NOT_COUNTED = "Opening it from a browser connected to your private master isn't counted as a visit.";
   function linkResultHtml(entry, extra = "") {
-    return `<p>Link for <b>${esc(entry.company || "this job")}</b>, code <code>${esc(entry.id)}</code>, works until ${esc(entry.expires || "you switch it off")}.</p>
-      <div class="link-out"><input readonly value="${esc(entry.url || linkUrl(entry))}"><button class="btn ink small" data-copy-link type="button">Copy</button></div>${extra}
-      <p class="help">It goes live a minute or two after you made it. Manage, extend or switch it off under <b>Tailored links</b>.</p>`;
+    const url = entry.url || linkUrl(entry);
+    return `<p>Link for <b>${esc(entry.company || "this job")}</b>, code <code>${esc(entry.id)}</code>${entry.expires ? `, works until ${esc(entry.expires)}` : ", active"}.</p>
+      <div class="link-out"><input readonly value="${esc(url)}"><button class="btn ink small" data-copy-link type="button">Copy</button>${openBtn(url)}</div>${extra}
+      <p class="help">${entry.activatedElsewhere ? "Activated on your live site; manage, extend or switch it off there under <b>Tailored links</b>." : "It goes live a minute or two after you made it. Manage, extend or switch it off under <b>Tailored links</b>."} ${NOT_COUNTED}</p>`;
   }
 
   function renderLinkTab() {
@@ -310,12 +314,14 @@
       // made here, still to be created on the live site
       el.innerHTML = `<div class="link-form">
         <p>Tailored link for <b>${esc(current.link.company || "this job")}</b>, code <code>${esc(current.link.id)}</code>:</p>
-        <div class="link-out"><input readonly value="${esc(current.link.url)}"><button class="btn ghost small" data-copy-link type="button">Copy link</button></div>
+        <div class="link-out"><input readonly value="${esc(current.link.url)}"><button class="btn ghost small" data-copy-link type="button">Copy link</button>${openBtn(current.link.url)}</div>
         ${inCvBox()}
         <div class="note" style="margin-top:14px"><b>Still to do:</b> until you activate it, this address opens your normal public site. To activate it, copy the code and paste it on your live site, connected to your private repository, under <b>Tailored links → New link</b>. It then highlights exactly what's in this CV.
-          <p style="margin:10px 0 0"><button class="btn ink small" id="link-transfer" type="button">Copy code for the live site</button></p></div></div>`;
+          <p style="margin:10px 0 0"><button class="btn ink small" id="link-transfer" type="button">Copy code for the live site</button></p>
+          <p class="help" style="margin:10px 0 0">Already activated it? This page can't check, so open the link: if it says “Prepared for ${esc(current.link.company || "…")}”, it's live. <button class="btn ghost small" id="link-mark-live" type="button">Mark as activated</button></p></div></div>`;
       el.querySelector("[data-copy-link]").addEventListener("click", () => G.copyText(current.link.url).then(() => toast("Link copied")));
       $("#link-transfer").addEventListener("click", copyTransfer);
+      $("#link-mark-live").addEventListener("click", () => { current.link.pending = false; current.link.activatedElsewhere = true; updateHistoryItem(); renderLinkTab(); toast("Marked as activated"); });
       wireInCv();
       return;
     }
@@ -369,7 +375,7 @@
       links.map((l) => `<tr data-id="${esc(l.id)}" class="${state(l) === "Active" ? "" : "state-off"}">
         <td><b>${esc(l.company || "—")}</b><br>${esc(l.role || "")}</td><td><code>${esc(l.id)}</code></td><td>${esc(l.created || "")}</td>
         <td><input type="date" value="${esc(l.expires || "")}" aria-label="Works until"></td><td>${state(l)}</td>
-        <td><button class="btn ghost small" data-act="copy" type="button">Copy link</button>
+        <td><button class="btn ghost small" data-act="copy" type="button">Copy link</button> ${openBtn(linkUrl(l))}
           <button class="btn ghost small" data-act="toggle" type="button">${l.off ? "Switch on" : "Switch off"}</button></td></tr>`).join("")
     }</tbody></table>`;
     const save = async (mutate, msg) => {

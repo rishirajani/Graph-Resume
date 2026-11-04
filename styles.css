@@ -293,6 +293,7 @@ table.reqs td .chips { display: flex; flex-wrap: wrap; gap: 5px; }
 .sec-move { display: inline-flex; gap: 4px; }
 .sec-move .btn { min-width: 30px; padding: 2px 8px; }
 .sec-move .btn:disabled { opacity: .35; cursor: default; }
+a.btn { text-decoration: none; color: var(--ink); display: inline-flex; align-items: center; }
 .page-nav { display: inline-flex; align-items: center; gap: 4px; margin-left: 10px; }
 .page-nav:empty { display: none; }
 .page-nav button { border: 1px solid var(--rule); background: var(--surface); color: var(--ink); border-radius: 6px; min-width: 24px; padding: 1px 6px; font: 600 12px/18px var(--sans); cursor: pointer; }
