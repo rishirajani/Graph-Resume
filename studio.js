@@ -151,6 +151,23 @@
     if (!r.ok) throw new Error(`GitHub answered ${r.status} when saving ${p}.`);
   }
   const connected = () => !!(window.GR_OWNER?.configured && G.ownerView);
+  // why this page can't save to your private master, in words you can act on
+  function notConnectedNote(extra = "") {
+    const O = window.GR_OWNER || {};
+    const C = window.GRCORE, live = (C?.UPSTREAM || "") + "#studio";
+    let msg;
+    if (runtime.inArtifact) msg = `This claude.ai preview can't reach GitHub, so it can't save here. Manage links and visibility on your live site${C?.UPSTREAM ? `: <a href="${esc(live)}" target="_blank" rel="noopener">${esc(live.replace(/^https?:\/\//, ""))}</a>` : ""}. To make a link for a CV here, use the <b>Tailored link</b> tab next to that CV.`;
+    else if (O.asVisitor) msg = `This tab is showing your site as a visitor sees it, so your private master isn't loaded. <button class="btn ghost small" type="button" data-back-to-owner>Back to your view</button>`;
+    else if (O.configured && O.error) msg = `Couldn't load your private master: ${esc(O.error)} Check the repository and token under <b>Model settings → Private master on GitHub</b>.`;
+    else if (O.configured) msg = `Your private master is still loading. Reload the page in a moment.`;
+    else msg = `Connect this browser to your private master first: <b>Model settings → Private master on GitHub</b>.`;
+    return `<p class="note">${msg}${extra ? " " + extra : ""}</p>`;
+  }
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest("[data-back-to-owner]")) return;
+    try { sessionStorage.removeItem("gr.asVisitor"); } catch {}
+    location.reload();
+  });
 
   /* ---------------- tailored links ---------------- */
   const rand = (n) => crypto.getRandomValues(new Uint8Array(n));
@@ -362,7 +379,7 @@
     $("#links").hidden = false;
     const body = $("#links-body"), st = (t) => ($("#links-status").textContent = t);
     $("#links-new").hidden = true; $("#links-new-box").hidden = true;
-    if (!connected()) { body.innerHTML = `<p class="note">Connect this browser to your private master first: <b>Model settings → Private master on GitHub</b>.</p>`; return; }
+    if (!connected()) { body.innerHTML = notConnectedNote(); return; }
     body.innerHTML = `<p class="help">Loading…</p>`; st("");
     $("#links-new").hidden = false;
     let reg;
@@ -442,7 +459,7 @@
     $("#visibility").hidden = false;
     const O = window.GR_OWNER || {};
     if (!G.ownerView || !O.configured) {
-      $("#vis-body").innerHTML = `<p class="note">Connect this browser to your private master first: <b>Model settings → Private master on GitHub</b>. Changes are saved there and published from there.</p>`;
+      $("#vis-body").innerHTML = notConnectedNote(runtime.inArtifact ? "" : "Changes are saved there and published from there.");
       $("#vis-save").disabled = true; $("#vis-cascade").hidden = true; return;
     }
     visWant = Object.fromEntries(allNodes.map((n) => [n.id, !!n.private]));

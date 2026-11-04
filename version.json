@@ -1,8 +1,8 @@
 {
-  "version": "1.6.1",
+  "version": "1.6.2",
   "date": "2026-11-04",
   "notes": [
-    "Opening a tailored link that isn't live yet tells you, as the owner, that new links go live a minute or two after they're created."
+    "When Tailored links or What visitors see can't save, the studio now says why: the claude.ai preview, visitor view in this tab, a token GitHub rejected, or no connection set up."
   ],
   "files": [
     "index.html",
