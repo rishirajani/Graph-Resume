@@ -289,12 +289,13 @@
 
       <div class="tab" id="tab-cv" hidden>
         <div class="export-bar">
-          <span class="muted">Click any text to edit before exporting. <span class="page-nav"></span></span>
+          <span class="muted"><span class="edit-note">Click any text to edit; edits are saved as you type.</span> <span class="page-nav"></span></span>
           <div class="row">
             <button class="btn ghost small" data-export="cv-pdf">PDF</button>
             <button class="btn ghost small" data-export="cv-docx">Word</button>
             <button class="btn ghost small" data-export="cv-md">Markdown</button>
             <button class="btn ghost small" data-export="cv-copy">Copy text</button>
+            <button class="btn ghost small" data-restore="cv" type="button" hidden>Restore generated text</button>
             <button class="btn ghost small" id="cv-link-tab" type="button">Tailored link…</button>
             <button class="btn ghost small" id="cv-sections-btn" type="button" aria-expanded="false" aria-controls="cv-sections">Sections…</button>
           </div>
@@ -307,12 +308,13 @@
 
       <div class="tab" id="tab-letter" hidden>
         <div class="export-bar">
-          <span class="muted">Click any text to edit before exporting. <span class="page-nav"></span></span>
+          <span class="muted"><span class="edit-note">Click any text to edit; edits are saved as you type.</span> <span class="page-nav"></span></span>
           <div class="row">
             <button class="btn ghost small" data-export="cl-pdf">PDF</button>
             <button class="btn ghost small" data-export="cl-docx">Word</button>
             <button class="btn ghost small" data-export="cl-md">Markdown</button>
             <button class="btn ghost small" data-export="cl-copy">Copy text</button>
+            <button class="btn ghost small" data-restore="cl" type="button" hidden>Restore generated text</button>
           </div>
         </div>
         <div class="paper-wrap"><div id="cl-paper" class="paper letter" contenteditable="true" spellcheck="true"></div></div>
@@ -336,9 +338,9 @@
 <script src="resume.js"></script>
 <script src="owner.js?v=7d9c00eada"></script>
 <script src="ui.js?v=5a985798d7"></script>
-<script src="core.js?v=3b74fd8e44"></script>
+<script src="core.js?v=4d1bed98ea"></script>
 <script src="lib/cytoscape.min.js?v=081591ab73"></script>
-<script>window.GR_V = {"ui.js":"5a985798d7","core.js":"3b74fd8e44","owner.js":"7d9c00eada","loader.js":"644fe75471","app.js":"62be2678d6","studio.js":"e5385d18e1","customize.js":"349836d073","styles.css":"03d118356c","lib/cytoscape.min.js":"081591ab73","lib/docx.js":"e018e1d427"};</script>
+<script>window.GR_V = {"ui.js":"5a985798d7","core.js":"4d1bed98ea","owner.js":"7d9c00eada","loader.js":"644fe75471","app.js":"62be2678d6","studio.js":"79ebd9db69","customize.js":"349836d073","styles.css":"03d118356c","lib/cytoscape.min.js":"081591ab73","lib/docx.js":"e018e1d427"};</script>
 <script src="loader.js?v=644fe75471"></script>
 </body>
 </html>

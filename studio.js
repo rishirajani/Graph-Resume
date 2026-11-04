@@ -309,7 +309,7 @@
     const el = $("#tab-link");
     if (!current) { el.innerHTML = ""; return; }
     const inCvBox = () => `<label class="check" style="margin-top:12px"><input type="checkbox" id="link-in-cv" ${current.link.inCv ? "checked" : ""}> Add it to this CV and cover letter as “${esc(CVUI().linkLabel || "Portfolio")}”, next to your email and LinkedIn (the wording can be changed under Customize → CV and letter)</label>`;
-    const wireInCv = () => $("#link-in-cv").addEventListener("change", (e) => { current.link.inCv = e.target.checked; updateHistoryItem(); paintDocs(current.result, current.input); });
+    const wireInCv = () => $("#link-in-cv").addEventListener("change", (e) => { current.link.inCv = e.target.checked; updateHistoryItem(); refreshContact(); });
     if (current.link?.url && current.link.pending) {
       // made here, still to be created on the live site
       el.innerHTML = `<div class="link-form">
@@ -1109,7 +1109,11 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
   ["#cv-paper", "#cl-paper"].forEach((sel) => {
     const el = $(sel); if (!el) return;
     pageObserver?.observe(el);
-    let t; el.addEventListener("input", () => { clearTimeout(t); t = setTimeout(() => markPages(el), 250); });
+    let t, t2;
+    el.addEventListener("input", () => {
+      clearTimeout(t); t = setTimeout(() => markPages(el), 250);
+      clearTimeout(t2); t2 = setTimeout(() => saveEdits(sel === "#cv-paper" ? "cv" : "cl"), 400);
+    });
   });
   window.addEventListener("resize", () => ["#cv-paper", "#cl-paper"].forEach((sel) => $(sel) && markPages($(sel))));
   /* ----- this CV's section order (starts from your Customize order) ----- */
@@ -1149,6 +1153,7 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
   function setSections(order, hidden) {
     current.sections = order ? { order, hidden } : undefined;
     updateHistoryItem(); applySections(); renderSectionPanel();
+    if (current.edits?.cv) saveEdits("cv");
   }
   function renderSectionPanel() {
     const box = $("#cv-sections"); if (!box || !current?.result) return;
@@ -1183,11 +1188,54 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     $("#cv-sections-btn").setAttribute("aria-expanded", String(!box.hidden));
     if (!box.hidden) renderSectionPanel();
   });
+  /* ----- your hand edits, saved with the CV and letter in your history ----- */
+  const fragmentHtml = (nodes) => { const d = document.createElement("div"); nodes.forEach((n) => d.appendChild(n.cloneNode(true))); return cleanCopy(d).innerHTML; };
+  function saveEdits(which) {
+    if (!current?.result) return;
+    const paper = which === "cv" ? $("#cv-paper") : $("#cl-paper");
+    if (!paper.textContent.trim()) return;
+    current.edits = current.edits || {};
+    current.edits[which] = cleanCopy(paper).innerHTML;
+    if (which === "cv") current.edits.cvHidden = Object.fromEntries([...sectionStash].map(([k, nodes]) => [k, fragmentHtml(nodes)]));
+    updateHistoryItem(); showEditState();
+  }
+  function showEditState() {
+    ["cv", "cl"].forEach((w) => {
+      const b = $(`[data-restore="${w}"]`); if (!b) return;
+      b.hidden = !current?.edits?.[w];
+      b.textContent = "Restore generated text"; delete b.dataset.armed;
+      const note = $(`#tab-${w === "cv" ? "cv" : "letter"} .edit-note`);
+      if (note) note.textContent = current?.edits?.[w] ? "Your edits are saved with this " + (w === "cv" ? "CV." : "letter.") : "Click any text to edit; edits are saved as you type.";
+    });
+  }
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-restore]"); if (!b || !current) return;
+    if (!b.dataset.armed) { b.dataset.armed = "1"; b.textContent = "Click again to discard your edits"; setTimeout(() => { if (b.dataset.armed) { delete b.dataset.armed; b.textContent = "Restore generated text"; } }, 4000); return; }
+    const w = b.dataset.restore;
+    if (current.edits) { delete current.edits[w]; if (w === "cv") delete current.edits.cvHidden; }
+    updateHistoryItem(); paintDocs(current.result, current.input); toast(w === "cv" ? "CV restored to the generated text" : "Letter restored to the generated text");
+  });
+  // the contact line alone, e.g. when the tailored link is added, without touching your edits
+  function refreshContact() {
+    const cv = $("#cv-paper .p-contact"), cl = $("#cl-paper .l-head p");
+    if (cv) cv.innerHTML = contactLine();
+    if (cl) cl.innerHTML = contactLine();
+    if (current?.edits?.cv) saveEdits("cv");
+    if (current?.edits?.cl) saveEdits("cl");
+    ["#cv-paper", "#cl-paper"].forEach((sel) => markPages($(sel)));
+  }
   function paintDocs(result, input) {
+    const ed = current?.result === result ? current.edits || {} : {};
     // every section is drawn, then this CV's hidden ones are set aside, so they can be shown again
-    $("#cv-paper").innerHTML = renderCv(result, Object.assign(cvLook(), { hidden: [] })); styleCv($("#cv-paper"));
-    sectionStash.clear(); applySections(); renderSectionPanel();
-    if (result.coverLetter) { $("#cl-paper").innerHTML = renderLetter(result, input); styleCv($("#cl-paper")); }
+    sectionStash.clear();
+    if (ed.cv) {
+      $("#cv-paper").innerHTML = ed.cv;
+      Object.entries(ed.cvHidden || {}).forEach(([k, html]) => { const t = document.createElement("template"); t.innerHTML = html; sectionStash.set(k, [...t.content.childNodes]); });
+    } else $("#cv-paper").innerHTML = renderCv(result, Object.assign(cvLook(), { hidden: [] }));
+    styleCv($("#cv-paper"));
+    applySections(); renderSectionPanel();
+    if (result.coverLetter) { $("#cl-paper").innerHTML = ed.cl || renderLetter(result, input); styleCv($("#cl-paper")); }
+    showEditState();
     (document.fonts?.ready || Promise.resolve()).then(() => { markPages($("#cv-paper")); markPages($("#cl-paper")); });
   }
   function contactLine() {
