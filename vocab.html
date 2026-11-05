@@ -22,42 +22,345 @@
  },
  "@graph": [
   {
-   "@id": "gr:Award",
-   "@type": "owl:Class",
-   "rdfs:comment": {
-    "@language": "en",
-    "@value": "A recognition given to the person, for example by an employer. schema.org only has award as a text property, so this makes awards nodes that can be linked to who gave them."
-   },
-   "rdfs:label": {
-    "@language": "en",
-    "@value": "Award"
-   },
-   "rdfs:seeAlso": {
-    "@id": "schema:award"
-   },
-   "rdfs:subClassOf": {
-    "@id": "schema:Thing"
-   }
-  },
-  {
-   "@id": "gr:workedAs",
+   "@id": "gr:holds",
    "@type": "owl:ObjectProperty",
    "rdfs:comment": {
     "@language": "en",
-    "@value": "The person held this role in the past; the role has an end date."
+    "@value": "The person holds this certification."
    },
    "rdfs:domain": {
     "@id": "schema:Person"
    },
    "rdfs:label": {
     "@language": "en",
-    "@value": "worked as"
+    "@value": "holds"
+   },
+   "rdfs:range": {
+    "@id": "schema:EducationalOccupationalCredential"
+   },
+   "rdfs:subPropertyOf": {
+    "@id": "schema:hasCredential"
+   }
+  },
+  {
+   "@id": "gr:shows",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "A skill this certification is evidence of."
+   },
+   "rdfs:domain": {
+    "@id": "schema:EducationalOccupationalCredential"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "shows"
+   },
+   "rdfs:range": {
+    "@id": "schema:DefinedTerm"
+   },
+   "rdfs:seeAlso": {
+    "@id": "schema:competencyRequired"
+   }
+  },
+  {
+   "@id": "gr:speaks",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "The person speaks this language; how well is given by proficiency on the language."
+   },
+   "rdfs:domain": {
+    "@id": "schema:Person"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "speaks"
+   },
+   "rdfs:range": {
+    "@id": "schema:Language"
+   },
+   "rdfs:subPropertyOf": {
+    "@id": "schema:knowsLanguage"
+   }
+  },
+  {
+   "@id": "gr:location",
+   "@type": "owl:DatatypeProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "Where it took place, as written on a CV (city and country, or remote)."
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "location"
+   },
+   "rdfs:range": {
+    "@id": "xsd:string"
+   },
+   "rdfs:seeAlso": {
+    "@id": "schema:location"
+   }
+  },
+  {
+   "@id": "gr:worksAs",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "The person holds this role now; the role has no end date."
+   },
+   "rdfs:domain": {
+    "@id": "schema:Person"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "works as"
    },
    "rdfs:range": {
     "@id": "schema:OrganizationRole"
    },
    "rdfs:subPropertyOf": {
     "@id": "gr:heldRole"
+   }
+  },
+  {
+   "@id": "gr:focusOn",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "One of the person's skill areas."
+   },
+   "rdfs:domain": {
+    "@id": "schema:Person"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "specialises in"
+   },
+   "rdfs:range": {
+    "@id": "schema:DefinedTermSet"
+   }
+  },
+  {
+   "@id": "gr:proficiency",
+   "@type": "owl:DatatypeProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "How well a language is spoken: a CEFR level (A1 to C2) or Native, Fluent or Basic."
+   },
+   "rdfs:domain": {
+    "@id": "schema:Language"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "proficiency"
+   },
+   "rdfs:range": {
+    "@id": "xsd:string"
+   }
+  },
+  {
+   "@id": "gr:studied",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "The person studied for this degree or certificate, finished or still in progress. (schema:hasCredential would claim the credential is already held.)"
+   },
+   "rdfs:domain": {
+    "@id": "schema:Person"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "studied"
+   },
+   "rdfs:range": {
+    "@id": "schema:EducationalOccupationalCredential"
+   },
+   "rdfs:seeAlso": [
+    {
+     "@id": "schema:hasCredential"
+    },
+    {
+     "@id": "schema:alumniOf"
+    }
+   ]
+  },
+  {
+   "@id": "gr:heldRole",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "The person held this role. Use the more specific worked as (finished) or works as (current)."
+   },
+   "rdfs:domain": {
+    "@id": "schema:Person"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "held role"
+   },
+   "rdfs:range": {
+    "@id": "schema:OrganizationRole"
+   },
+   "rdfs:seeAlso": {
+    "@id": "schema:hasOccupation"
+   }
+  },
+  {
+   "@id": "gr:took",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "The person took this career break."
+   },
+   "rdfs:domain": {
+    "@id": "schema:Person"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "took"
+   },
+   "rdfs:range": {
+    "@id": "gr:CareerBreak"
+   }
+  },
+  {
+   "@id": "gr:built",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "The person built or authored this project."
+   },
+   "rdfs:domain": {
+    "@id": "schema:Person"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "built"
+   },
+   "rdfs:range": {
+    "@id": "schema:CreativeWork"
+   },
+   "rdfs:seeAlso": {
+    "@id": "schema:creator"
+   }
+  },
+  {
+   "@id": "gr:awardedBy",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "The organisation that gave the award."
+   },
+   "rdfs:domain": {
+    "@id": "gr:Award"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "awarded by"
+   },
+   "rdfs:range": {
+    "@id": "schema:Organization"
+   },
+   "rdfs:seeAlso": {
+    "@id": "schema:recognizedBy"
+   }
+  },
+  {
+   "@id": "gr:received",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "The person received this award."
+   },
+   "rdfs:domain": {
+    "@id": "schema:Person"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "received"
+   },
+   "rdfs:range": {
+    "@id": "gr:Award"
+   },
+   "rdfs:seeAlso": {
+    "@id": "schema:award"
+   }
+  },
+  {
+   "@id": "gr:at",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "Where a role was held (the employer) or where a degree or certificate was studied (the school)."
+   },
+   "rdfs:domain": {
+    "@id": "_:n617afdcb3ecc4d4eb974b96e5b4ff51db1"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "at"
+   },
+   "rdfs:range": {
+    "@id": "schema:Organization"
+   },
+   "rdfs:seeAlso": [
+    {
+     "@id": "schema:worksFor"
+    },
+    {
+     "@id": "schema:alumniOf"
+    }
+   ]
+  },
+  {
+   "@id": "_:n617afdcb3ecc4d4eb974b96e5b4ff51db1",
+   "@type": "owl:Class",
+   "owl:unionOf": {
+    "@list": [
+     {
+      "@id": "schema:OrganizationRole"
+     },
+     {
+      "@id": "schema:EducationalOccupationalCredential"
+     }
+    ]
+   }
+  },
+  {
+   "@id": "gr:promotedFrom",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "This role followed the earlier role through a promotion at the same organisation."
+   },
+   "rdfs:domain": {
+    "@id": "schema:OrganizationRole"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "promoted from"
+   },
+   "rdfs:range": {
+    "@id": "schema:OrganizationRole"
+   }
+  },
+  {
+   "@id": "gr:ledTo",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "A programme of study that led directly to this role, for example a certificate run with an employer."
+   },
+   "rdfs:domain": {
+    "@id": "schema:EducationalOccupationalCredential"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "led to"
+   },
+   "rdfs:range": {
+    "@id": "schema:OrganizationRole"
    }
   },
   {
@@ -99,57 +402,18 @@
    ]
   },
   {
-   "@id": "gr:CareerBreak",
-   "@type": "owl:Class",
+   "@id": "gr:kind",
+   "@type": "owl:DatatypeProperty",
    "rdfs:comment": {
     "@language": "en",
-    "@value": "A period between roles, with what happened during it. Lets a gap be described honestly instead of left blank."
+    "@value": "What kind of item this is in the resume's own terms (Role, Education, Project, Skill, …). Several kinds share a schema.org type, for example Education and Certification are both schema:EducationalOccupationalCredential; kind keeps them apart."
    },
    "rdfs:label": {
     "@language": "en",
-    "@value": "Career break"
-   },
-   "rdfs:subClassOf": {
-    "@id": "schema:Thing"
-   }
-  },
-  {
-   "@id": "gr:trainedIn",
-   "@type": "owl:ObjectProperty",
-   "rdfs:comment": {
-    "@language": "en",
-    "@value": "A skill taught or practised during this degree or course."
-   },
-   "rdfs:domain": {
-    "@id": "schema:EducationalOccupationalCredential"
-   },
-   "rdfs:label": {
-    "@language": "en",
-    "@value": "trained in"
+    "@value": "kind"
    },
    "rdfs:range": {
-    "@id": "schema:DefinedTerm"
-   },
-   "rdfs:seeAlso": {
-    "@id": "schema:teaches"
-   }
-  },
-  {
-   "@id": "gr:promotedFrom",
-   "@type": "owl:ObjectProperty",
-   "rdfs:comment": {
-    "@language": "en",
-    "@value": "This role followed the earlier role through a promotion at the same organisation."
-   },
-   "rdfs:domain": {
-    "@id": "schema:OrganizationRole"
-   },
-   "rdfs:label": {
-    "@language": "en",
-    "@value": "promoted from"
-   },
-   "rdfs:range": {
-    "@id": "schema:OrganizationRole"
+    "@id": "xsd:string"
    }
   },
   {
@@ -168,117 +432,6 @@
    },
    "rdfs:range": {
     "@id": "schema:Organization"
-   }
-  },
-  {
-   "@id": "gr:heldRole",
-   "@type": "owl:ObjectProperty",
-   "rdfs:comment": {
-    "@language": "en",
-    "@value": "The person held this role. Use the more specific worked as (finished) or works as (current)."
-   },
-   "rdfs:domain": {
-    "@id": "schema:Person"
-   },
-   "rdfs:label": {
-    "@language": "en",
-    "@value": "held role"
-   },
-   "rdfs:range": {
-    "@id": "schema:OrganizationRole"
-   },
-   "rdfs:seeAlso": {
-    "@id": "schema:hasOccupation"
-   }
-  },
-  {
-   "@id": "gr:built",
-   "@type": "owl:ObjectProperty",
-   "rdfs:comment": {
-    "@language": "en",
-    "@value": "The person built or authored this project."
-   },
-   "rdfs:domain": {
-    "@id": "schema:Person"
-   },
-   "rdfs:label": {
-    "@language": "en",
-    "@value": "built"
-   },
-   "rdfs:range": {
-    "@id": "schema:CreativeWork"
-   },
-   "rdfs:seeAlso": {
-    "@id": "schema:creator"
-   }
-  },
-  {
-   "@id": "gr:focusOn",
-   "@type": "owl:ObjectProperty",
-   "rdfs:comment": {
-    "@language": "en",
-    "@value": "One of the person's skill areas."
-   },
-   "rdfs:domain": {
-    "@id": "schema:Person"
-   },
-   "rdfs:label": {
-    "@language": "en",
-    "@value": "specialises in"
-   },
-   "rdfs:range": {
-    "@id": "schema:DefinedTermSet"
-   }
-  },
-  {
-   "@id": "gr:highlight",
-   "@type": "owl:DatatypeProperty",
-   "rdfs:comment": {
-    "@language": "en",
-    "@value": "One achievement or responsibility in a role, degree or project, written as a CV bullet point. Order is not significant."
-   },
-   "rdfs:label": {
-    "@language": "en",
-    "@value": "highlight"
-   },
-   "rdfs:range": {
-    "@id": "xsd:string"
-   }
-  },
-  {
-   "@id": "gr:location",
-   "@type": "owl:DatatypeProperty",
-   "rdfs:comment": {
-    "@language": "en",
-    "@value": "Where it took place, as written on a CV (city and country, or remote)."
-   },
-   "rdfs:label": {
-    "@language": "en",
-    "@value": "location"
-   },
-   "rdfs:range": {
-    "@id": "xsd:string"
-   },
-   "rdfs:seeAlso": {
-    "@id": "schema:location"
-   }
-  },
-  {
-   "@id": "gr:ledTo",
-   "@type": "owl:ObjectProperty",
-   "rdfs:comment": {
-    "@language": "en",
-    "@value": "A programme of study that led directly to this role, for example a certificate run with an employer."
-   },
-   "rdfs:domain": {
-    "@id": "schema:EducationalOccupationalCredential"
-   },
-   "rdfs:label": {
-    "@language": "en",
-    "@value": "led to"
-   },
-   "rdfs:range": {
-    "@id": "schema:OrganizationRole"
    }
   },
   {
@@ -303,6 +456,42 @@
    }
   },
   {
+   "@id": "gr:highlight",
+   "@type": "owl:DatatypeProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "One achievement or responsibility in a role, degree or project, written as a CV bullet point. Order is not significant."
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "highlight"
+   },
+   "rdfs:range": {
+    "@id": "xsd:string"
+   }
+  },
+  {
+   "@id": "gr:trainedIn",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "A skill taught or practised during this degree or course."
+   },
+   "rdfs:domain": {
+    "@id": "schema:EducationalOccupationalCredential"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "trained in"
+   },
+   "rdfs:range": {
+    "@id": "schema:DefinedTerm"
+   },
+   "rdfs:seeAlso": {
+    "@id": "schema:teaches"
+   }
+  },
+  {
    "@id": "gr:used",
    "@type": "owl:ObjectProperty",
    "rdfs:comment": {
@@ -310,21 +499,21 @@
     "@value": "A skill put to use in this role, project or career break, including a language used at work. Together with trained in and shows, it ties each skill to the work behind it."
    },
    "rdfs:domain": {
-    "@id": "_:n93e0aa139d1540a5a15ba506375e6814b11"
+    "@id": "_:n617afdcb3ecc4d4eb974b96e5b4ff51db11"
    },
    "rdfs:label": {
     "@language": "en",
     "@value": "used"
    },
    "rdfs:range": {
-    "@id": "_:n93e0aa139d1540a5a15ba506375e6814b16"
+    "@id": "_:n617afdcb3ecc4d4eb974b96e5b4ff51db16"
    },
    "rdfs:seeAlso": {
     "@id": "schema:skills"
    }
   },
   {
-   "@id": "_:n93e0aa139d1540a5a15ba506375e6814b11",
+   "@id": "_:n617afdcb3ecc4d4eb974b96e5b4ff51db11",
    "@type": "owl:Class",
    "owl:unionOf": {
     "@list": [
@@ -344,7 +533,7 @@
    }
   },
   {
-   "@id": "_:n93e0aa139d1540a5a15ba506375e6814b16",
+   "@id": "_:n617afdcb3ecc4d4eb974b96e5b4ff51db16",
    "@type": "owl:Class",
    "owl:unionOf": {
     "@list": [
@@ -358,42 +547,18 @@
    }
   },
   {
-   "@id": "gr:awardedBy",
-   "@type": "owl:ObjectProperty",
+   "@id": "gr:CareerBreak",
+   "@type": "owl:Class",
    "rdfs:comment": {
     "@language": "en",
-    "@value": "The organisation that gave the award."
-   },
-   "rdfs:domain": {
-    "@id": "gr:Award"
+    "@value": "A period between roles, with what happened during it. Lets a gap be described honestly instead of left blank."
    },
    "rdfs:label": {
     "@language": "en",
-    "@value": "awarded by"
+    "@value": "Career break"
    },
-   "rdfs:range": {
-    "@id": "schema:Organization"
-   },
-   "rdfs:seeAlso": {
-    "@id": "schema:recognizedBy"
-   }
-  },
-  {
-   "@id": "gr:proficiency",
-   "@type": "owl:DatatypeProperty",
-   "rdfs:comment": {
-    "@language": "en",
-    "@value": "How well a language is spoken: a CEFR level (A1 to C2) or Native, Fluent or Basic."
-   },
-   "rdfs:domain": {
-    "@id": "schema:Language"
-   },
-   "rdfs:label": {
-    "@language": "en",
-    "@value": "proficiency"
-   },
-   "rdfs:range": {
-    "@id": "xsd:string"
+   "rdfs:subClassOf": {
+    "@id": "schema:Thing"
    }
   },
   {
@@ -418,167 +583,24 @@
    }
   },
   {
-   "@id": "gr:worksAs",
+   "@id": "gr:workedAs",
    "@type": "owl:ObjectProperty",
    "rdfs:comment": {
     "@language": "en",
-    "@value": "The person holds this role now; the role has no end date."
+    "@value": "The person held this role in the past; the role has an end date."
    },
    "rdfs:domain": {
     "@id": "schema:Person"
    },
    "rdfs:label": {
     "@language": "en",
-    "@value": "works as"
+    "@value": "worked as"
    },
    "rdfs:range": {
     "@id": "schema:OrganizationRole"
    },
    "rdfs:subPropertyOf": {
     "@id": "gr:heldRole"
-   }
-  },
-  {
-   "@id": "gr:kind",
-   "@type": "owl:DatatypeProperty",
-   "rdfs:comment": {
-    "@language": "en",
-    "@value": "What kind of item this is in the resume's own terms (Role, Education, Project, Skill, …). Several kinds share a schema.org type, for example Education and Certification are both schema:EducationalOccupationalCredential; kind keeps them apart."
-   },
-   "rdfs:label": {
-    "@language": "en",
-    "@value": "kind"
-   },
-   "rdfs:range": {
-    "@id": "xsd:string"
-   }
-  },
-  {
-   "@id": "gr:shows",
-   "@type": "owl:ObjectProperty",
-   "rdfs:comment": {
-    "@language": "en",
-    "@value": "A skill this certification is evidence of."
-   },
-   "rdfs:domain": {
-    "@id": "schema:EducationalOccupationalCredential"
-   },
-   "rdfs:label": {
-    "@language": "en",
-    "@value": "shows"
-   },
-   "rdfs:range": {
-    "@id": "schema:DefinedTerm"
-   },
-   "rdfs:seeAlso": {
-    "@id": "schema:competencyRequired"
-   }
-  },
-  {
-   "@id": "gr:studied",
-   "@type": "owl:ObjectProperty",
-   "rdfs:comment": {
-    "@language": "en",
-    "@value": "The person studied for this degree or certificate, finished or still in progress. (schema:hasCredential would claim the credential is already held.)"
-   },
-   "rdfs:domain": {
-    "@id": "schema:Person"
-   },
-   "rdfs:label": {
-    "@language": "en",
-    "@value": "studied"
-   },
-   "rdfs:range": {
-    "@id": "schema:EducationalOccupationalCredential"
-   },
-   "rdfs:seeAlso": [
-    {
-     "@id": "schema:hasCredential"
-    },
-    {
-     "@id": "schema:alumniOf"
-    }
-   ]
-  },
-  {
-   "@id": "gr:took",
-   "@type": "owl:ObjectProperty",
-   "rdfs:comment": {
-    "@language": "en",
-    "@value": "The person took this career break."
-   },
-   "rdfs:domain": {
-    "@id": "schema:Person"
-   },
-   "rdfs:label": {
-    "@language": "en",
-    "@value": "took"
-   },
-   "rdfs:range": {
-    "@id": "gr:CareerBreak"
-   }
-  },
-  {
-   "@id": "gr:speaks",
-   "@type": "owl:ObjectProperty",
-   "rdfs:comment": {
-    "@language": "en",
-    "@value": "The person speaks this language; how well is given by proficiency on the language."
-   },
-   "rdfs:domain": {
-    "@id": "schema:Person"
-   },
-   "rdfs:label": {
-    "@language": "en",
-    "@value": "speaks"
-   },
-   "rdfs:range": {
-    "@id": "schema:Language"
-   },
-   "rdfs:subPropertyOf": {
-    "@id": "schema:knowsLanguage"
-   }
-  },
-  {
-   "@id": "gr:received",
-   "@type": "owl:ObjectProperty",
-   "rdfs:comment": {
-    "@language": "en",
-    "@value": "The person received this award."
-   },
-   "rdfs:domain": {
-    "@id": "schema:Person"
-   },
-   "rdfs:label": {
-    "@language": "en",
-    "@value": "received"
-   },
-   "rdfs:range": {
-    "@id": "gr:Award"
-   },
-   "rdfs:seeAlso": {
-    "@id": "schema:award"
-   }
-  },
-  {
-   "@id": "gr:holds",
-   "@type": "owl:ObjectProperty",
-   "rdfs:comment": {
-    "@language": "en",
-    "@value": "The person holds this certification."
-   },
-   "rdfs:domain": {
-    "@id": "schema:Person"
-   },
-   "rdfs:label": {
-    "@language": "en",
-    "@value": "holds"
-   },
-   "rdfs:range": {
-    "@id": "schema:EducationalOccupationalCredential"
-   },
-   "rdfs:subPropertyOf": {
-    "@id": "schema:hasCredential"
    }
   },
   {
@@ -596,14 +618,14 @@
     "@value": "part of"
    },
    "rdfs:range": {
-    "@id": "_:n93e0aa139d1540a5a15ba506375e6814b4"
+    "@id": "_:n617afdcb3ecc4d4eb974b96e5b4ff51db4"
    },
    "rdfs:seeAlso": {
     "@id": "schema:isPartOf"
    }
   },
   {
-   "@id": "_:n93e0aa139d1540a5a15ba506375e6814b4",
+   "@id": "_:n617afdcb3ecc4d4eb974b96e5b4ff51db4",
    "@type": "owl:Class",
    "owl:unionOf": {
     "@list": [
@@ -617,43 +639,21 @@
    }
   },
   {
-   "@id": "gr:at",
-   "@type": "owl:ObjectProperty",
+   "@id": "gr:Award",
+   "@type": "owl:Class",
    "rdfs:comment": {
     "@language": "en",
-    "@value": "Where a role was held (the employer) or where a degree or certificate was studied (the school)."
-   },
-   "rdfs:domain": {
-    "@id": "_:n93e0aa139d1540a5a15ba506375e6814b1"
+    "@value": "A recognition given to the person, for example by an employer. schema.org only has award as a text property, so this makes awards nodes that can be linked to who gave them."
    },
    "rdfs:label": {
     "@language": "en",
-    "@value": "at"
+    "@value": "Award"
    },
-   "rdfs:range": {
-    "@id": "schema:Organization"
+   "rdfs:seeAlso": {
+    "@id": "schema:award"
    },
-   "rdfs:seeAlso": [
-    {
-     "@id": "schema:worksFor"
-    },
-    {
-     "@id": "schema:alumniOf"
-    }
-   ]
-  },
-  {
-   "@id": "_:n93e0aa139d1540a5a15ba506375e6814b1",
-   "@type": "owl:Class",
-   "owl:unionOf": {
-    "@list": [
-     {
-      "@id": "schema:OrganizationRole"
-     },
-     {
-      "@id": "schema:EducationalOccupationalCredential"
-     }
-    ]
+   "rdfs:subClassOf": {
+    "@id": "schema:Thing"
    }
   },
   {
@@ -671,11 +671,11 @@
     "@value": "included"
    },
    "rdfs:range": {
-    "@id": "_:n93e0aa139d1540a5a15ba506375e6814b7"
+    "@id": "_:n617afdcb3ecc4d4eb974b96e5b4ff51db7"
    }
   },
   {
-   "@id": "_:n93e0aa139d1540a5a15ba506375e6814b7",
+   "@id": "_:n617afdcb3ecc4d4eb974b96e5b4ff51db7",
    "@type": "owl:Class",
    "owl:unionOf": {
     "@list": [
