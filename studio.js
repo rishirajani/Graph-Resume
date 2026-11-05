@@ -624,7 +624,7 @@
     const unlinked = links.filter((l) => !l.off && !list.some((a) => a.link === l.id));
     $("#apps-summary").innerHTML = list.length ? `<p class="apps-counts">${[["Applied", count("Applied")], ["Interviewing", count("Interviewing")], ["Offer", count("Offer") + count("Accepted")], ["Closed", count("Rejected") + count("Withdrawn") + count("No reply")]]
       .map(([k, n]) => `<span><b>${n}</b> ${k.toLowerCase()}</span>`).join("")}<span><b>${totalVisitors}</b> link visitor${totalVisitors === 1 ? "" : "s"}</span></p>
-      <p class="help">${visits ? `Visitor counts come from GoatCounter every hour${visits.updated ? `; the last new visit was recorded ${esc(fmtDay(visits.updated.slice(0, 10)))}` : ""}. People who block trackers aren't counted, so a link can be opened without showing up here.` : "Visitor counts appear here once the hourly <code>Visit counts</code> workflow has run (it needs the <code>GOATCOUNTER_TOKEN</code> secret)."}</p>` : "";
+      <p class="help">${visits ? `Visitor counts come from GoatCounter every hour${totalVisitors ? `; the last new visit was recorded ${esc(fmtDay(Object.values(visits.links || {}).map((d) => d.last).filter(Boolean).sort().at(-1) || visits.updated.slice(0, 10)))}` : "; nobody has opened a tailored link yet"}. People who block trackers aren't counted, so a link can be opened without showing up here.` : "Visitor counts appear here once the hourly <code>Visit counts</code> workflow has run (it needs the <code>GOATCOUNTER_TOKEN</code> secret)."}</p>` : "";
     // newest first: by the date you applied (not applied yet counts as today), then most recently added
     const sorted = list.map((a, i) => [a, i]).sort(([a, i], [b, j]) => String(b.applied || todayIso()).localeCompare(String(a.applied || todayIso())) || j - i).map(([a]) => a);
     body.innerHTML = (unlinked.length ? `<div class="note apps-unlinked"><b>Tailored links without an application:</b> ${unlinked.map((l) => `<button class="btn ghost small" type="button" data-from-link="${esc(l.id)}">Add ${esc(l.company || l.id)}</button>`).join(" ")}</div>` : "")
@@ -656,6 +656,21 @@
     });
   }
   $("#studio-apps-btn").addEventListener("click", openApps);
+
+  /* ---------------- studio tabs: show which panel is open ---------------- */
+  // Each panel has its button; the open one is marked, whichever way it was opened.
+  const PANEL_BTN = { "#workspace": "#studio-jd-btn", "#apps": "#studio-apps-btn", "#links": "#studio-links-btn",
+    "#visibility": "#studio-vis-btn", "#customize": "#studio-customize-btn", "#settings": "#studio-settings-btn" };
+  function markOpenPanel() {
+    for (const [panel, btn] of Object.entries(PANEL_BTN)) {
+      const b = $(btn); if (!b) continue;
+      if ($(panel) && !$(panel).hidden) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
+    }
+  }
+  const panelWatch = new MutationObserver(markOpenPanel);
+  Object.keys(PANEL_BTN).forEach((p) => $(p) && panelWatch.observe($(p), { attributes: true, attributeFilter: ["hidden"] }));
+  markOpenPanel();
+  $("#studio-jd-btn").addEventListener("click", () => enterStudio());
   $("#apps-back").addEventListener("click", () => { $("#apps").hidden = true; enterStudio(); });
 
   /* ---------------- what visitors see ---------------- */

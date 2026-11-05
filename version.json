@@ -1,9 +1,9 @@
 {
-  "version": "1.9.3",
+  "version": "1.9.4",
   "date": "2026-11-05",
   "notes": [
-    "Applications are listed newest first: by the date you applied, then the one you added most recently. A status no longer moves an application to the top or bottom.",
-    "CVs list projects, education, awards and certificates newest first, like experience (ongoing ones on top). The model still chooses which projects to include."
+    "The studio's buttons now show which panel is open, and a new Job description button takes you back to writing a CV and letter from any panel.",
+    "Applications are listed newest first: by the date you applied, then the one you added most recently. A status no longer moves an application to the top or bottom."
   ],
   "files": [
     "index.html",

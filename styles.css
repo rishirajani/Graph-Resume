@@ -229,6 +229,7 @@ a { color: var(--c-role); }
 .studio-top h1 { margin: 0; font-size: 40px; letter-spacing: -0.02em; line-height: 1; }
 .studio-top .sub { margin: 8px 0 0; color: var(--ink-2); font: 400 18px/1.4 var(--serif); }
 .studio-top-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.studio-top-actions .btn[aria-current="page"] { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
 
 .gate, .settings { background: var(--surface); border: 1px solid var(--rule); border-radius: 14px; padding: 24px; max-width: 560px; }
 .gate h2, .settings h2 { margin: 0 0 8px; font-size: 22px; }
