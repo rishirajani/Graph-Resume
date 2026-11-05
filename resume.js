@@ -387,6 +387,32 @@ window.RESUME = {
       ]
     },
     {
+      "id": "p-weft",
+      "type": "Project",
+      "label": "Weft: designed and published an open ontology for evidence-backed career graphs",
+      "short": "Weft ontology",
+      "start": "2026-10",
+      "url": "https://rishirajani.github.io/weft/",
+      "highlights": [
+        "Designed Weft, an OWL vocabulary of 28 terms extending Schema.org that links each skill to the roles, projects, courses and certifications behind it; published it under CC BY 4.0 with documentation in HTML, Turtle, JSON-LD and RDF/XML, a JSON-LD context and an example that uses every term.",
+        "Linked 69 skills and 5 languages to Wikidata and ESCO with SKOS exactMatch/closeMatch mappings.",
+        "Validated the published graph with SHACL shapes and domain/range checks in a GitHub Actions pipeline that blocks publishing on violations."
+      ],
+      "skills": [
+        "s-ontology",
+        "s-owl",
+        "s-rdf",
+        "s-rdfs",
+        "s-shacl",
+        "s-turtle",
+        "s-semmodel",
+        "s-python",
+        "s-cicd",
+        "s-git",
+        "s-docs"
+      ]
+    },
+    {
       "id": "p-loom",
       "type": "Project",
       "label": "Loom: open-source CSV-to-RDF ontology mapping tool",

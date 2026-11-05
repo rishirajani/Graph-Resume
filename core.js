@@ -1,6 +1,6 @@
 /* Graph resume: shared core, used by the site (window.GRCORE) and by tools/publish.mjs.
    Turns resume.js into graph edges, decides what visitors may see, and writes RDF
-   (JSON-LD and Turtle) with schema.org, SKOS mappings to Wikidata/ESCO, and gr: terms. */
+   (JSON-LD and Turtle) with schema.org, SKOS mappings to Wikidata/ESCO, and Weft (weft:) terms. */
 (function (root) {
   "use strict";
 
@@ -71,16 +71,17 @@
   const SCHEMA_TYPE = {
     Person: "Person", Role: "OrganizationRole", Organization: "Organization", Education: "EducationalOccupationalCredential",
     School: "CollegeOrUniversity", Project: "CreativeWork", Skill: "DefinedTerm", SkillGroup: "DefinedTermSet",
-    Language: "Language", Certification: "EducationalOccupationalCredential", Award: "gr:Award", Publication: "ScholarlyArticle",
-    Break: "gr:CareerBreak"
+    Language: "Language", Certification: "EducationalOccupationalCredential", Award: "weft:Award", Publication: "ScholarlyArticle",
+    Break: "weft:CareerBreak"
   };
 
   // version of the shared code; must match release.json (checked when publishing)
-  const VERSION = "1.7.0";
+  const VERSION = "1.8.0";
   // where released versions are announced (copies of the code check this for updates)
   const UPSTREAM = "https://rishirajani.github.io/Graph-Resume/";
-  // the gr: vocabulary lives at one fixed address, whichever site uses it
-  const GR_NS = "https://rishirajani.github.io/Graph-Resume/vocab#";
+  // relations come from Weft, an open vocabulary with permanent IRIs (https://w3id.org/weft)
+  const WEFT_NS = "https://w3id.org/weft#";
+  const WEFT_DOCS = "https://rishirajani.github.io/weft/";
   const PREFIXES = {
     schema: "https://schema.org/",
     skos: "http://www.w3.org/2004/02/skos/core#",
@@ -101,44 +102,44 @@
   // base: the site's address ending in "#", e.g. https://example.org/cv/#
   function toJsonLd(nodes, edges, base) {
     const graph = nodes.map((n) => {
-      const o = { "@id": "cv:" + n.id, "@type": SCHEMA_TYPE[n.type] || "Thing", name: n.label || n.name, "gr:kind": n.type };
+      const o = { "@id": "cv:" + n.id, "@type": SCHEMA_TYPE[n.type] || "Thing", name: n.label || n.name, "weft:kind": n.type };
       const summary = n.summary || n.description;
       if (summary && !isPlaceholder(summary)) o.description = summary;
       if (n.headline) o.disambiguatingDescription = n.headline;
       if (n.email) o.email = n.email;
       if (n.start) o.startDate = n.start;
       if (n.end) o.endDate = n.end;
-      if (n.location) o["gr:location"] = n.location;
+      if (n.location) o["weft:location"] = n.location;
       if (n.status) o.creativeWorkStatus = n.status;
-      if (n.level) o["gr:proficiency"] = n.level;
+      if (n.level) o["weft:proficiency"] = n.level;
       if (n.url) o.url = n.url;
       const hls = clean(n.highlights);
-      if (hls.length) o["gr:highlight"] = hls;
+      if (hls.length) o["weft:highlight"] = hls;
       // the same concept in shared vocabularies (Wikidata, ESCO)
       if ((n.exactMatch || []).length) o["skos:exactMatch"] = n.exactMatch.map((x) => ({ "@id": expand(x) }));
       if ((n.closeMatch || []).length) o["skos:closeMatch"] = n.closeMatch.map((x) => ({ "@id": expand(x) }));
       for (const e of edges.filter((e) => e.source === n.id)) {
-        const k = "gr:" + e.pred;
+        const k = "weft:" + e.pred;
         (o[k] = o[k] || []).push({ "@id": "cv:" + e.target });
       }
       return o;
     });
     return {
-      "@context": { "@vocab": PREFIXES.schema, cv: base, gr: GR_NS, skos: PREFIXES.skos },
+      "@context": { "@vocab": PREFIXES.schema, cv: base, weft: WEFT_NS, skos: PREFIXES.skos },
       "@graph": graph
     };
   }
 
   function toTurtle(doc) {
     const lit = (s) => `"${String(s).replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\n/g, "\\n").replace(/\r/g, "\\r")}"`;
-    const prefixed = { ...PREFIXES, gr: doc["@context"].gr, cv: doc["@context"].cv };
+    const prefixed = { ...PREFIXES, weft: doc["@context"].weft, cv: doc["@context"].cv };
     const iri = (x) => {
-      if (/^(cv|gr|skos|schema):/.test(x)) return x;
+      if (/^(cv|weft|skos|schema):/.test(x)) return x;
       for (const [p, ns] of Object.entries(PREFIXES)) if (x.startsWith(ns) && /^[A-Za-z0-9_-]+$/.test(x.slice(ns.length))) return `${p}:${x.slice(ns.length)}`;
       return `<${x}>`;
     };
-    const term = (k) => (/^(gr|skos):/.test(k) ? k : `schema:${k}`);
-    const typ = (t) => (t.startsWith("gr:") ? t : `schema:${t}`);
+    const term = (k) => (/^(weft|skos):/.test(k) ? k : `schema:${k}`);
+    const typ = (t) => (t.startsWith("weft:") ? t : `schema:${t}`);
     const lines = [...Object.entries(prefixed).map(([p, ns]) => `@prefix ${p}: <${ns}> .`), ""];
     for (const o of doc["@graph"]) {
       const po = [`a ${typ(o["@type"])}`];
@@ -159,5 +160,5 @@
     return [me, ...R.nodes];
   }
 
-  root.GRCORE = { VERSION, UPSTREAM, GR_NS, expand, matchLink, PRED, SCHEMA_TYPE, PREFIXES, isPlaceholder, clean, deriveEdges, REF_FIELDS, refsOf, publicSubset, toJsonLd, toTurtle, graphOf };
+  root.GRCORE = { VERSION, UPSTREAM, WEFT_NS, WEFT_DOCS, expand, matchLink, PRED, SCHEMA_TYPE, PREFIXES, isPlaceholder, clean, deriveEdges, REF_FIELDS, refsOf, publicSubset, toJsonLd, toTurtle, graphOf };
 })(typeof window !== "undefined" ? window : globalThis);

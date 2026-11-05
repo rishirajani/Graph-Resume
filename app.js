@@ -601,7 +601,7 @@
       ${section("education", "Education", "--c-edu", edu, nodesOf("Education").length)}
       ${section("skills", "Skills", "--c-skill", groups || ungrouped.length ? `<div class="skills-grid">${groups}${ungrouped.length ? `<div><h3>Other</h3><div class="links">${ungrouped.map((s) => chip(s.id)).join("")}</div></div>` : ""}</div>` : "", shownNodes.filter((n) => n.type === "Skill").length)}
       ${section("more", "Languages and more", "--c-other", more, ["Certification", "Award", "Publication", "Language"].flatMap(nodesOf).length)}
-      ${R.site?.allowPublicGraphExport !== false && UI.features.download ? `<p class="read-foot"><button class="btn ghost small" type="button" id="read-download">Download this graph as JSON-LD or Turtle</button> <a class="read-vocab" href="${esc(window.GRCORE.GR_NS.replace(/#$/, ""))}">How the graph is described: the gr: vocabulary</a></p>` : ""}
+      ${R.site?.allowPublicGraphExport !== false && UI.features.download ? `<p class="read-foot"><button class="btn ghost small" type="button" id="read-download">Download this graph as JSON-LD or Turtle</button> <a class="read-vocab" href="${esc(window.GRCORE.WEFT_DOCS)}">How the graph is described: the Weft vocabulary</a></p>` : ""}
     `;
     $("#read-download")?.addEventListener("click", () => $("#export-graph-btn").click());
     $$("#read-body [data-goto]").forEach((b) => b.addEventListener("click", () => go(b.dataset.goto)));

@@ -1,9 +1,9 @@
 {
-  "version": "1.7.0",
+  "version": "1.8.0",
   "date": "2026-11-05",
   "notes": [
-    "Tailored links can be edited after they're live: the note, company and role, what's highlighted, hidden items and the end date. The address stays the same, so links you've already sent keep working.",
-    "The link form now lists the highlighted skills, so you can untick any you don't want to point at."
+    "The graph is now described with Weft, an open vocabulary for career graphs with its own permanent address (w3id.org/weft). Downloads use the weft: prefix in place of gr:; the terms are the same.",
+    "The text view links to Weft's documentation."
   ],
   "files": [
     "index.html",

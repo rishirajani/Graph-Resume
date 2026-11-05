@@ -2,7 +2,7 @@
   "@context": {
     "@vocab": "https://schema.org/",
     "cv": "https://rishirajani.github.io/Graph-Resume/#",
-    "gr": "https://rishirajani.github.io/Graph-Resume/vocab#",
+    "weft": "https://w3id.org/weft#",
     "skos": "http://www.w3.org/2004/02/skos/core#"
   },
   "@graph": [
@@ -10,12 +10,12 @@
       "@id": "cv:me",
       "@type": "Person",
       "name": "Rishi Rajani",
-      "gr:kind": "Person",
+      "weft:kind": "Person",
       "description": "Data and knowledge engineer with approximately three years of experience in fintech and enterprise data, connecting business meaning with reliable data systems. Experienced in defining and documenting shared business metrics, standardizing data models, reconciling heterogeneous sources, and establishing data-quality practices and reporting adopted across business functions. Currently completing an M.Sc. in Computer Science at Universität Stuttgart, specializing in ontology engineering, knowledge graphs, description logics, and machine learning.",
       "disambiguatingDescription": "Data and knowledge engineer working on semantics, ontologies, data governance and quality",
       "email": "rishirajani078@gmail.com",
-      "gr:location": "Stuttgart, Germany (open to relocation)",
-      "gr:workedAs": [
+      "weft:location": "Stuttgart, Germany (open to relocation)",
+      "weft:workedAs": [
         {
           "@id": "cv:r-nobel"
         },
@@ -38,12 +38,12 @@
           "@id": "cv:r-oracle"
         }
       ],
-      "gr:received": [
+      "weft:received": [
         {
           "@id": "cv:a-ironman"
         }
       ],
-      "gr:studied": [
+      "weft:studied": [
         {
           "@id": "cv:e-msc"
         },
@@ -54,7 +54,7 @@
           "@id": "cv:e-rubika"
         }
       ],
-      "gr:holds": [
+      "weft:holds": [
         {
           "@id": "cv:c-udemy-python"
         },
@@ -65,9 +65,12 @@
           "@id": "cv:c-ielts"
         }
       ],
-      "gr:built": [
+      "weft:built": [
         {
           "@id": "cv:p-thesis"
+        },
+        {
+          "@id": "cv:p-weft"
         },
         {
           "@id": "cv:p-loom"
@@ -82,7 +85,7 @@
           "@id": "cv:p-rossmann"
         }
       ],
-      "gr:focusOn": [
+      "weft:focusOn": [
         {
           "@id": "cv:g-gov"
         },
@@ -105,7 +108,7 @@
           "@id": "cv:g-collab"
         }
       ],
-      "gr:speaks": [
+      "weft:speaks": [
         {
           "@id": "cv:l-en"
         },
@@ -127,18 +130,18 @@
       "@id": "cv:o-nobel",
       "@type": "Organization",
       "name": "Nobel Hygiene Pvt. Ltd.",
-      "gr:kind": "Organization",
+      "weft:kind": "Organization",
       "description": "Manufacturer of adult and baby hygiene products such as diapers and sanitary pads."
     },
     {
       "@id": "cv:r-nobel",
       "@type": "OrganizationRole",
       "name": "Data Engineering Consultant",
-      "gr:kind": "Role",
+      "weft:kind": "Role",
       "startDate": "2023-10",
       "endDate": "2024-03",
-      "gr:location": "Mumbai, India",
-      "gr:highlight": [
+      "weft:location": "Mumbai, India",
+      "weft:highlight": [
         "Built a data integration and reporting proof of concept around existing SAP HANA and API services, implementing Python extraction, logging and transformation workflows, PostgreSQL storage, and Docker-hosted Apache Superset dashboards for sales leaders, the CFO and CMO.",
         "Standardized source-to-target field mappings and definitions, corrected duplicate API records, and reconciled delayed secondary-sales figures with manual sales-team reporting alongside primary- and secondary-sales stakeholders.",
         "Automated recurring data extraction and reporting, reducing manual reporting time by approximately 40%; coordinated access to on-premises virtual machines, APIs and data infrastructure.",
@@ -148,12 +151,12 @@
         "Deployed the company's business-intelligence platform, NHPL BizIntel, on Apache Superset 3.0 with Docker Compose: company branding, a PostgreSQL metadata store with Redis, and database drivers for SAP HANA, SQL Server, MySQL and PostgreSQL.",
         "Built a custom Superset image with Firefox and GeckoDriver so scheduled email reports and alerts could render dashboard screenshots, delivered via Office 365 SMTP; added Prophet for forecasting and enabled native filters, Jinja templating and full CSV export."
       ],
-      "gr:at": [
+      "weft:at": [
         {
           "@id": "cv:o-nobel"
         }
       ],
-      "gr:used": [
+      "weft:used": [
         {
           "@id": "cv:s-python"
         },
@@ -214,18 +217,18 @@
       "@id": "cv:o-flexmoney",
       "@type": "Organization",
       "name": "Flexmoney Technologies Pvt. Ltd.",
-      "gr:kind": "Organization",
+      "weft:kind": "Organization",
       "description": "Fintech company that runs InstaCred, a checkout-financing network connecting merchants, lenders and customers. Lenders share pre-approved customer bases, either through API-based pre-approval checks or as encrypted files. At checkout, customers can see which lenders pre-approve them for the cart amount, and some merchants run the check automatically for larger purchases. Customers who aren't pre-approved can open a new credit line with a partner lender."
     },
     {
       "@id": "cv:r-flexmoney",
       "@type": "OrganizationRole",
       "name": "Executive – Marketing Analytics (data & analytics engineering)",
-      "gr:kind": "Role",
+      "weft:kind": "Role",
       "startDate": "2021-03",
       "endDate": "2023-03",
-      "gr:location": "Mumbai, India",
-      "gr:highlight": [
+      "weft:location": "Mumbai, India",
+      "weft:highlight": [
         "Co-defined and documented transaction metrics with merchant-, lender- and product-facing stakeholders, reconciling competing interpretations of customer activity and implementing distinct business perspectives through SQL reporting.",
         "Owned launch-critical analytics for a new lending approval journey, defining multi-stage conversion funnels, writing SQL models and delivering dashboards required for product go-live.",
         "Converted manual Excel-based reporting into scalable Apache Superset dashboards and reusable queries; delivered analytics for six clients across two projects and ran demonstrations to support daily adoption by business and marketing teams.",
@@ -249,12 +252,12 @@
         "Onboarded new colleagues on the database schema, Athena, Redshift, CleverTap and Superset.",
         "Led a team at the Flexathon 1.0 hackathon pitching Transactions as a Service, letting customers order with Cardless EMI directly from product-page widgets; the team received recognition."
       ],
-      "gr:at": [
+      "weft:at": [
         {
           "@id": "cv:o-flexmoney"
         }
       ],
-      "gr:used": [
+      "weft:used": [
         {
           "@id": "cv:s-kpi"
         },
@@ -330,17 +333,17 @@
       "@id": "cv:r-flexmoney-am",
       "@type": "OrganizationRole",
       "name": "Assistant Manager – Marketing Analytics (data & analytics engineering)",
-      "gr:kind": "Role",
+      "weft:kind": "Role",
       "description": "Promoted from Executive – Marketing Analytics in April 2023, following the FY 2022-23 performance review.",
       "startDate": "2023-04",
       "endDate": "2023-08",
-      "gr:location": "Mumbai, India",
-      "gr:at": [
+      "weft:location": "Mumbai, India",
+      "weft:at": [
         {
           "@id": "cv:o-flexmoney"
         }
       ],
-      "gr:promotedFrom": [
+      "weft:promotedFrom": [
         {
           "@id": "cv:r-flexmoney"
         }
@@ -350,26 +353,26 @@
       "@id": "cv:o-vmlyr",
       "@type": "Organization",
       "name": "VMLY&R (QAIS Consulting Pvt. Ltd.)",
-      "gr:kind": "Organization"
+      "weft:kind": "Organization"
     },
     {
       "@id": "cv:r-vmlyr",
       "@type": "OrganizationRole",
       "name": "Freelance Consultant, Product Outreach",
-      "gr:kind": "Role",
+      "weft:kind": "Role",
       "startDate": "2020-08",
       "endDate": "2020-09",
-      "gr:location": "Mumbai, India",
-      "gr:highlight": [
+      "weft:location": "Mumbai, India",
+      "weft:highlight": [
         "Researched outreach solutions for a client's product aimed at adult gamers in Japan and Indonesia, working within constraints such as age restrictions and avoiding any association with violence.",
         "Identified prospect needs and developed responses with information on suitable services."
       ],
-      "gr:at": [
+      "weft:at": [
         {
           "@id": "cv:o-vmlyr"
         }
       ],
-      "gr:used": [
+      "weft:used": [
         {
           "@id": "cv:s-market"
         }
@@ -379,28 +382,28 @@
       "@id": "cv:o-ubisoft",
       "@type": "Organization",
       "name": "Ubisoft Entertainment India Pvt. Ltd.",
-      "gr:kind": "Organization",
+      "weft:kind": "Organization",
       "description": "Ubisoft's Pune studio, mainly testing games for other Ubisoft studios and beginning to take on game design."
     },
     {
       "@id": "cv:r-ubisoft",
       "@type": "OrganizationRole",
       "name": "Intern Game Tester",
-      "gr:kind": "Role",
+      "weft:kind": "Role",
       "startDate": "2019-12",
       "endDate": "2020-02",
-      "gr:location": "Pune, India",
-      "gr:highlight": [
+      "weft:location": "Pune, India",
+      "weft:highlight": [
         "Tested the gameplay functionality and integrity of a AAA title and reported bugs in JIRA.",
         "Prepared reports on the testing team's work, tracked player responses to the game on social media, and kept the team updated on company news.",
         "Received a full-time Junior Game Tester offer at the end of the internship."
       ],
-      "gr:at": [
+      "weft:at": [
         {
           "@id": "cv:o-ubisoft"
         }
       ],
-      "gr:used": [
+      "weft:used": [
         {
           "@id": "cv:s-gameqa"
         },
@@ -413,29 +416,29 @@
       "@id": "cv:o-hog",
       "@type": "Organization",
       "name": "House of Gaming Pvt. Ltd.",
-      "gr:kind": "Organization",
+      "weft:kind": "Organization",
       "description": "Esports company behind the Indian Gaming League brand."
     },
     {
       "@id": "cv:r-hog",
       "@type": "OrganizationRole",
       "name": "Operations Management Intern",
-      "gr:kind": "Role",
+      "weft:kind": "Role",
       "description": "Worked on the company's esports brand, Indian Gaming League.",
       "startDate": "2019-01",
       "endDate": "2019-07",
-      "gr:location": "Mumbai, India",
-      "gr:highlight": [
+      "weft:location": "Mumbai, India",
+      "weft:highlight": [
         "Set up operations for the company's esports brand, Indian Gaming League.",
         "Took part in decisions on the development of the website and mobile applications together with the development team.",
         "Continuously researched the gaming industry for the latest news and upcoming tournaments and events."
       ],
-      "gr:at": [
+      "weft:at": [
         {
           "@id": "cv:o-hog"
         }
       ],
-      "gr:used": [
+      "weft:used": [
         {
           "@id": "cv:s-esports"
         },
@@ -448,28 +451,28 @@
       "@id": "cv:o-oracle",
       "@type": "Organization",
       "name": "Oracle Financial Services Software Ltd.",
-      "gr:kind": "Organization",
+      "weft:kind": "Organization",
       "description": "Oracle subsidiary building software for banks and other financial institutions."
     },
     {
       "@id": "cv:r-oracle",
       "@type": "OrganizationRole",
       "name": "Project Intern",
-      "gr:kind": "Role",
+      "weft:kind": "Role",
       "startDate": "2017-12",
       "endDate": "2018-01",
-      "gr:location": "Mumbai, India",
-      "gr:highlight": [
+      "weft:location": "Mumbai, India",
+      "weft:highlight": [
         "Developed REST web services for model uploading in Oracle Financial Services Analytical Applications (OFSAA) and performed unit testing.",
         "Worked on the development of a Data Quality Framework.",
         "Built a Java web application with Servlets, JSP and JDBC on an Oracle database, then re-implemented its operations as a JSON REST service with JAX-RS (Jersey) and a client to exercise every endpoint."
       ],
-      "gr:at": [
+      "weft:at": [
         {
           "@id": "cv:o-oracle"
         }
       ],
-      "gr:used": [
+      "weft:used": [
         {
           "@id": "cv:s-java"
         },
@@ -498,12 +501,12 @@
     },
     {
       "@id": "cv:a-ironman",
-      "@type": "gr:Award",
+      "@type": "weft:Award",
       "name": "“Iron Man” Award",
-      "gr:kind": "Award",
+      "weft:kind": "Award",
       "description": "Recognized for driving innovation in analytics, introducing new automated insights workflows, and supporting company-wide growth initiatives.",
-      "gr:location": "Mumbai, India",
-      "gr:awardedBy": [
+      "weft:location": "Mumbai, India",
+      "weft:awardedBy": [
         {
           "@id": "cv:o-flexmoney"
         }
@@ -513,22 +516,22 @@
       "@id": "cv:sch-stuttgart",
       "@type": "CollegeOrUniversity",
       "name": "Universität Stuttgart",
-      "gr:kind": "School"
+      "weft:kind": "School"
     },
     {
       "@id": "cv:e-msc",
       "@type": "EducationalOccupationalCredential",
       "name": "Master's, Computer Science",
-      "gr:kind": "Education",
+      "weft:kind": "Education",
       "description": "Focus: knowledge graphs, semantic web, ontology engineering, machine learning.",
       "startDate": "2024-04",
-      "gr:location": "Stuttgart, Germany",
-      "gr:at": [
+      "weft:location": "Stuttgart, Germany",
+      "weft:at": [
         {
           "@id": "cv:sch-stuttgart"
         }
       ],
-      "gr:trainedIn": [
+      "weft:trainedIn": [
         {
           "@id": "cv:s-ontology"
         },
@@ -553,21 +556,21 @@
       "@id": "cv:sch-tsec",
       "@type": "CollegeOrUniversity",
       "name": "Thadomal Shahani Engineering College",
-      "gr:kind": "School"
+      "weft:kind": "School"
     },
     {
       "@id": "cv:e-be",
       "@type": "EducationalOccupationalCredential",
       "name": "Bachelor's, Computer Engineering",
-      "gr:kind": "Education",
+      "weft:kind": "Education",
       "startDate": "2015-08",
       "endDate": "2019-07",
-      "gr:at": [
+      "weft:at": [
         {
           "@id": "cv:sch-tsec"
         }
       ],
-      "gr:trainedIn": [
+      "weft:trainedIn": [
         {
           "@id": "cv:s-agile"
         }
@@ -577,33 +580,33 @@
       "@id": "cv:sch-rubika",
       "@type": "CollegeOrUniversity",
       "name": "Rubika Supinfogame India",
-      "gr:kind": "School"
+      "weft:kind": "School"
     },
     {
       "@id": "cv:e-rubika",
       "@type": "EducationalOccupationalCredential",
       "name": "Certificate, Game Testing in Quality Control",
-      "gr:kind": "Education",
+      "weft:kind": "Education",
       "description": "Six-month programme in game testing jointly conducted by Ubisoft Pune and Rubika: four months of coursework at Rubika followed by the Ubisoft internship. Coursework covered industry research, the video-game development life cycle, game art and design concepts, frameworks for testing video games, bug-reporting tools, and project and team management.",
       "startDate": "2019-08",
       "endDate": "2020-02",
-      "gr:location": "Pune, India",
-      "gr:ledTo": [
+      "weft:location": "Pune, India",
+      "weft:ledTo": [
         {
           "@id": "cv:r-ubisoft"
         }
       ],
-      "gr:at": [
+      "weft:at": [
         {
           "@id": "cv:sch-rubika"
         }
       ],
-      "gr:runWith": [
+      "weft:runWith": [
         {
           "@id": "cv:o-ubisoft"
         }
       ],
-      "gr:trainedIn": [
+      "weft:trainedIn": [
         {
           "@id": "cv:s-gamedesign"
         },
@@ -616,10 +619,10 @@
       "@id": "cv:c-udemy-python",
       "@type": "EducationalOccupationalCredential",
       "name": "Complete Python Bootcamp: From Zero to Hero in Python",
-      "gr:kind": "Certification",
+      "weft:kind": "Certification",
       "description": "Credential ID UC-544d7ee3-b558-46b0-941e-bc03ef3603c8",
       "url": "http://ude.my/UC-544d7ee3-b558-46b0-941e-bc03ef3603c8",
-      "gr:shows": [
+      "weft:shows": [
         {
           "@id": "cv:s-python"
         }
@@ -629,9 +632,9 @@
       "@id": "cv:c-hackerrank-python",
       "@type": "EducationalOccupationalCredential",
       "name": "Python (Basic) Certificate",
-      "gr:kind": "Certification",
+      "weft:kind": "Certification",
       "description": "Credential ID 9394CF9CC5B4",
-      "gr:shows": [
+      "weft:shows": [
         {
           "@id": "cv:s-python"
         }
@@ -641,26 +644,26 @@
       "@id": "cv:c-ielts",
       "@type": "EducationalOccupationalCredential",
       "name": "IELTS Academic, overall band 8.0 (CEFR C1)",
-      "gr:kind": "Certification",
+      "weft:kind": "Certification",
       "description": "Listening 8.5, Reading 9.0, Writing 8.0, Speaking 7.0."
     },
     {
       "@id": "cv:p-thesis",
       "@type": "CreativeWork",
       "name": "Semantic Concept Learning in EL++ Knowledge Graphs using Box Embeddings",
-      "gr:kind": "Project",
+      "weft:kind": "Project",
       "startDate": "2026-03",
-      "gr:location": "Stuttgart, Germany",
+      "weft:location": "Stuttgart, Germany",
       "creativeWorkStatus": "Master's thesis, ongoing",
-      "gr:highlight": [
+      "weft:highlight": [
         "Investigating concept learning with description logics and geometric box embeddings, evaluating semantic similarity and concept prediction in knowledge graphs."
       ],
-      "gr:partOf": [
+      "weft:partOf": [
         {
           "@id": "cv:e-msc"
         }
       ],
-      "gr:used": [
+      "weft:used": [
         {
           "@id": "cv:s-dl"
         },
@@ -676,18 +679,66 @@
       ]
     },
     {
+      "@id": "cv:p-weft",
+      "@type": "CreativeWork",
+      "name": "Weft: designed and published an open ontology for evidence-backed career graphs",
+      "weft:kind": "Project",
+      "startDate": "2026-10",
+      "url": "https://rishirajani.github.io/weft/",
+      "weft:highlight": [
+        "Designed Weft, an OWL vocabulary of 28 terms extending Schema.org that links each skill to the roles, projects, courses and certifications behind it; published it under CC BY 4.0 with documentation in HTML, Turtle, JSON-LD and RDF/XML, a JSON-LD context and an example that uses every term.",
+        "Linked 69 skills and 5 languages to Wikidata and ESCO with SKOS exactMatch/closeMatch mappings.",
+        "Validated the published graph with SHACL shapes and domain/range checks in a GitHub Actions pipeline that blocks publishing on violations."
+      ],
+      "weft:used": [
+        {
+          "@id": "cv:s-ontology"
+        },
+        {
+          "@id": "cv:s-owl"
+        },
+        {
+          "@id": "cv:s-rdf"
+        },
+        {
+          "@id": "cv:s-rdfs"
+        },
+        {
+          "@id": "cv:s-shacl"
+        },
+        {
+          "@id": "cv:s-turtle"
+        },
+        {
+          "@id": "cv:s-semmodel"
+        },
+        {
+          "@id": "cv:s-python"
+        },
+        {
+          "@id": "cv:s-cicd"
+        },
+        {
+          "@id": "cv:s-git"
+        },
+        {
+          "@id": "cv:s-docs"
+        }
+      ]
+    },
+    {
       "@id": "cv:p-loom",
       "@type": "CreativeWork",
       "name": "Loom: open-source CSV-to-RDF ontology mapping tool",
-      "gr:kind": "Project",
+      "weft:kind": "Project",
       "startDate": "2026-06",
       "url": "https://github.com/rishirajani/loom",
-      "gr:highlight": [
+      "weft:highlight": [
         "Built a locally running TypeScript/React application using N3.js to map spreadsheet columns to RDF vocabularies and generate structured semantic representations.",
         "Implemented mapping suggestions, datatype matching and integrity checks for duplicate records and unmapped columns; integrated CI checks and 41 Vitest regression tests.",
         "Runs entirely in the browser with no server or upload; bundles Schema.org and DCAT ontology subsets, offers tiered mapping suggestions, detects duplicate identifiers and IRI collisions, validates the base IRI and exports Turtle. Released under the MIT licence."
       ],
-      "gr:used": [
+      "weft:used": [
         {
           "@id": "cv:s-ts"
         },
@@ -724,14 +775,14 @@
       "@id": "cv:p-heat",
       "@type": "CreativeWork",
       "name": "Urban Heat Risk Knowledge Graph",
-      "gr:kind": "Project",
+      "weft:kind": "Project",
       "startDate": "2026-05",
       "endDate": "2026-09",
       "url": "https://github.com/rishirajani/UrbanHeatRiskReasoning",
-      "gr:highlight": [
+      "weft:highlight": [
         "Integrated CityGML, OpenStreetMap, climate, vegetation and building data into RDF representations; applied SPARQL and semantic reasoning to assess urban heat risk and identify vulnerable buildings."
       ],
-      "gr:used": [
+      "weft:used": [
         {
           "@id": "cv:s-rdf"
         },
@@ -753,13 +804,13 @@
       "@id": "cv:p-arch",
       "@type": "CreativeWork",
       "name": "Knowledge Graph Applications in Architecture",
-      "gr:kind": "Project",
+      "weft:kind": "Project",
       "startDate": "2026-04",
       "endDate": "2026-09",
-      "gr:highlight": [
+      "weft:highlight": [
         "Designed Turtle ontologies for crane navigation and urban landscape analysis; loaded RDF into Neo4j with neosemantics for Cypher-based querying of spatial relationships and constraints."
       ],
-      "gr:used": [
+      "weft:used": [
         {
           "@id": "cv:s-turtle"
         },
@@ -784,24 +835,24 @@
       "@id": "cv:p-rossmann",
       "@type": "CreativeWork",
       "name": "Rossmann Store Sales Prediction",
-      "gr:kind": "Project",
+      "weft:kind": "Project",
       "description": "Final-year Computer Engineering project comparing machine learning models for retail sales forecasting, plus a web application that uses them to predict daily or weekly sales for any of the 1,115 stores of the Dirk Rossmann GmbH chain.",
       "startDate": "2018",
       "endDate": "2019-04",
       "creativeWorkStatus": "Bachelor's final-year project, team of three",
-      "gr:highlight": [
+      "weft:highlight": [
         "Performed a comparative analysis of Linear Regression, K-Nearest Neighbors and XGBoost regression on the Kaggle Rossmann Store Sales dataset to determine the merits and drawbacks of each model.",
         "Cleaned the data and selected 11 features using correlation heatmaps, Variance Inflation Factors and chi-square tests, discarding highly collinear features such as Promo2.",
         "Evaluated the models on an 80/20 split with RMSE and adjusted R²: XGBoost reached an RMSE of 457 and adjusted R² of 97.8%, against 1,015 and 89.3% for KNN and 1,545 and 75.2% for Linear Regression.",
         "Developed a Django web application with employee login that loads the serialized models and predicts a store's sales for a day or a chosen week with all three models, comparing results with promotions on and off.",
         "In hindsight, these scores overstate real forecasting accuracy: same-day customer counts, unknown at prediction time, were used as a feature, and the test set was a random rather than time-based split. A leakage-free evaluation would drop Customers, hold out the final weeks, and tune on a separate validation set."
       ],
-      "gr:partOf": [
+      "weft:partOf": [
         {
           "@id": "cv:e-be"
         }
       ],
-      "gr:used": [
+      "weft:used": [
         {
           "@id": "cv:s-python"
         },
@@ -832,13 +883,13 @@
       "@id": "cv:g-gov",
       "@type": "DefinedTermSet",
       "name": "Business semantics & data governance",
-      "gr:kind": "SkillGroup"
+      "weft:kind": "SkillGroup"
     },
     {
       "@id": "cv:s-kpi",
       "@type": "DefinedTerm",
       "name": "Business-term & KPI definitions",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:closeMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q860554"
@@ -850,7 +901,7 @@
           "@id": "http://data.europa.eu/esco/skill/8dcbcabe-09f7-4d11-940d-125af57bbc40"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-gov"
         }
@@ -860,13 +911,13 @@
       "@id": "cv:s-metricstd",
       "@type": "DefinedTerm",
       "name": "Metric standardization",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:closeMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q860554"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-gov"
         }
@@ -876,13 +927,13 @@
       "@id": "cv:s-s2t",
       "@type": "DefinedTerm",
       "name": "Source-to-target mapping",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:closeMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q2330408"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-gov"
         }
@@ -892,7 +943,7 @@
       "@id": "cv:s-dq",
       "@type": "DefinedTerm",
       "name": "Data-quality rules",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:closeMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q1757694"
@@ -901,7 +952,7 @@
           "@id": "http://data.europa.eu/esco/skill/54c9c155-9293-4329-8ed2-2e76e8b519d4"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-gov"
         }
@@ -911,13 +962,13 @@
       "@id": "cv:s-mdm",
       "@type": "DefinedTerm",
       "name": "Master-data validation",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:closeMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q190349"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-gov"
         }
@@ -927,13 +978,13 @@
       "@id": "cv:s-reconcile",
       "@type": "DefinedTerm",
       "name": "Data reconciliation",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q48719515"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-gov"
         }
@@ -943,7 +994,7 @@
       "@id": "cv:s-docs",
       "@type": "DefinedTerm",
       "name": "Technical documentation",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q1413406"
@@ -952,7 +1003,7 @@
           "@id": "http://data.europa.eu/esco/skill/04dfd9fb-e0cf-40f6-96c6-9d2280c4347e"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-gov"
         }
@@ -962,7 +1013,7 @@
       "@id": "cv:s-privacy",
       "@type": "DefinedTerm",
       "name": "Data privacy (PII handling)",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://data.europa.eu/esco/skill/5d5ba629-0b4c-424f-8803-000c3736f3f7"
@@ -973,7 +1024,7 @@
           "@id": "http://www.wikidata.org/entity/Q1076693"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-gov"
         }
@@ -983,19 +1034,19 @@
       "@id": "cv:g-kr",
       "@type": "DefinedTermSet",
       "name": "Knowledge representation & ontologies",
-      "gr:kind": "SkillGroup"
+      "weft:kind": "SkillGroup"
     },
     {
       "@id": "cv:s-rdf",
       "@type": "DefinedTerm",
       "name": "RDF",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q54872"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-kr"
         }
@@ -1005,13 +1056,13 @@
       "@id": "cv:s-rdfs",
       "@type": "DefinedTerm",
       "name": "RDFS",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q1751819"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-kr"
         }
@@ -1021,13 +1072,13 @@
       "@id": "cv:s-owl",
       "@type": "DefinedTerm",
       "name": "OWL",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q826165"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-kr"
         }
@@ -1037,7 +1088,7 @@
       "@id": "cv:s-sparql",
       "@type": "DefinedTerm",
       "name": "SPARQL",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q54871"
@@ -1051,7 +1102,7 @@
           "@id": "http://data.europa.eu/esco/skill/99207709-d076-4cce-ba38-e90d3bb28806"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-kr"
         }
@@ -1061,13 +1112,13 @@
       "@id": "cv:s-shacl",
       "@type": "DefinedTerm",
       "name": "SHACL",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q29377821"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-kr"
         }
@@ -1077,13 +1128,13 @@
       "@id": "cv:s-turtle",
       "@type": "DefinedTerm",
       "name": "Turtle",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q114409"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-kr"
         }
@@ -1093,13 +1144,13 @@
       "@id": "cv:s-ontology",
       "@type": "DefinedTerm",
       "name": "Ontology engineering",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q1027508"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-kr"
         }
@@ -1109,13 +1160,13 @@
       "@id": "cv:s-dl",
       "@type": "DefinedTerm",
       "name": "Description logics",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q387196"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-kr"
         }
@@ -1125,7 +1176,7 @@
       "@id": "cv:s-semmodel",
       "@type": "DefinedTerm",
       "name": "Semantic modeling",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:closeMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q7449052"
@@ -1134,7 +1185,7 @@
           "@id": "http://data.europa.eu/esco/skill/fbafa41f-cd05-4109-a649-8b44d306d779"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-kr"
         }
@@ -1144,13 +1195,13 @@
       "@id": "cv:s-neo4j",
       "@type": "DefinedTerm",
       "name": "Neo4j",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q1628290"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-kr"
         }
@@ -1160,7 +1211,7 @@
       "@id": "cv:s-cypher",
       "@type": "DefinedTerm",
       "name": "Cypher",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q16834355"
@@ -1171,7 +1222,7 @@
           "@id": "http://data.europa.eu/esco/skill/75f839c2-fd9a-4ad3-8921-6e734608568d"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-kr"
         }
@@ -1181,13 +1232,13 @@
       "@id": "cv:s-n10s",
       "@type": "DefinedTerm",
       "name": "neosemantics",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q140676801"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-kr"
         }
@@ -1197,13 +1248,13 @@
       "@id": "cv:g-de",
       "@type": "DefinedTermSet",
       "name": "Enterprise data engineering",
-      "gr:kind": "SkillGroup"
+      "weft:kind": "SkillGroup"
     },
     {
       "@id": "cv:s-python",
       "@type": "DefinedTerm",
       "name": "Python",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q28865"
@@ -1212,7 +1263,7 @@
           "@id": "http://data.europa.eu/esco/skill/ccd0a1d9-afda-43d9-b901-96344886e14d"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-de"
         }
@@ -1222,7 +1273,7 @@
       "@id": "cv:s-sql",
       "@type": "DefinedTerm",
       "name": "SQL",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q47607"
@@ -1231,7 +1282,7 @@
           "@id": "http://data.europa.eu/esco/skill/598de5b0-5b58-4ea7-8058-a4bc4d18c742"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-de"
         }
@@ -1241,7 +1292,7 @@
       "@id": "cv:s-etl",
       "@type": "DefinedTerm",
       "name": "ETL / ELT",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q1276130"
@@ -1252,7 +1303,7 @@
           "@id": "http://data.europa.eu/esco/skill/9d0d89be-bffa-4393-b6f6-8d05bea49051"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-de"
         }
@@ -1262,13 +1313,13 @@
       "@id": "cv:s-integration",
       "@type": "DefinedTerm",
       "name": "Data integration",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q386824"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-de"
         }
@@ -1278,7 +1329,7 @@
       "@id": "cv:s-postgres",
       "@type": "DefinedTerm",
       "name": "PostgreSQL",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q192490"
@@ -1287,7 +1338,7 @@
           "@id": "http://data.europa.eu/esco/skill/a8d07b5a-c1a1-42c6-9d53-db9c7a2ca996"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-de"
         }
@@ -1297,13 +1348,13 @@
       "@id": "cv:s-sap",
       "@type": "DefinedTerm",
       "name": "SAP HANA integration",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:closeMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q951374"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-de"
         }
@@ -1313,13 +1364,13 @@
       "@id": "cv:s-redshift",
       "@type": "DefinedTerm",
       "name": "Redshift",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q17012109"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-de"
         }
@@ -1329,13 +1380,13 @@
       "@id": "cv:s-docker",
       "@type": "DefinedTerm",
       "name": "Docker",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q15206305"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-de"
         }
@@ -1345,13 +1396,13 @@
       "@id": "cv:s-sqlite",
       "@type": "DefinedTerm",
       "name": "SQLite",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q319417"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-de"
         }
@@ -1361,13 +1412,13 @@
       "@id": "cv:s-athena",
       "@type": "DefinedTerm",
       "name": "AWS Athena",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q65203360"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-de"
         }
@@ -1377,13 +1428,13 @@
       "@id": "cv:s-jdbc",
       "@type": "DefinedTerm",
       "name": "JDBC",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q722772"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-de"
         }
@@ -1393,7 +1444,7 @@
       "@id": "cv:s-oracledb",
       "@type": "DefinedTerm",
       "name": "Oracle Database",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q185524"
@@ -1402,7 +1453,7 @@
           "@id": "http://data.europa.eu/esco/skill/de9f85ba-e77f-48fd-8c66-f5ebaf32d655"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-de"
         }
@@ -1412,7 +1463,7 @@
       "@id": "cv:s-mssql",
       "@type": "DefinedTerm",
       "name": "Microsoft SQL Server",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q215819"
@@ -1421,7 +1472,7 @@
           "@id": "http://data.europa.eu/esco/skill/c062bab3-3ea0-4291-9220-a2d8fef4bead"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-de"
         }
@@ -1431,13 +1482,13 @@
       "@id": "cv:s-sqlalchemy",
       "@type": "DefinedTerm",
       "name": "SQLAlchemy",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q1092514"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-de"
         }
@@ -1447,13 +1498,13 @@
       "@id": "cv:s-pandas",
       "@type": "DefinedTerm",
       "name": "pandas",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q15967387"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-de"
         }
@@ -1463,13 +1514,13 @@
       "@id": "cv:s-cron",
       "@type": "DefinedTerm",
       "name": "Job scheduling (cron)",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q300864"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-de"
         }
@@ -1479,19 +1530,19 @@
       "@id": "cv:g-an",
       "@type": "DefinedTermSet",
       "name": "Analytics & platforms",
-      "gr:kind": "SkillGroup"
+      "weft:kind": "SkillGroup"
     },
     {
       "@id": "cv:s-superset",
       "@type": "DefinedTerm",
       "name": "Apache Superset",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q68705831"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-an"
         }
@@ -1501,13 +1552,13 @@
       "@id": "cv:s-clevertap",
       "@type": "DefinedTerm",
       "name": "CleverTap",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:closeMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q48966378"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-an"
         }
@@ -1517,7 +1568,7 @@
       "@id": "cv:s-funnel",
       "@type": "DefinedTerm",
       "name": "Funnel analytics",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q18356622"
@@ -1528,7 +1579,7 @@
           "@id": "http://www.wikidata.org/entity/Q5166474"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-an"
         }
@@ -1538,8 +1589,8 @@
       "@id": "cv:s-attribution",
       "@type": "DefinedTerm",
       "name": "Campaign attribution",
-      "gr:kind": "Skill",
-      "gr:inGroup": [
+      "weft:kind": "Skill",
+      "weft:inGroup": [
         {
           "@id": "cv:g-an"
         }
@@ -1549,7 +1600,7 @@
       "@id": "cv:s-kpifw",
       "@type": "DefinedTerm",
       "name": "KPI frameworks",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:closeMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q860554"
@@ -1561,7 +1612,7 @@
           "@id": "http://data.europa.eu/esco/skill/8dcbcabe-09f7-4d11-940d-125af57bbc40"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-an"
         }
@@ -1571,8 +1622,8 @@
       "@id": "cv:s-alerting",
       "@type": "DefinedTerm",
       "name": "Monitoring & alerting (OpsGenie)",
-      "gr:kind": "Skill",
-      "gr:inGroup": [
+      "weft:kind": "Skill",
+      "weft:inGroup": [
         {
           "@id": "cv:g-an"
         }
@@ -1582,7 +1633,7 @@
       "@id": "cv:s-segment",
       "@type": "DefinedTerm",
       "name": "Customer segmentation",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://data.europa.eu/esco/skill/136e0cab-0b19-48f7-9086-745d615f416b"
@@ -1593,7 +1644,7 @@
           "@id": "http://www.wikidata.org/entity/Q363057"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-an"
         }
@@ -1603,7 +1654,7 @@
       "@id": "cv:s-survey",
       "@type": "DefinedTerm",
       "name": "Survey analysis & user personas",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:closeMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q814232"
@@ -1612,7 +1663,7 @@
           "@id": "http://data.europa.eu/esco/skill/6b30644d-bdc5-4bca-b1af-edbf5c6b15ee"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-an"
         }
@@ -1622,7 +1673,7 @@
       "@id": "cv:s-market",
       "@type": "DefinedTerm",
       "name": "Market research",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q913709"
@@ -1631,7 +1682,7 @@
           "@id": "http://data.europa.eu/esco/skill/8770350e-746f-4adb-9556-18ca68104be6"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-an"
         }
@@ -1641,13 +1692,13 @@
       "@id": "cv:g-sw",
       "@type": "DefinedTermSet",
       "name": "Software engineering & AI",
-      "gr:kind": "SkillGroup"
+      "weft:kind": "SkillGroup"
     },
     {
       "@id": "cv:s-ts",
       "@type": "DefinedTerm",
       "name": "TypeScript",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q978185"
@@ -1656,7 +1707,7 @@
           "@id": "http://data.europa.eu/esco/skill/867137fb-ff1b-4ca3-99f3-cb6969aa2c68"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-sw"
         }
@@ -1666,13 +1717,13 @@
       "@id": "cv:s-react",
       "@type": "DefinedTerm",
       "name": "React",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q19399674"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-sw"
         }
@@ -1682,13 +1733,13 @@
       "@id": "cv:s-n3",
       "@type": "DefinedTerm",
       "name": "N3.js",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q140704882"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-sw"
         }
@@ -1698,7 +1749,7 @@
       "@id": "cv:s-java",
       "@type": "DefinedTerm",
       "name": "Java",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q251"
@@ -1707,7 +1758,7 @@
           "@id": "http://data.europa.eu/esco/skill/19a8293b-8e95-4de3-983f-77484079c389"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-sw"
         }
@@ -1717,7 +1768,7 @@
       "@id": "cv:s-git",
       "@type": "DefinedTerm",
       "name": "Git",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q186055"
@@ -1728,7 +1779,7 @@
           "@id": "http://data.europa.eu/esco/skill/9d2e926f-53d9-41f5-98f3-19dfaa687f3f"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-sw"
         }
@@ -1738,7 +1789,7 @@
       "@id": "cv:s-cicd",
       "@type": "DefinedTerm",
       "name": "CI / CD",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q28136854"
@@ -1752,7 +1803,7 @@
           "@id": "http://www.wikidata.org/entity/Q2507377"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-sw"
         }
@@ -1762,13 +1813,13 @@
       "@id": "cv:s-pytorch",
       "@type": "DefinedTerm",
       "name": "PyTorch",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q47509047"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-sw"
         }
@@ -1778,13 +1829,13 @@
       "@id": "cv:s-sklearn",
       "@type": "DefinedTerm",
       "name": "scikit-learn",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q1026367"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-sw"
         }
@@ -1794,13 +1845,13 @@
       "@id": "cv:s-kge",
       "@type": "DefinedTerm",
       "name": "Knowledge graph embeddings",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q33003557"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-sw"
         }
@@ -1810,13 +1861,13 @@
       "@id": "cv:s-xgboost",
       "@type": "DefinedTerm",
       "name": "XGBoost",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q23793561"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-sw"
         }
@@ -1826,13 +1877,13 @@
       "@id": "cv:s-regression",
       "@type": "DefinedTerm",
       "name": "Regression modelling",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q208042"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-sw"
         }
@@ -1842,13 +1893,13 @@
       "@id": "cv:s-featsel",
       "@type": "DefinedTerm",
       "name": "Feature selection",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q446488"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-sw"
         }
@@ -1858,13 +1909,13 @@
       "@id": "cv:s-django",
       "@type": "DefinedTerm",
       "name": "Django",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q842014"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-sw"
         }
@@ -1874,7 +1925,7 @@
       "@id": "cv:s-web",
       "@type": "DefinedTerm",
       "name": "HTML / CSS / JavaScript",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:closeMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q8811"
@@ -1895,7 +1946,7 @@
           "@id": "http://data.europa.eu/esco/skill/0af062de-eb43-41e9-9b96-249e2cd22d26"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-sw"
         }
@@ -1905,13 +1956,13 @@
       "@id": "cv:s-rest",
       "@type": "DefinedTerm",
       "name": "REST APIs",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q749568"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-sw"
         }
@@ -1921,7 +1972,7 @@
       "@id": "cv:s-servlets",
       "@type": "DefinedTerm",
       "name": "Java Servlets & JSP",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:closeMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q375673"
@@ -1930,7 +1981,7 @@
           "@id": "http://www.wikidata.org/entity/Q183169"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-sw"
         }
@@ -1940,7 +1991,7 @@
       "@id": "cv:s-unittest",
       "@type": "DefinedTerm",
       "name": "Unit testing",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q907375"
@@ -1949,7 +2000,7 @@
           "@id": "http://data.europa.eu/esco/skill/7961413f-61d0-4722-9cd9-20a050a29899"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-sw"
         }
@@ -1959,13 +2010,13 @@
       "@id": "cv:s-jira",
       "@type": "DefinedTerm",
       "name": "JIRA",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q1359246"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-sw"
         }
@@ -1975,19 +2026,19 @@
       "@id": "cv:g-games",
       "@type": "DefinedTermSet",
       "name": "Games & esports",
-      "gr:kind": "SkillGroup"
+      "weft:kind": "SkillGroup"
     },
     {
       "@id": "cv:s-gameqa",
       "@type": "DefinedTerm",
       "name": "Game QA testing",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q1093030"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-games"
         }
@@ -1997,13 +2048,13 @@
       "@id": "cv:s-gamedesign",
       "@type": "DefinedTerm",
       "name": "Game design fundamentals",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q858057"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-games"
         }
@@ -2013,13 +2064,13 @@
       "@id": "cv:s-esports",
       "@type": "DefinedTerm",
       "name": "Esports operations",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:closeMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q300920"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-games"
         }
@@ -2029,19 +2080,19 @@
       "@id": "cv:g-collab",
       "@type": "DefinedTermSet",
       "name": "Collaboration",
-      "gr:kind": "SkillGroup"
+      "weft:kind": "SkillGroup"
     },
     {
       "@id": "cv:s-stakeholders",
       "@type": "DefinedTerm",
       "name": "Cross-functional stakeholder alignment",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:closeMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q59751"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-collab"
         }
@@ -2051,7 +2102,7 @@
       "@id": "cv:s-requirements",
       "@type": "DefinedTerm",
       "name": "Business requirements analysis",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:exactMatch": [
         {
           "@id": "http://data.europa.eu/esco/skill/b04f377b-ee80-4b38-aca1-19d266a23b17"
@@ -2065,7 +2116,7 @@
           "@id": "http://www.wikidata.org/entity/Q5001932"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-collab"
         }
@@ -2075,8 +2126,8 @@
       "@id": "cv:s-enablement",
       "@type": "DefinedTerm",
       "name": "User enablement",
-      "gr:kind": "Skill",
-      "gr:inGroup": [
+      "weft:kind": "Skill",
+      "weft:inGroup": [
         {
           "@id": "cv:g-collab"
         }
@@ -2086,7 +2137,7 @@
       "@id": "cv:s-agile",
       "@type": "DefinedTerm",
       "name": "Agile / Scrum",
-      "gr:kind": "Skill",
+      "weft:kind": "Skill",
       "skos:closeMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q30232"
@@ -2098,7 +2149,7 @@
           "@id": "http://data.europa.eu/esco/skill/dba46f87-0831-49cd-a1c7-340a653c0221"
         }
       ],
-      "gr:inGroup": [
+      "weft:inGroup": [
         {
           "@id": "cv:g-collab"
         }
@@ -2108,8 +2159,8 @@
       "@id": "cv:l-en",
       "@type": "Language",
       "name": "English",
-      "gr:kind": "Language",
-      "gr:proficiency": "Fluent",
+      "weft:kind": "Language",
+      "weft:proficiency": "Fluent",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q1860"
@@ -2120,8 +2171,8 @@
       "@id": "cv:l-de",
       "@type": "Language",
       "name": "German",
-      "gr:kind": "Language",
-      "gr:proficiency": "B1",
+      "weft:kind": "Language",
+      "weft:proficiency": "B1",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q188"
@@ -2132,8 +2183,8 @@
       "@id": "cv:l-hi",
       "@type": "Language",
       "name": "Hindi",
-      "gr:kind": "Language",
-      "gr:proficiency": "Native",
+      "weft:kind": "Language",
+      "weft:proficiency": "Native",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q1568"
@@ -2144,8 +2195,8 @@
       "@id": "cv:l-mr",
       "@type": "Language",
       "name": "Marathi",
-      "gr:kind": "Language",
-      "gr:proficiency": "Basic",
+      "weft:kind": "Language",
+      "weft:proficiency": "Basic",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q1571"
@@ -2156,8 +2207,8 @@
       "@id": "cv:l-sd",
       "@type": "Language",
       "name": "Sindhi",
-      "gr:kind": "Language",
-      "gr:proficiency": "Basic",
+      "weft:kind": "Language",
+      "weft:proficiency": "Basic",
       "skos:exactMatch": [
         {
           "@id": "http://www.wikidata.org/entity/Q33997"
