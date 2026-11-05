@@ -1,8 +1,8 @@
 {
-  "version": "1.6.2",
-  "date": "2026-11-04",
+  "version": "1.6.3",
+  "date": "2026-11-05",
   "notes": [
-    "When Tailored links or What visitors see can't save, the studio now says why: the claude.ai preview, visitor view in this tab, a token GitHub rejected, or no connection set up."
+    "Editing near the end of a CV or letter no longer makes the page jump: the page sheets are only adjusted where something changed."
   ],
   "files": [
     "index.html",

@@ -1057,32 +1057,36 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
   function markPages(paper) {
     const wrap = paper?.parentElement; if (!wrap) return;
     const tab = paper.id === "cv-paper" ? "cv" : paper.id === "cl-paper" ? "letter" : null;
-    // clear the previous sheets
-    wrap.querySelectorAll(".page-guide").forEach((e) => e.remove());
-    paper.querySelectorAll(".pg-start").forEach((e) => { e.classList.remove("pg-start"); e.style.removeProperty("margin-top"); });
-    paper.style.removeProperty("min-height"); paper.classList.remove("sheets");
+    // Breaks are measured on a hidden copy, so the page itself is only touched where something
+    // actually changed. Clearing and redrawing every sheet on each keystroke moved the text under
+    // the cursor and made the view jump while editing.
     const empty = !paper.textContent.trim();
     const cuts = empty ? [] : pageCuts(paper), pages = empty ? 0 : cuts.length + 1;
-    if (paper.offsetHeight && pages) {
-      const mm = paper.getBoundingClientRect().width / 210;
-      // on a narrow screen the page isn't drawn at A4 width, so sheets wouldn't be true to size: mark the breaks with a line instead
-      const trueSize = Math.abs(paper.getBoundingClientRect().width - 210 * 96 / 25.4) < 4;
+    const visible = !!paper.offsetHeight;
+    const rect = paper.getBoundingClientRect(), mm = rect.width / 210;
+    // on a narrow screen the page isn't drawn at A4 width, so sheets wouldn't be true to size: mark the breaks with a line instead
+    const trueSize = visible && pages > 0 && Math.abs(rect.width - 210 * 96 / 25.4) < 4;
+    const blocks = visible ? [...paper.querySelectorAll(BLOCKS)] : [];
+    const starts = new Set(trueSize ? cuts.filter((c) => c.at >= 0).map((c) => blocks[c.at]).filter(Boolean) : []);
+    paper.querySelectorAll(".pg-start").forEach((e) => { if (!starts.has(e)) { e.classList.remove("pg-start"); e.style.removeProperty("margin-top"); } });
+    if (paper.classList.contains("sheets") !== trueSize) paper.classList.toggle("sheets", trueSize);
+    const guides = [];
+    if (visible && pages) {
       const sheet = 297 * mm, margin = pageMargin(paper) * mm;
-      const blocks = [...paper.querySelectorAll(BLOCKS)];
       const top = () => paper.getBoundingClientRect().top;
-      if (trueSize) paper.classList.add("sheets");
       cuts.forEach((c, k) => {
         const n = k + 1; // sheets before this break
         const el = c.at >= 0 ? blocks[c.at] : null;
         let lineY;
         if (el && trueSize) {
-          const m0 = parseFloat(getComputedStyle(el).marginTop) || 0;
-          const yNoMargin = el.getBoundingClientRect().top - top() - m0;
           const want = n * (sheet + SHEET_GAP) + margin;
-          el.classList.add("pg-start"); el.style.marginTop = `${Math.max(0, want - yNoMargin)}px`;
-          // collapsing margins can shift it a little: measure and correct once
-          const off = want - (el.getBoundingClientRect().top - top());
-          if (Math.abs(off) > 0.5) el.style.marginTop = `${Math.max(0, parseFloat(el.style.marginTop) + off)}px`;
+          // move it only by the difference (twice at most, as collapsing margins can absorb part of it)
+          for (let i = 0; i < 2; i++) {
+            const off = want - (el.getBoundingClientRect().top - top());
+            if (Math.abs(off) <= 0.5) break;
+            const m = parseFloat(getComputedStyle(el).marginTop) || 0;
+            el.classList.add("pg-start"); el.style.marginTop = `${Math.max(0, m + off)}px`;
+          }
           lineY = n * sheet + (n - 1) * SHEET_GAP;
         } else if (el) {
           lineY = el.getBoundingClientRect().top - top() - 4;
@@ -1090,14 +1094,24 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
           const r = blocks[c.inside.index].getBoundingClientRect();
           lineY = r.top - top() + c.inside.offset * r.height;
         } else return;
+        guides.push({ page: n + 1, gap: !!(el && trueSize), top: paper.offsetTop + lineY });
+      });
+      const mh = trueSize ? `${pages * sheet + (pages - 1) * SHEET_GAP}px` : "";
+      if (paper.style.minHeight !== mh) paper.style.minHeight = mh;
+    } else if (paper.style.minHeight) paper.style.removeProperty("min-height");
+    // the grey gaps and lines sit beside the page; redraw them only when they moved
+    const key = guides.map((g) => `${g.page}:${g.gap}:${Math.round(g.top)}:${paper.offsetLeft}:${paper.offsetWidth}`).join("|");
+    if (wrap.dataset.guides !== key || (visible && wrap.querySelectorAll(".page-guide").length !== guides.length)) {
+      wrap.querySelectorAll(".page-guide").forEach((e) => e.remove());
+      guides.forEach((s) => {
         const g = document.createElement("div");
-        g.className = "page-guide" + (el && trueSize ? " gap" : ""); g.setAttribute("aria-hidden", "true"); g.dataset.page = n + 1;
-        g.style.top = `${paper.offsetTop + lineY}px`; g.style.left = `${paper.offsetLeft}px`; g.style.width = `${paper.offsetWidth}px`;
-        if (el && trueSize) g.style.height = `${SHEET_GAP}px`;
-        g.innerHTML = `<span>Page ${n + 1}</span>`;
+        g.className = "page-guide" + (s.gap ? " gap" : ""); g.setAttribute("aria-hidden", "true"); g.dataset.page = s.page;
+        g.style.top = `${s.top}px`; g.style.left = `${paper.offsetLeft}px`; g.style.width = `${paper.offsetWidth}px`;
+        if (s.gap) g.style.height = `${SHEET_GAP}px`;
+        g.innerHTML = `<span>Page ${s.page}</span>`;
         wrap.appendChild(g);
       });
-      if (trueSize) paper.style.minHeight = `${pages * sheet + (pages - 1) * SHEET_GAP}px`;
+      if (visible) wrap.dataset.guides = key;
     }
     if (!tab) return;
     const want = tab === "cv" ? Number(current?.input?.length) || 0 : 1;
