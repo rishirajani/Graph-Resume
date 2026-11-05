@@ -837,7 +837,7 @@
       "name": "Rossmann Store Sales Prediction",
       "weft:kind": "Project",
       "description": "Final-year Computer Engineering project comparing machine learning models for retail sales forecasting, plus a web application that uses them to predict daily or weekly sales for any of the 1,115 stores of the Dirk Rossmann GmbH chain.",
-      "startDate": "2018",
+      "startDate": "2018-10",
       "endDate": "2019-04",
       "creativeWorkStatus": "Bachelor's final-year project, team of three",
       "weft:highlight": [

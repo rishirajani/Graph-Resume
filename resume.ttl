@@ -233,7 +233,7 @@ cv:p-rossmann a schema:CreativeWork ;
     schema:name "Rossmann Store Sales Prediction" ;
     weft:kind "Project" ;
     schema:description "Final-year Computer Engineering project comparing machine learning models for retail sales forecasting, plus a web application that uses them to predict daily or weekly sales for any of the 1,115 stores of the Dirk Rossmann GmbH chain." ;
-    schema:startDate "2018" ;
+    schema:startDate "2018-10" ;
     schema:endDate "2019-04" ;
     schema:creativeWorkStatus "Bachelor's final-year project, team of three" ;
     weft:highlight "Performed a comparative analysis of Linear Regression, K-Nearest Neighbors and XGBoost regression on the Kaggle Rossmann Store Sales dataset to determine the merits and drawbacks of each model.", "Cleaned the data and selected 11 features using correlation heatmaps, Variance Inflation Factors and chi-square tests, discarding highly collinear features such as Promo2.", "Evaluated the models on an 80/20 split with RMSE and adjusted R²: XGBoost reached an RMSE of 457 and adjusted R² of 97.8%, against 1,015 and 89.3% for KNN and 1,545 and 75.2% for Linear Regression.", "Developed a Django web application with employee login that loads the serialized models and predicts a store's sales for a day or a chosen week with all three models, comparing results with promotions on and off.", "In hindsight, these scores overstate real forecasting accuracy: same-day customer counts, unknown at prediction time, were used as a feature, and the test set was a random rather than time-based split. A leakage-free evaluation would drop Customers, hold out the final weeks, and tune on a separate validation set." ;

@@ -482,7 +482,7 @@ window.RESUME = {
       "short": "Rossmann Sales\nPrediction",
       "partOf": "e-be",
       "status": "Bachelor's final-year project, team of three",
-      "start": "2018",
+      "start": "2018-10",
       "end": "2019-04",
       "summary": "Final-year Computer Engineering project comparing machine learning models for retail sales forecasting, plus a web application that uses them to predict daily or weekly sales for any of the 1,115 stores of the Dirk Rossmann GmbH chain.",
       "highlights": [
