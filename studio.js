@@ -671,17 +671,19 @@
   function jobCard(j, st, isNew) {
     const saved = st.saved.includes(j.refnr), dismissed = st.dismissed.includes(j.refnr);
     const age = daysSince(j.posted);
-    const tag = (t) => `<span class="job-tag${/German required|Pay up to/.test(t) ? " warn" : /applied/i.test(t) ? " done" : ""}">${esc(t)}</span>`;
-    const href = safeUrl(j.url) || safeUrl(j.baUrl);
+    const tag = (t) => `<span class="job-tag${/German required|Pay up to|Listed since/.test(t) ? " warn" : /applied/i.test(t) ? " done" : ""}">${esc(t)}</span>`;
+    const real = (u) => { const v = safeUrl(u); try { return v && new URL(v).pathname.length > 1 ? v : ""; } catch { return ""; } };
+    const href = real(j.url) || real(j.baUrl);
     return `<article class="job${dismissed ? " closed" : ""}" data-ref="${esc(j.refnr)}">
       <header class="app-head">
         <div><h3>${href ? `<a href="${esc(href)}" target="_blank" rel="noopener">${esc(j.title)}</a>` : esc(j.title)}${isNew ? ` <span class="job-new">New</span>` : ""}</h3>
-          <p class="app-role">${esc(j.company)}${j.place ? ` · ${esc(j.place)}` : ""}${j.posted ? ` · <span class="vis-meta">posted ${age === 0 ? "today" : age === 1 ? "yesterday" : age + " days ago"}</span>` : ""}</p></div>
+          <p class="app-role">${esc(j.company)}${j.place ? ` · ${esc(j.place)}` : ""}${j.posted ? ` · <span class="vis-meta">${age > 60 ? `first posted ${esc(fmtDay(j.posted))}` : `posted ${age === 0 ? "today" : age === 1 ? "yesterday" : age + " days ago"}`}</span>` : ""}
+          ${real(j.url) && real(j.baUrl) ? ` · <a class="vis-meta" href="${esc(j.baUrl)}" target="_blank" rel="noopener">agency listing</a>` : ""}</p></div>
         <span class="job-score" title="Fit score from your preferences and skills">${j.score}</span>
       </header>
       <p class="job-why">${(j.why || []).map((w) => `<span class="job-chip">${esc(w)}</span>`).join("")}${(j.tags || []).map(tag).join("")}</p>
       ${j.skills?.length ? `<p class="app-meta">Your skills in it: ${j.skills.map(esc).join(", ")}${j.skillCount > j.skills.length ? ` and ${j.skillCount - j.skills.length} more` : ""}</p>` : ""}
-      ${j.description ? `<details class="app-notes"><summary>Job description</summary><div class="job-desc">${esc(j.description)}</div></details>` : ""}
+      ${j.description ? `<details class="app-notes"><summary>Job description${j.from ? ` <span class="vis-meta">(full text from ${esc(j.from)})</span>` : ` <span class="vis-meta">(as listed by the agency; may be shortened)</span>`}</summary><div class="job-desc">${esc(j.description)}</div></details>` : ""}
       <div class="app-actions">
         <button class="btn ink small" data-act="write" type="button">Write CV &amp; letter</button>
         <button class="btn ghost small" data-act="track" type="button">Add to Applications</button>

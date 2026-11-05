@@ -1,9 +1,9 @@
 {
-  "version": "1.10.0",
+  "version": "1.10.1",
   "date": "2026-11-05",
   "notes": [
-    "New in the studio: Jobs. Every morning a job search in your private repository looks for new postings that fit the role types, places and limits in jobs/preferences.json, ranks them against your graph's skills, and lists them here with the reasons and warnings (for example German required). From each you can write a CV and letter, add it to Applications, save it or set it aside.",
-    "The job search is a GitHub Actions workflow (Job search) in your private repository; it uses the Federal Employment Agency's public job database, so it currently covers Germany."
+    "Jobs: each posting links to the real job page (the employer's site, or the agency's listing), never a site's home page; descriptions come in full from the employer's job system when it has a public one (Ashby, Greenhouse, Lever, SmartRecruiters); postings first listed more than three months ago are marked.",
+    "New in the studio: Jobs. Every morning a job search in your private repository looks for new postings that fit the role types, places and limits in jobs/preferences.json, ranks them against your graph's skills, and lists them here with the reasons and warnings (for example German required). From each you can write a CV and letter, add it to Applications, save it or set it aside."
   ],
   "files": [
     "index.html",
