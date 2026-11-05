@@ -70,7 +70,7 @@
   async function enterStudio() {
     await ready;
     checkForUpdate();
-    ["#gate", "#settings", "#workspace", "#visibility", "#links", "#customize", "#apps"].forEach((s) => ($(s).hidden = true));
+    ["#gate", "#settings", "#workspace", "#visibility", "#links", "#customize", "#apps", "#jobs"].forEach((s) => ($(s).hidden = true));
     if (runtime.inArtifact && !runtime.isOwner) {
       $("#gate").hidden = false;
       $("#gate").innerHTML = "<h2>Owner only</h2><p>The studio is available to the owner of this page.</p>";
@@ -133,7 +133,7 @@
   });
   ["#model", "#base-url"].forEach((s) => $(s).addEventListener("input", () => ($("#preset").value = "")));
   $("#base-url").addEventListener("change", () => ($("#api-key").value = getKey($("#provider").value, $("#base-url").value)));
-  $("#studio-settings-btn").addEventListener("click", () => { ["#visibility", "#links", "#customize", "#apps"].forEach((x) => ($(x).hidden = true)); openSettings(); });
+  $("#studio-settings-btn").addEventListener("click", () => { ["#visibility", "#links", "#customize", "#apps", "#jobs"].forEach((x) => ($(x).hidden = true)); openSettings(); });
 
   /* ---------------- GitHub (private master) ---------------- */
   const ghHeaders = () => { const gh = LS.get("gh", {}) || {}; return { Authorization: `Bearer ${gh.token}`, Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" }; };
@@ -410,7 +410,7 @@
   }
 
   async function openLinks() {
-    ["#gate", "#settings", "#workspace", "#visibility", "#customize", "#apps"].forEach((x) => ($(x).hidden = true));
+    ["#gate", "#settings", "#workspace", "#visibility", "#customize", "#apps", "#jobs"].forEach((x) => ($(x).hidden = true));
     $("#links").hidden = false;
     const body = $("#links-body"), st = (t) => ($("#links-status").textContent = t);
     $("#links-new").hidden = true; $("#links-new-box").hidden = true;
@@ -566,7 +566,7 @@
     </form>`;
   }
   async function openApps() {
-    ["#gate", "#settings", "#workspace", "#visibility", "#links", "#customize"].forEach((x) => ($(x).hidden = true));
+    ["#gate", "#settings", "#workspace", "#visibility", "#links", "#customize", "#jobs"].forEach((x) => ($(x).hidden = true));
     $("#apps").hidden = false;
     const body = $("#apps-body"), box = $("#apps-form-box"), st = (t) => ($("#apps-status").textContent = t);
     $("#apps-new").hidden = true; box.hidden = true; box.innerHTML = "";
@@ -657,9 +657,109 @@
   }
   $("#studio-apps-btn").addEventListener("click", openApps);
 
+  /* ---------------- jobs ---------------- */
+  // Postings found by the daily job search (.github/workflows/jobs.yml → jobs/inbox.json), ranked
+  // against jobs/preferences.json and your graph. What you save or dismiss is kept in
+  // jobs/state.json in your private repository.
+  const JOB_FILTERS = [["review", "To review"], ["saved", "Saved"], ["dismissed", "Dismissed"], ["all", "All"]];
+  let jobsView = { filter: "review", hideGerman: false };
+  async function readJobState() {
+    const f = await ghGet("jobs/state.json");
+    const data = f ? JSON.parse(f.text) : {};
+    return { sha: f?.sha, data: { saved: data.saved || [], dismissed: data.dismissed || [], lastLooked: data.lastLooked || "" } };
+  }
+  function jobCard(j, st, isNew) {
+    const saved = st.saved.includes(j.refnr), dismissed = st.dismissed.includes(j.refnr);
+    const age = daysSince(j.posted);
+    const tag = (t) => `<span class="job-tag${/German required|Pay up to/.test(t) ? " warn" : /applied/i.test(t) ? " done" : ""}">${esc(t)}</span>`;
+    const href = safeUrl(j.url) || safeUrl(j.baUrl);
+    return `<article class="job${dismissed ? " closed" : ""}" data-ref="${esc(j.refnr)}">
+      <header class="app-head">
+        <div><h3>${href ? `<a href="${esc(href)}" target="_blank" rel="noopener">${esc(j.title)}</a>` : esc(j.title)}${isNew ? ` <span class="job-new">New</span>` : ""}</h3>
+          <p class="app-role">${esc(j.company)}${j.place ? ` · ${esc(j.place)}` : ""}${j.posted ? ` · <span class="vis-meta">posted ${age === 0 ? "today" : age === 1 ? "yesterday" : age + " days ago"}</span>` : ""}</p></div>
+        <span class="job-score" title="Fit score from your preferences and skills">${j.score}</span>
+      </header>
+      <p class="job-why">${(j.why || []).map((w) => `<span class="job-chip">${esc(w)}</span>`).join("")}${(j.tags || []).map(tag).join("")}</p>
+      ${j.skills?.length ? `<p class="app-meta">Your skills in it: ${j.skills.map(esc).join(", ")}${j.skillCount > j.skills.length ? ` and ${j.skillCount - j.skills.length} more` : ""}</p>` : ""}
+      ${j.description ? `<details class="app-notes"><summary>Job description</summary><div class="job-desc">${esc(j.description)}</div></details>` : ""}
+      <div class="app-actions">
+        <button class="btn ink small" data-act="write" type="button">Write CV &amp; letter</button>
+        <button class="btn ghost small" data-act="track" type="button">Add to Applications</button>
+        <button class="btn ghost small" data-act="save" type="button">${saved ? "Saved ✓" : "Save"}</button>
+        <button class="btn ghost small" data-act="dismiss" type="button">${dismissed ? "Restore" : "Not for me"}</button>
+      </div>
+    </article>`;
+  }
+  async function openJobs() {
+    ["#gate", "#settings", "#workspace", "#visibility", "#links", "#customize", "#apps", "#jobs"].forEach((x) => ($(x).hidden = true));
+    $("#jobs").hidden = false;
+    const body = $("#jobs-body"), st = (t) => ($("#jobs-status").textContent = t);
+    $("#jobs-summary").innerHTML = ""; $("#jobs-filters").innerHTML = "";
+    if (!connected()) { body.innerHTML = notConnectedNote(); return; }
+    body.innerHTML = `<p class="help">Loading…</p>`; st("");
+    let inbox, state;
+    try {
+      const f = await ghGet("jobs/inbox.json");
+      inbox = f ? JSON.parse(f.text) : null; state = await readJobState();
+    } catch (e) { body.innerHTML = ""; st(e.message); return; }
+    if (!inbox) { body.innerHTML = `<p class="help">No job list yet. The <code>Job search</code> workflow in your private repository writes it every morning.</p>`; return; }
+    const jobs = inbox.jobs || [], s = state.data;
+    const lastLooked = s.lastLooked;
+    const isNew = (j) => !lastLooked || (j.found || "") > lastLooked.slice(0, 10);
+    const saveState = async (mutate, quiet) => {
+      try { const r = await readJobState(); mutate(r.data); await ghPut("jobs/state.json", JSON.stringify(r.data, null, 1) + "\n", r.sha, "Jobs: " + (quiet || "updated")); Object.assign(s, r.data); if (!quiet) st("Saved."); }
+      catch (e) { st(e.message); }
+    };
+    const render = () => {
+      const counts = { review: jobs.filter((j) => !s.dismissed.includes(j.refnr)).length, saved: jobs.filter((j) => s.saved.includes(j.refnr)).length, dismissed: jobs.filter((j) => s.dismissed.includes(j.refnr)).length, all: jobs.length };
+      $("#jobs-filters").innerHTML = JOB_FILTERS.map(([k, label]) => `<button class="btn ghost small" type="button" data-filter="${k}"${jobsView.filter === k ? ' aria-pressed="true"' : ""}>${label} <span class="vis-meta">${counts[k]}</span></button>`).join("")
+        + `<label class="job-hide"><input type="checkbox" id="jobs-hide-german"${jobsView.hideGerman ? " checked" : ""}> Hide roles that require German</label>`;
+      let list = jobs.filter((j) => jobsView.filter === "all" ? true : jobsView.filter === "saved" ? s.saved.includes(j.refnr) : jobsView.filter === "dismissed" ? s.dismissed.includes(j.refnr) : !s.dismissed.includes(j.refnr));
+      if (jobsView.hideGerman) list = list.filter((j) => !(j.tags || []).includes("German required"));
+      body.innerHTML = list.length ? list.map((j) => jobCard(j, s, isNew(j))).join("") : `<p class="help">Nothing here.</p>`;
+      $$("#jobs-filters [data-filter]").forEach((b) => b.addEventListener("click", () => { jobsView.filter = b.dataset.filter; render(); }));
+      $("#jobs-hide-german").addEventListener("change", (e) => { jobsView.hideGerman = e.target.checked; render(); });
+      $$("#jobs-body article.job").forEach((el) => {
+        const j = jobs.find((x) => x.refnr === el.dataset.ref);
+        el.querySelector('[data-act="save"]').addEventListener("click", () => saveState((d) => {
+          d.saved = d.saved.includes(j.refnr) ? d.saved.filter((r) => r !== j.refnr) : [...d.saved, j.refnr];
+        }).then(render));
+        el.querySelector('[data-act="dismiss"]').addEventListener("click", () => saveState((d) => {
+          d.dismissed = d.dismissed.includes(j.refnr) ? d.dismissed.filter((r) => r !== j.refnr) : [...d.dismissed, j.refnr];
+        }).then(render));
+        el.querySelector('[data-act="write"]').addEventListener("click", async () => {
+          await enterStudio();
+          $("#jd").value = `${j.title}\n${j.company}${j.place ? ", " + j.place : ""}\n\n${j.description || ""}`.trim();
+          $("#company").value = j.company || "";
+          $("#jd").dispatchEvent(new Event("input", { bubbles: true }));
+          $("#jd-form").scrollIntoView({ behavior: "smooth", block: "start" });
+          if ((j.description || "").length < 400) toast("The posting's text is short; paste the full description from the job page if you have it.");
+        });
+        el.querySelector('[data-act="track"]').addEventListener("click", async () => {
+          st("Adding to Applications…");
+          try {
+            const r = await readApps(); r.data.applications = r.data.applications || [];
+            if (r.data.applications.some((a) => a.url && (a.url === j.url || a.url === j.baUrl))) { st("It's already in Applications."); return; }
+            r.data.applications.push({ id: appId(), company: j.company, role: j.title, status: "Preparing", url: safeUrl(j.url) || j.baUrl, history: [{ status: "Preparing", date: todayIso() }] });
+            await ghPut("applications.json", JSON.stringify(r.data, null, 2) + "\n", r.sha, `Application: ${j.company}, ${j.title} (from Jobs)`);
+            st(`Added to Applications as "Preparing".`);
+          } catch (e) { st(e.message); }
+        });
+      });
+    };
+    const newCount = jobs.filter((j) => isNew(j) && !s.dismissed.includes(j.refnr)).length;
+    const german = jobs.filter((j) => (j.tags || []).includes("German required")).length;
+    $("#jobs-summary").innerHTML = `<p class="apps-counts"><span><b>${newCount}</b> new since you last looked</span><span><b>${jobs.length}</b> in the list</span><span><b>${german}</b> require German</span></p>
+      <p class="help">Updated ${esc(fmtDay((inbox.updated || "").slice(0, 10)))} from the Federal Employment Agency's job database. Ranked by role type (knowledge and ontology engineering first), place (Munich, then Berlin, then remote), your skills in the posting, seniority and German. Change what it looks for in <code>jobs/preferences.json</code>.</p>`;
+    render();
+    if (newCount && jobs.length) saveState((d) => { d.lastLooked = new Date().toISOString(); }, "looked");
+  }
+  $("#studio-jobs-btn").addEventListener("click", openJobs);
+  $("#jobs-back").addEventListener("click", () => { $("#jobs").hidden = true; enterStudio(); });
+
   /* ---------------- studio tabs: show which panel is open ---------------- */
   // Each panel has its button; the open one is marked, whichever way it was opened.
-  const PANEL_BTN = { "#workspace": "#studio-jd-btn", "#apps": "#studio-apps-btn", "#links": "#studio-links-btn",
+  const PANEL_BTN = { "#workspace": "#studio-jd-btn", "#jobs": "#studio-jobs-btn", "#apps": "#studio-apps-btn", "#links": "#studio-links-btn",
     "#visibility": "#studio-vis-btn", "#customize": "#studio-customize-btn", "#settings": "#studio-settings-btn" };
   function markOpenPanel() {
     for (const [panel, btn] of Object.entries(PANEL_BTN)) {
@@ -695,7 +795,7 @@
   }
 
   function openVisibility() {
-    ["#gate", "#settings", "#workspace", "#links", "#customize", "#apps"].forEach((x) => ($(x).hidden = true));
+    ["#gate", "#settings", "#workspace", "#links", "#customize", "#apps", "#jobs"].forEach((x) => ($(x).hidden = true));
     $("#visibility").hidden = false;
     const O = window.GR_OWNER || {};
     if (!G.ownerView || !O.configured) {

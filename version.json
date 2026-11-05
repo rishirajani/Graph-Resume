@@ -1,9 +1,9 @@
 {
-  "version": "1.9.4",
+  "version": "1.10.0",
   "date": "2026-11-05",
   "notes": [
-    "The studio's buttons now show which panel is open, and a new Job description button takes you back to writing a CV and letter from any panel.",
-    "Applications are listed newest first: by the date you applied, then the one you added most recently. A status no longer moves an application to the top or bottom."
+    "New in the studio: Jobs. Every morning a job search in your private repository looks for new postings that fit the role types, places and limits in jobs/preferences.json, ranks them against your graph's skills, and lists them here with the reasons and warnings (for example German required). From each you can write a CV and letter, add it to Applications, save it or set it aside.",
+    "The job search is a GitHub Actions workflow (Job search) in your private repository; it uses the Federal Employment Agency's public job database, so it currently covers Germany."
   ],
   "files": [
     "index.html",

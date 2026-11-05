@@ -9,7 +9,7 @@
 <meta property="og:description" content="An explorable knowledge graph of experience, education, projects and skills.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="styles.css?v=0e30e369d4">
+<link rel="stylesheet" href="styles.css?v=7d4fc50441">
 <link rel="alternate" type="text/turtle" href="resume.ttl" title="This resume as RDF (Turtle)">
 <link rel="alternate" type="application/ld+json" href="resume.jsonld" title="This resume as JSON-LD">
 </head>
@@ -82,6 +82,7 @@
     </div>
     <div class="studio-top-actions">
       <button class="btn ghost" id="studio-jd-btn">Job description</button>
+      <button class="btn ghost" id="studio-jobs-btn">Jobs</button>
       <button class="btn ghost" id="studio-customize-btn">Customize</button>
       <button class="btn ghost" id="studio-apps-btn">Applications</button>
       <button class="btn ghost" id="studio-links-btn">Tailored links</button>
@@ -224,6 +225,17 @@
     </div>
   </section>
 
+  <!-- jobs -->
+  <section id="jobs" class="settings apps" hidden>
+    <h2>Jobs</h2>
+    <p class="help">New postings that fit what you're looking for, found every morning and ranked against your preferences and your graph.</p>
+    <div id="jobs-summary"></div>
+    <div id="jobs-filters" class="job-filters"></div>
+    <div id="jobs-body"></div>
+    <p class="help" id="jobs-status" role="status"></p>
+    <div class="row end"><button class="btn ghost" id="jobs-back" type="button">Back</button></div>
+  </section>
+
   <!-- applications -->
   <section id="apps" class="settings apps" hidden>
     <h2>Applications</h2>
@@ -352,9 +364,9 @@
 <script src="resume.js"></script>
 <script src="owner.js?v=7d9c00eada"></script>
 <script src="ui.js?v=5a985798d7"></script>
-<script src="core.js?v=f33e933867"></script>
+<script src="core.js?v=4062bb4ba8"></script>
 <script src="lib/cytoscape.min.js?v=081591ab73"></script>
-<script>window.GR_V = {"ui.js":"5a985798d7","core.js":"f33e933867","owner.js":"7d9c00eada","loader.js":"644fe75471","app.js":"d2137b3799","studio.js":"255c7932a0","customize.js":"aad4e179fb","styles.css":"0e30e369d4","lib/cytoscape.min.js":"081591ab73","lib/docx.js":"e018e1d427"};</script>
+<script>window.GR_V = {"ui.js":"5a985798d7","core.js":"4062bb4ba8","owner.js":"7d9c00eada","loader.js":"644fe75471","app.js":"d2137b3799","studio.js":"2391371452","customize.js":"d993679904","styles.css":"7d4fc50441","lib/cytoscape.min.js":"081591ab73","lib/docx.js":"e018e1d427"};</script>
 <script src="loader.js?v=644fe75471"></script>
 </body>
 </html>

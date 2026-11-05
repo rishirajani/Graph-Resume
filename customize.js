@@ -273,7 +273,7 @@
 
   /* ---------------- open / close ---------------- */
   function open() {
-    ["#gate", "#settings", "#workspace", "#visibility", "#links", "#apps"].forEach((x) => ($(x).hidden = true));
+    ["#gate", "#settings", "#workspace", "#visibility", "#links", "#apps", "#jobs"].forEach((x) => ($(x).hidden = true));
     $("#customize").hidden = false;
     draft = clone(U.ui);
     $("#cz-save").hidden = !S.connected();

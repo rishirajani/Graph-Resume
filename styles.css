@@ -451,6 +451,22 @@ a.btn { text-decoration: none; color: var(--ink); display: inline-flex; align-it
 .link-actions { display: flex; flex-direction: column; gap: 6px; align-items: stretch; min-width: 96px; }
 .link-actions .btn { justify-content: center; text-align: center; }
 @media (max-width: 640px) { .link-actions { flex-direction: row; flex-wrap: wrap; } }
+/* jobs */
+.job-filters { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 12px 0 14px; }
+.job-filters .btn[aria-pressed="true"] { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
+.job-filters .btn[aria-pressed="true"] .vis-meta { color: inherit; opacity: .75; }
+.job-hide { margin-left: auto; font-size: 13.5px; color: var(--ink-2); display: inline-flex; gap: 6px; align-items: center; }
+.job { background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; padding: 14px 16px 12px; margin: 0 0 12px; }
+.job.closed { background: var(--surface-2); }
+.job h3 { margin: 0; font-size: 17px; }
+.job h3 a { text-decoration: none; } .job h3 a:hover { text-decoration: underline; }
+.job-new { font-size: 11.5px; font-weight: 700; background: var(--hl-soft); color: var(--ink); border-radius: 4px; padding: 1px 6px; vertical-align: 2px; }
+.job-score { flex: none; min-width: 40px; text-align: center; font-weight: 750; font-size: 17px; border: 1.5px solid var(--c-skill); color: var(--c-skill); border-radius: 999px; padding: 3px 8px; }
+.job-why { display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 0 0; }
+.job-chip, .job-tag { font-size: 12.5px; border-radius: 999px; padding: 2px 9px; background: var(--surface-2); border: 1px solid var(--rule); color: var(--ink-2); }
+.job-tag.warn { background: #FFF3E0; border-color: #F0C48A; color: #8A4B00; }
+.job-tag.done { background: var(--hl-soft); border-color: var(--hl); color: var(--ink); }
+.job-desc { white-space: pre-wrap; font-size: 13.5px; line-height: 1.5; max-height: 360px; overflow: auto; background: var(--surface-2); border-radius: 8px; padding: 10px 12px; margin-top: 6px; }
 /* applications */
 .apps { max-width: 820px; }
 .apps-counts { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 4px 0 0; font-size: 15px; }
