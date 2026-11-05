@@ -1,8 +1,9 @@
 {
-  "version": "1.6.3",
+  "version": "1.6.4",
   "date": "2026-11-05",
   "notes": [
-    "Editing near the end of a CV or letter no longer makes the page jump: the page sheets are only adjusted where something changed."
+    "On wider screens the CV and letter scroll in their own area, separately from the page.",
+    "While you edit, each printed page is outlined on its own instead of the whole document as one block."
   ],
   "files": [
     "index.html",

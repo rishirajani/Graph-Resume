@@ -1106,7 +1106,9 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
       guides.forEach((s) => {
         const g = document.createElement("div");
         g.className = "page-guide" + (s.gap ? " gap" : ""); g.setAttribute("aria-hidden", "true"); g.dataset.page = s.page;
-        g.style.top = `${s.top}px`; g.style.left = `${paper.offsetLeft}px`; g.style.width = `${paper.offsetWidth}px`;
+        g.style.top = `${s.top}px`;
+        // a gap is 2px wider than the page on each side, so it also covers the page's editing outline
+        g.style.left = `${paper.offsetLeft - (s.gap ? 2 : 0)}px`; g.style.width = `${paper.offsetWidth + (s.gap ? 4 : 0)}px`;
         if (s.gap) g.style.height = `${SHEET_GAP}px`;
         g.innerHTML = `<span>Page ${s.page}</span>`;
         wrap.appendChild(g);

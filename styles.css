@@ -300,7 +300,9 @@ a.btn { text-decoration: none; color: var(--ink); display: inline-flex; align-it
 .page-nav button:hover { border-color: var(--ink); }
 .page-nav em { font-style: normal; color: #C0392B; margin-left: 4px; }
 .page-guide { scroll-margin-top: 90px; position: absolute; height: 0; border-top: 1.5px dashed #C0392B; opacity: .75; pointer-events: none; }
-.page-guide.gap { border: 0; opacity: 1; background: var(--paper-2); margin-left: -1px; padding: 0 1px; box-sizing: content-box; }
+.page-guide.gap { border: 0; opacity: 1; background: var(--paper-2); box-sizing: border-box; }
+/* while you edit, each sheet gets its own outline: the gap between sheets covers the page's outline there and draws the sheet edges */
+.paper-wrap:has(.paper:focus-visible) .page-guide.gap { border-top: 2px solid var(--c-role); border-bottom: 2px solid var(--c-role); }
 .page-guide.gap span { top: 2px; right: auto; left: 50%; transform: translateX(-50%); background: transparent; color: var(--muted); }
 .page-guide span { position: absolute; right: 4px; top: -8px; font: 650 9.5px/14px var(--sans); color: #B03A2E; background: #fff; padding: 0 4px; white-space: nowrap; }
 .paper {
@@ -309,6 +311,10 @@ a.btn { text-decoration: none; color: var(--ink); display: inline-flex; align-it
   color: #111; font: 400 10.4pt/1.42 var(--sans); outline: none;
 }
 .paper:focus-visible { box-shadow: 0 0 0 2px var(--c-role); }
+/* on wider screens the CV and letter scroll on their own, inside the page */
+@media (min-width: 861px) {
+  .results .paper-wrap { max-height: calc(100vh - 120px); overflow: auto; overscroll-behavior: contain; scroll-padding-top: 12px; }
+}
 .paper h1 { font-size: 21pt; line-height: 1.05; margin: 0 0 2pt; letter-spacing: -0.015em; font-weight: 750; }
 .paper .p-headline { font-size: 11pt; margin: 0 0 4pt; color: #333; }
 .paper .p-contact { font-size: 9pt; color: #444; margin: 0 0 10pt; }
