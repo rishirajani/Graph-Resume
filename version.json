@@ -1,10 +1,9 @@
 {
-  "version": "1.9.1",
+  "version": "1.9.2",
   "date": "2026-11-05",
   "notes": [
-    "Fix: when a CV mentions only one role of a promotion (for example the later title), it now still shows the whole stay at that company, with both titles and the full dates.",
-    "New in the studio: Applications, a private list of the jobs you've applied for, with status, follow-up dates, notes and the tailored link you sent. It's saved in your private repository (needs the private master connected).",
-    "Tailored links and Applications show how many people opened each link, when your private repository runs the hourly visit-count workflow."
+    "CVs list projects, education, awards and certificates newest first, like experience (ongoing ones on top). The model still chooses which projects to include.",
+    "Fix: when a CV mentions only one role of a promotion (for example the later title), it now still shows the whole stay at that company, with both titles and the full dates."
   ],
   "files": [
     "index.html",

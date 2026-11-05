@@ -882,7 +882,7 @@ Hard rules
 3. When the job asks for something the graph does not support, record it as a "gap" in fit. Do not imply that experience in the CV. In the cover letter, write at most one sentence about gaps, framed as what the candidate wants to learn next; never claim the experience, never open a paragraph with a gap or an apology ("To be candid", "Although I have not"), and never compare the candidate's years of experience with the job's.
 4. Refer to roles, projects, education, skills and languages by their exact node "id". The app fills in titles, organisations and dates from the graph, so do not repeat them in bullets.
 5. Bullets start with a strong past-tense verb (present tense for current work), are concrete, at most 28 words. ${limits}
-6. Order projects by relevance to this job, most relevant first. The app lists experience newest first and combines a role with the role it was promoted from (promotedFrom), so list experience in any order and do not write a bullet that only states a promotion. Leave out nodes that do not help this application, with one exception: always include current roles (no end date), even unrelated ones, with at least one short bullet, so the timeline has no apparent gap. Likewise include a "Break" node in experience (using its id, with its summary condensed into one bullet) whenever omitting it would leave an unexplained gap of six months or more between the roles you list.
+6. Choose projects by relevance to this job. The app lists projects, education, awards and certifications newest first, and experience newest first and combines a role with the role it was promoted from (promotedFrom), so list experience in any order and do not write a bullet that only states a promotion. Leave out nodes that do not help this application, with one exception: always include current roles (no end date), even unrelated ones, with at least one short bullet, so the timeline has no apparent gap. Likewise include a "Break" node in experience (using its id, with its summary condensed into one bullet) whenever omitting it would leave an unexplained gap of six months or more between the roles you list.
 7. Keep the graph's limiting words when you rephrase a fact: "proof of concept", "prototype", "pilot", "co-defined", "together with", "supported", "part-time", "coursework" and the like stay attached to that fact in the CV and the letter. Never turn a proof of concept into a production system or a shared result into a solo one.
 8. Skills with "evidence": "coursework only" were learned in a degree, not used in work or projects. Include one only if the job asks for it, and then only in a skill group named for coursework (in ${lang}, e.g. "Coursework"), never in bullets or the profile as practical experience.
 9. If the candidate's availability is given, state it once, in the cover letter's last paragraph, in your own words. Otherwise say nothing about start dates.
@@ -1549,20 +1549,24 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
       const dates = G.dateRange({ start: e.start, end: n.end });
       return `<div class="p-item">${row(esc(n.label) + (org ? `, ${esc(org.label)}` : ""), dates)}${sub ? `<div class="p-sub">${esc(sub)}</div>` : ""}${bullets(e.bullets)}</div>`;
     }).join("");
-    const proj = (cv.projects || []).map((x) => {
+    // newest first, like experience: ongoing items on top, then by end date, then by start date
+    const when = (n) => [n.end || (n.start ? "9999" : n.date || ""), n.start || n.date || ""];
+    const newest = (getNode) => (a, b) => { const [ea, sa] = when(getNode(a)), [eb, sb] = when(getNode(b)); return eb.localeCompare(ea) || sb.localeCompare(sa); };
+    const node = (x) => byId.get(typeof x === "string" ? x : x.id) || {};
+    const proj = (cv.projects || []).filter((x) => byId.has(x.id)).sort(newest(node)).map((x) => {
       const n = byId.get(x.id);
       return `<div class="p-item">${row(esc(n.label), G.dateRange(n) || n.status)}${bullets(x.bullets)}</div>`;
     }).join("");
-    const edu = (cv.education || []).map((x) => {
+    const edu = (cv.education || []).filter((x) => byId.has(x.id)).sort(newest(node)).map((x) => {
       const n = byId.get(x.id); const s = byId.get(n.school);
       return `<div class="p-item">${row(esc(n.label), G.dateRange(n))}${s ? `<div class="p-sub">${esc(s.label)}</div>` : ""}${x.note ? `<p class="p-summary">${esc(x.note)}</p>` : ""}</div>`;
     }).join("");
     const skills = (cv.skills || []).map((g) => `<p><b>${esc(g.group)}:</b> ${g.ids.map((id) => esc(byId.get(id).label)).join(", ")}</p>`).join("");
-    const awards = (cv.awards || []).map((id) => {
+    const awards = (cv.awards || []).filter((id) => byId.has(id)).sort(newest(node)).map((id) => {
       const n = byId.get(id); const o = byId.get(n.org);
       return `<div class="p-item">${row(esc(n.label) + (o ? `, ${esc(o.label)}` : ""), G.fmtDate(n.date))}${n.summary ? `<p class="p-summary">${esc(n.summary)}</p>` : ""}</div>`;
     }).join("");
-    const certs = (cv.certifications || []).map((id) => {
+    const certs = (cv.certifications || []).filter((id) => byId.has(id)).sort(newest(node)).map((id) => {
       const n = byId.get(id);
       return `<div class="p-item">${row(esc(n.label) + (n.issuer ? `, ${esc(n.issuer)}` : ""), G.fmtDate(n.date))}</div>`;
     }).join("");
