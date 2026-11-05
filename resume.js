@@ -283,7 +283,6 @@ window.RESUME = {
       "short": "M.Sc. Computer Science",
       "school": "sch-stuttgart",
       "start": "2024-04",
-      "end": "2026-12",
       "location": "Stuttgart, Germany",
       "summary": "Focus: knowledge graphs, semantic web, ontology engineering, machine learning.",
       "skills": [
@@ -358,6 +357,15 @@ window.RESUME = {
       "skills": [
         "s-python"
       ]
+    },
+    {
+      "id": "c-ielts",
+      "type": "Certification",
+      "label": "IELTS Academic, overall band 8.0 (CEFR C1)",
+      "short": "IELTS Academic\n8.0 (C1)",
+      "issuer": "IELTS",
+      "date": "2023-04",
+      "summary": "Listening 8.5, Reading 9.0, Writing 8.0, Speaking 7.0."
     },
     {
       "id": "p-thesis",

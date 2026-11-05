@@ -60,6 +60,9 @@
         },
         {
           "@id": "cv:c-hackerrank-python"
+        },
+        {
+          "@id": "cv:c-ielts"
         }
       ],
       "gr:built": [
@@ -519,7 +522,6 @@
       "gr:kind": "Education",
       "description": "Focus: knowledge graphs, semantic web, ontology engineering, machine learning.",
       "startDate": "2024-04",
-      "endDate": "2026-12",
       "gr:location": "Stuttgart, Germany",
       "gr:at": [
         {
@@ -634,6 +636,13 @@
           "@id": "cv:s-python"
         }
       ]
+    },
+    {
+      "@id": "cv:c-ielts",
+      "@type": "EducationalOccupationalCredential",
+      "name": "IELTS Academic, overall band 8.0 (CEFR C1)",
+      "gr:kind": "Certification",
+      "description": "Listening 8.5, Reading 9.0, Writing 8.0, Speaking 7.0."
     },
     {
       "@id": "cv:p-thesis",

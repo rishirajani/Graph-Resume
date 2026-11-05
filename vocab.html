@@ -22,24 +22,42 @@
  },
  "@graph": [
   {
-   "@id": "gr:inGroup",
-   "@type": "owl:ObjectProperty",
+   "@id": "gr:Award",
+   "@type": "owl:Class",
    "rdfs:comment": {
     "@language": "en",
-    "@value": "The skill area this skill is grouped under. Each skill belongs to exactly one."
-   },
-   "rdfs:domain": {
-    "@id": "schema:DefinedTerm"
+    "@value": "A recognition given to the person, for example by an employer. schema.org only has award as a text property, so this makes awards nodes that can be linked to who gave them."
    },
    "rdfs:label": {
     "@language": "en",
-    "@value": "belongs to"
+    "@value": "Award"
+   },
+   "rdfs:seeAlso": {
+    "@id": "schema:award"
+   },
+   "rdfs:subClassOf": {
+    "@id": "schema:Thing"
+   }
+  },
+  {
+   "@id": "gr:workedAs",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "The person held this role in the past; the role has an end date."
+   },
+   "rdfs:domain": {
+    "@id": "schema:Person"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "worked as"
    },
    "rdfs:range": {
-    "@id": "schema:DefinedTermSet"
+    "@id": "schema:OrganizationRole"
    },
    "rdfs:subPropertyOf": {
-    "@id": "schema:inDefinedTermSet"
+    "@id": "gr:heldRole"
    }
   },
   {
@@ -81,124 +99,18 @@
    ]
   },
   {
-   "@id": "gr:ledTo",
-   "@type": "owl:ObjectProperty",
-   "rdfs:comment": {
-    "@language": "en",
-    "@value": "A programme of study that led directly to this role, for example a certificate run with an employer."
-   },
-   "rdfs:domain": {
-    "@id": "schema:EducationalOccupationalCredential"
-   },
-   "rdfs:label": {
-    "@language": "en",
-    "@value": "led to"
-   },
-   "rdfs:range": {
-    "@id": "schema:OrganizationRole"
-   }
-  },
-  {
-   "@id": "gr:workedAs",
-   "@type": "owl:ObjectProperty",
-   "rdfs:comment": {
-    "@language": "en",
-    "@value": "The person held this role in the past; the role has an end date."
-   },
-   "rdfs:domain": {
-    "@id": "schema:Person"
-   },
-   "rdfs:label": {
-    "@language": "en",
-    "@value": "worked as"
-   },
-   "rdfs:range": {
-    "@id": "schema:OrganizationRole"
-   },
-   "rdfs:subPropertyOf": {
-    "@id": "gr:heldRole"
-   }
-  },
-  {
-   "@id": "gr:wrote",
-   "@type": "owl:ObjectProperty",
-   "owl:inverseOf": {
-    "@id": "schema:author"
-   },
-   "rdfs:comment": {
-    "@language": "en",
-    "@value": "The person is an author of this publication."
-   },
-   "rdfs:domain": {
-    "@id": "schema:Person"
-   },
-   "rdfs:label": {
-    "@language": "en",
-    "@value": "wrote"
-   },
-   "rdfs:range": {
-    "@id": "schema:ScholarlyArticle"
-   }
-  },
-  {
-   "@id": "gr:received",
-   "@type": "owl:ObjectProperty",
-   "rdfs:comment": {
-    "@language": "en",
-    "@value": "The person received this award."
-   },
-   "rdfs:domain": {
-    "@id": "schema:Person"
-   },
-   "rdfs:label": {
-    "@language": "en",
-    "@value": "received"
-   },
-   "rdfs:range": {
-    "@id": "gr:Award"
-   },
-   "rdfs:seeAlso": {
-    "@id": "schema:award"
-   }
-  },
-  {
-   "@id": "gr:at",
-   "@type": "owl:ObjectProperty",
-   "rdfs:comment": {
-    "@language": "en",
-    "@value": "Where a role was held (the employer) or where a degree or certificate was studied (the school)."
-   },
-   "rdfs:domain": {
-    "@id": "_:nfce34398fb054dbe8683bc389aa8daf1b1"
-   },
-   "rdfs:label": {
-    "@language": "en",
-    "@value": "at"
-   },
-   "rdfs:range": {
-    "@id": "schema:Organization"
-   },
-   "rdfs:seeAlso": [
-    {
-     "@id": "schema:worksFor"
-    },
-    {
-     "@id": "schema:alumniOf"
-    }
-   ]
-  },
-  {
-   "@id": "_:nfce34398fb054dbe8683bc389aa8daf1b1",
+   "@id": "gr:CareerBreak",
    "@type": "owl:Class",
-   "owl:unionOf": {
-    "@list": [
-     {
-      "@id": "schema:OrganizationRole"
-     },
-     {
-      "@id": "schema:EducationalOccupationalCredential"
-     }
-    ]
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "A period between roles, with what happened during it. Lets a gap be described honestly instead of left blank."
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "Career break"
+   },
+   "rdfs:subClassOf": {
+    "@id": "schema:Thing"
    }
   },
   {
@@ -223,45 +135,6 @@
    }
   },
   {
-   "@id": "gr:took",
-   "@type": "owl:ObjectProperty",
-   "rdfs:comment": {
-    "@language": "en",
-    "@value": "The person took this career break."
-   },
-   "rdfs:domain": {
-    "@id": "schema:Person"
-   },
-   "rdfs:label": {
-    "@language": "en",
-    "@value": "took"
-   },
-   "rdfs:range": {
-    "@id": "gr:CareerBreak"
-   }
-  },
-  {
-   "@id": "gr:built",
-   "@type": "owl:ObjectProperty",
-   "rdfs:comment": {
-    "@language": "en",
-    "@value": "The person built or authored this project."
-   },
-   "rdfs:domain": {
-    "@id": "schema:Person"
-   },
-   "rdfs:label": {
-    "@language": "en",
-    "@value": "built"
-   },
-   "rdfs:range": {
-    "@id": "schema:CreativeWork"
-   },
-   "rdfs:seeAlso": {
-    "@id": "schema:creator"
-   }
-  },
-  {
    "@id": "gr:promotedFrom",
    "@type": "owl:ObjectProperty",
    "rdfs:comment": {
@@ -280,84 +153,21 @@
    }
   },
   {
-   "@id": "gr:location",
-   "@type": "owl:DatatypeProperty",
-   "rdfs:comment": {
-    "@language": "en",
-    "@value": "Where it took place, as written on a CV (city and country, or remote)."
-   },
-   "rdfs:label": {
-    "@language": "en",
-    "@value": "location"
-   },
-   "rdfs:range": {
-    "@id": "xsd:string"
-   },
-   "rdfs:seeAlso": {
-    "@id": "schema:location"
-   }
-  },
-  {
-   "@id": "gr:shows",
+   "@id": "gr:runWith",
    "@type": "owl:ObjectProperty",
    "rdfs:comment": {
     "@language": "en",
-    "@value": "A skill this certification is evidence of."
+    "@value": "An organisation that co-ran this programme with the school."
    },
    "rdfs:domain": {
     "@id": "schema:EducationalOccupationalCredential"
    },
    "rdfs:label": {
     "@language": "en",
-    "@value": "shows"
-   },
-   "rdfs:range": {
-    "@id": "schema:DefinedTerm"
-   },
-   "rdfs:seeAlso": {
-    "@id": "schema:competencyRequired"
-   }
-  },
-  {
-   "@id": "gr:worksAs",
-   "@type": "owl:ObjectProperty",
-   "rdfs:comment": {
-    "@language": "en",
-    "@value": "The person holds this role now; the role has no end date."
-   },
-   "rdfs:domain": {
-    "@id": "schema:Person"
-   },
-   "rdfs:label": {
-    "@language": "en",
-    "@value": "works as"
-   },
-   "rdfs:range": {
-    "@id": "schema:OrganizationRole"
-   },
-   "rdfs:subPropertyOf": {
-    "@id": "gr:heldRole"
-   }
-  },
-  {
-   "@id": "gr:awardedBy",
-   "@type": "owl:ObjectProperty",
-   "rdfs:comment": {
-    "@language": "en",
-    "@value": "The organisation that gave the award."
-   },
-   "rdfs:domain": {
-    "@id": "gr:Award"
-   },
-   "rdfs:label": {
-    "@language": "en",
-    "@value": "awarded by"
+    "@value": "run with"
    },
    "rdfs:range": {
     "@id": "schema:Organization"
-   },
-   "rdfs:seeAlso": {
-    "@id": "schema:recognizedBy"
    }
   },
   {
@@ -382,25 +192,139 @@
    }
   },
   {
-   "@id": "gr:included",
+   "@id": "gr:built",
    "@type": "owl:ObjectProperty",
    "rdfs:comment": {
     "@language": "en",
-    "@value": "Something done during a career break, such as freelance work or a certification."
+    "@value": "The person built or authored this project."
    },
    "rdfs:domain": {
-    "@id": "gr:CareerBreak"
+    "@id": "schema:Person"
    },
    "rdfs:label": {
     "@language": "en",
-    "@value": "included"
+    "@value": "built"
    },
    "rdfs:range": {
-    "@id": "_:nfce34398fb054dbe8683bc389aa8daf1b7"
+    "@id": "schema:CreativeWork"
+   },
+   "rdfs:seeAlso": {
+    "@id": "schema:creator"
    }
   },
   {
-   "@id": "_:nfce34398fb054dbe8683bc389aa8daf1b7",
+   "@id": "gr:focusOn",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "One of the person's skill areas."
+   },
+   "rdfs:domain": {
+    "@id": "schema:Person"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "specialises in"
+   },
+   "rdfs:range": {
+    "@id": "schema:DefinedTermSet"
+   }
+  },
+  {
+   "@id": "gr:highlight",
+   "@type": "owl:DatatypeProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "One achievement or responsibility in a role, degree or project, written as a CV bullet point. Order is not significant."
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "highlight"
+   },
+   "rdfs:range": {
+    "@id": "xsd:string"
+   }
+  },
+  {
+   "@id": "gr:location",
+   "@type": "owl:DatatypeProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "Where it took place, as written on a CV (city and country, or remote)."
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "location"
+   },
+   "rdfs:range": {
+    "@id": "xsd:string"
+   },
+   "rdfs:seeAlso": {
+    "@id": "schema:location"
+   }
+  },
+  {
+   "@id": "gr:ledTo",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "A programme of study that led directly to this role, for example a certificate run with an employer."
+   },
+   "rdfs:domain": {
+    "@id": "schema:EducationalOccupationalCredential"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "led to"
+   },
+   "rdfs:range": {
+    "@id": "schema:OrganizationRole"
+   }
+  },
+  {
+   "@id": "gr:inGroup",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "The skill area this skill is grouped under. Each skill belongs to exactly one."
+   },
+   "rdfs:domain": {
+    "@id": "schema:DefinedTerm"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "belongs to"
+   },
+   "rdfs:range": {
+    "@id": "schema:DefinedTermSet"
+   },
+   "rdfs:subPropertyOf": {
+    "@id": "schema:inDefinedTermSet"
+   }
+  },
+  {
+   "@id": "gr:used",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "A skill put to use in this role, project or career break, including a language used at work. Together with trained in and shows, it ties each skill to the work behind it."
+   },
+   "rdfs:domain": {
+    "@id": "_:n93e0aa139d1540a5a15ba506375e6814b11"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "used"
+   },
+   "rdfs:range": {
+    "@id": "_:n93e0aa139d1540a5a15ba506375e6814b16"
+   },
+   "rdfs:seeAlso": {
+    "@id": "schema:skills"
+   }
+  },
+  {
+   "@id": "_:n93e0aa139d1540a5a15ba506375e6814b11",
    "@type": "owl:Class",
    "owl:unionOf": {
     "@list": [
@@ -408,12 +332,50 @@
       "@id": "schema:OrganizationRole"
      },
      {
-      "@id": "schema:EducationalOccupationalCredential"
+      "@id": "schema:CreativeWork"
      },
      {
-      "@id": "schema:CreativeWork"
+      "@id": "gr:CareerBreak"
+     },
+     {
+      "@id": "gr:Award"
      }
     ]
+   }
+  },
+  {
+   "@id": "_:n93e0aa139d1540a5a15ba506375e6814b16",
+   "@type": "owl:Class",
+   "owl:unionOf": {
+    "@list": [
+     {
+      "@id": "schema:DefinedTerm"
+     },
+     {
+      "@id": "schema:Language"
+     }
+    ]
+   }
+  },
+  {
+   "@id": "gr:awardedBy",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "The organisation that gave the award."
+   },
+   "rdfs:domain": {
+    "@id": "gr:Award"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "awarded by"
+   },
+   "rdfs:range": {
+    "@id": "schema:Organization"
+   },
+   "rdfs:seeAlso": {
+    "@id": "schema:recognizedBy"
    }
   },
   {
@@ -435,6 +397,48 @@
    }
   },
   {
+   "@id": "gr:wrote",
+   "@type": "owl:ObjectProperty",
+   "owl:inverseOf": {
+    "@id": "schema:author"
+   },
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "The person is an author of this publication."
+   },
+   "rdfs:domain": {
+    "@id": "schema:Person"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "wrote"
+   },
+   "rdfs:range": {
+    "@id": "schema:ScholarlyArticle"
+   }
+  },
+  {
+   "@id": "gr:worksAs",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "The person holds this role now; the role has no end date."
+   },
+   "rdfs:domain": {
+    "@id": "schema:Person"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "works as"
+   },
+   "rdfs:range": {
+    "@id": "schema:OrganizationRole"
+   },
+   "rdfs:subPropertyOf": {
+    "@id": "gr:heldRole"
+   }
+  },
+  {
    "@id": "gr:kind",
    "@type": "owl:DatatypeProperty",
    "rdfs:comment": {
@@ -447,6 +451,27 @@
    },
    "rdfs:range": {
     "@id": "xsd:string"
+   }
+  },
+  {
+   "@id": "gr:shows",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "A skill this certification is evidence of."
+   },
+   "rdfs:domain": {
+    "@id": "schema:EducationalOccupationalCredential"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "shows"
+   },
+   "rdfs:range": {
+    "@id": "schema:DefinedTerm"
+   },
+   "rdfs:seeAlso": {
+    "@id": "schema:competencyRequired"
    }
   },
   {
@@ -476,6 +501,24 @@
    ]
   },
   {
+   "@id": "gr:took",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "The person took this career break."
+   },
+   "rdfs:domain": {
+    "@id": "schema:Person"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "took"
+   },
+   "rdfs:range": {
+    "@id": "gr:CareerBreak"
+   }
+  },
+  {
    "@id": "gr:speaks",
    "@type": "owl:ObjectProperty",
    "rdfs:comment": {
@@ -497,89 +540,24 @@
    }
   },
   {
-   "@id": "gr:partOf",
+   "@id": "gr:received",
    "@type": "owl:ObjectProperty",
    "rdfs:comment": {
     "@language": "en",
-    "@value": "This project was done as part of a degree or a larger work, for example a thesis within a master's."
+    "@value": "The person received this award."
    },
    "rdfs:domain": {
-    "@id": "schema:CreativeWork"
+    "@id": "schema:Person"
    },
    "rdfs:label": {
     "@language": "en",
-    "@value": "part of"
+    "@value": "received"
    },
    "rdfs:range": {
-    "@id": "_:nfce34398fb054dbe8683bc389aa8daf1b4"
-   },
-   "rdfs:seeAlso": {
-    "@id": "schema:isPartOf"
-   }
-  },
-  {
-   "@id": "_:nfce34398fb054dbe8683bc389aa8daf1b4",
-   "@type": "owl:Class",
-   "owl:unionOf": {
-    "@list": [
-     {
-      "@id": "schema:EducationalOccupationalCredential"
-     },
-     {
-      "@id": "schema:CreativeWork"
-     }
-    ]
-   }
-  },
-  {
-   "@id": "gr:runWith",
-   "@type": "owl:ObjectProperty",
-   "rdfs:comment": {
-    "@language": "en",
-    "@value": "An organisation that co-ran this programme with the school."
-   },
-   "rdfs:domain": {
-    "@id": "schema:EducationalOccupationalCredential"
-   },
-   "rdfs:label": {
-    "@language": "en",
-    "@value": "run with"
-   },
-   "rdfs:range": {
-    "@id": "schema:Organization"
-   }
-  },
-  {
-   "@id": "gr:Award",
-   "@type": "owl:Class",
-   "rdfs:comment": {
-    "@language": "en",
-    "@value": "A recognition given to the person, for example by an employer. schema.org only has award as a text property, so this makes awards nodes that can be linked to who gave them."
-   },
-   "rdfs:label": {
-    "@language": "en",
-    "@value": "Award"
+    "@id": "gr:Award"
    },
    "rdfs:seeAlso": {
     "@id": "schema:award"
-   },
-   "rdfs:subClassOf": {
-    "@id": "schema:Thing"
-   }
-  },
-  {
-   "@id": "gr:highlight",
-   "@type": "owl:DatatypeProperty",
-   "rdfs:comment": {
-    "@language": "en",
-    "@value": "One achievement or responsibility in a role, degree or project, written as a CV bullet point. Order is not significant."
-   },
-   "rdfs:label": {
-    "@language": "en",
-    "@value": "highlight"
-   },
-   "rdfs:range": {
-    "@id": "xsd:string"
    }
   },
   {
@@ -604,43 +582,68 @@
    }
   },
   {
-   "@id": "gr:CareerBreak",
-   "@type": "owl:Class",
-   "rdfs:comment": {
-    "@language": "en",
-    "@value": "A period between roles, with what happened during it. Lets a gap be described honestly instead of left blank."
-   },
-   "rdfs:label": {
-    "@language": "en",
-    "@value": "Career break"
-   },
-   "rdfs:subClassOf": {
-    "@id": "schema:Thing"
-   }
-  },
-  {
-   "@id": "gr:used",
+   "@id": "gr:partOf",
    "@type": "owl:ObjectProperty",
    "rdfs:comment": {
     "@language": "en",
-    "@value": "A skill put to use in this role, project or career break, including a language used at work. Together with trained in and shows, it ties each skill to the work behind it."
+    "@value": "This project was done as part of a degree or a larger work, for example a thesis within a master's."
    },
    "rdfs:domain": {
-    "@id": "_:nfce34398fb054dbe8683bc389aa8daf1b11"
+    "@id": "schema:CreativeWork"
    },
    "rdfs:label": {
     "@language": "en",
-    "@value": "used"
+    "@value": "part of"
    },
    "rdfs:range": {
-    "@id": "_:nfce34398fb054dbe8683bc389aa8daf1b16"
+    "@id": "_:n93e0aa139d1540a5a15ba506375e6814b4"
    },
    "rdfs:seeAlso": {
-    "@id": "schema:skills"
+    "@id": "schema:isPartOf"
    }
   },
   {
-   "@id": "_:nfce34398fb054dbe8683bc389aa8daf1b11",
+   "@id": "_:n93e0aa139d1540a5a15ba506375e6814b4",
+   "@type": "owl:Class",
+   "owl:unionOf": {
+    "@list": [
+     {
+      "@id": "schema:EducationalOccupationalCredential"
+     },
+     {
+      "@id": "schema:CreativeWork"
+     }
+    ]
+   }
+  },
+  {
+   "@id": "gr:at",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "Where a role was held (the employer) or where a degree or certificate was studied (the school)."
+   },
+   "rdfs:domain": {
+    "@id": "_:n93e0aa139d1540a5a15ba506375e6814b1"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "at"
+   },
+   "rdfs:range": {
+    "@id": "schema:Organization"
+   },
+   "rdfs:seeAlso": [
+    {
+     "@id": "schema:worksFor"
+    },
+    {
+     "@id": "schema:alumniOf"
+    }
+   ]
+  },
+  {
+   "@id": "_:n93e0aa139d1540a5a15ba506375e6814b1",
    "@type": "owl:Class",
    "owl:unionOf": {
     "@list": [
@@ -648,47 +651,44 @@
       "@id": "schema:OrganizationRole"
      },
      {
-      "@id": "schema:CreativeWork"
-     },
-     {
-      "@id": "gr:CareerBreak"
-     },
-     {
-      "@id": "gr:Award"
+      "@id": "schema:EducationalOccupationalCredential"
      }
     ]
    }
   },
   {
-   "@id": "_:nfce34398fb054dbe8683bc389aa8daf1b16",
+   "@id": "gr:included",
+   "@type": "owl:ObjectProperty",
+   "rdfs:comment": {
+    "@language": "en",
+    "@value": "Something done during a career break, such as freelance work or a certification."
+   },
+   "rdfs:domain": {
+    "@id": "gr:CareerBreak"
+   },
+   "rdfs:label": {
+    "@language": "en",
+    "@value": "included"
+   },
+   "rdfs:range": {
+    "@id": "_:n93e0aa139d1540a5a15ba506375e6814b7"
+   }
+  },
+  {
+   "@id": "_:n93e0aa139d1540a5a15ba506375e6814b7",
    "@type": "owl:Class",
    "owl:unionOf": {
     "@list": [
      {
-      "@id": "schema:DefinedTerm"
+      "@id": "schema:OrganizationRole"
      },
      {
-      "@id": "schema:Language"
+      "@id": "schema:EducationalOccupationalCredential"
+     },
+     {
+      "@id": "schema:CreativeWork"
      }
     ]
-   }
-  },
-  {
-   "@id": "gr:focusOn",
-   "@type": "owl:ObjectProperty",
-   "rdfs:comment": {
-    "@language": "en",
-    "@value": "One of the person's skill areas."
-   },
-   "rdfs:domain": {
-    "@id": "schema:Person"
-   },
-   "rdfs:label": {
-    "@language": "en",
-    "@value": "specialises in"
-   },
-   "rdfs:range": {
-    "@id": "schema:DefinedTermSet"
    }
   }
  ]
@@ -798,8 +798,8 @@ schema.org doesn&#x27;t have, or only has as plain text.</p></div>
 </section><section class="term" id="holds">
   <h3><a class="anchor" href="#holds">holds</a> <code class="curie">gr:holds</code></h3>
   <p class="def">The person holds this certification.</p>
-  <dl><dt>IRI</dt><dd><code>https://rishirajani.github.io/Graph-Resume/vocab#holds</code></dd><dt>From</dt><dd><a href="https://schema.org/Person"><code>schema:Person</code></a></dd><dt>To</dt><dd><a href="https://schema.org/EducationalOccupationalCredential"><code>schema:EducationalOccupationalCredential</code></a></dd><dt>Narrower than</dt><dd><a href="https://schema.org/hasCredential"><code>schema:hasCredential</code></a></dd><dt>In this resume</dt><dd>used 2 times</dd></dl>
-  <ul class='ex'><li><a href="https://rishirajani.github.io/Graph-Resume/#me">Rishi Rajani</a> <span class='rel'>holds</span> <a href="https://rishirajani.github.io/Graph-Resume/#c-udemy-python">Complete Python Bootcamp: From Zero to Hero in Python</a></li><li><a href="https://rishirajani.github.io/Graph-Resume/#me">Rishi Rajani</a> <span class='rel'>holds</span> <a href="https://rishirajani.github.io/Graph-Resume/#c-hackerrank-python">Python (Basic) Certificate</a></li></ul>
+  <dl><dt>IRI</dt><dd><code>https://rishirajani.github.io/Graph-Resume/vocab#holds</code></dd><dt>From</dt><dd><a href="https://schema.org/Person"><code>schema:Person</code></a></dd><dt>To</dt><dd><a href="https://schema.org/EducationalOccupationalCredential"><code>schema:EducationalOccupationalCredential</code></a></dd><dt>Narrower than</dt><dd><a href="https://schema.org/hasCredential"><code>schema:hasCredential</code></a></dd><dt>In this resume</dt><dd>used 3 times</dd></dl>
+  <ul class='ex'><li><a href="https://rishirajani.github.io/Graph-Resume/#me">Rishi Rajani</a> <span class='rel'>holds</span> <a href="https://rishirajani.github.io/Graph-Resume/#c-udemy-python">Complete Python Bootcamp: From Zero to Hero in Python</a></li><li><a href="https://rishirajani.github.io/Graph-Resume/#me">Rishi Rajani</a> <span class='rel'>holds</span> <a href="https://rishirajani.github.io/Graph-Resume/#c-hackerrank-python">Python (Basic) Certificate</a></li><li><a href="https://rishirajani.github.io/Graph-Resume/#me">Rishi Rajani</a> <span class='rel'>holds</span> <a href="https://rishirajani.github.io/Graph-Resume/#c-ielts">IELTS Academic, overall band 8.0 (CEFR C1)</a></li></ul>
 </section><section class="term" id="built">
   <h3><a class="anchor" href="#built">built</a> <code class="curie">gr:built</code></h3>
   <p class="def">The person built or authored this project.</p>
@@ -896,7 +896,7 @@ schema.org doesn&#x27;t have, or only has as plain text.</p></div>
 </section><section class="term" id="kind">
   <h3><a class="anchor" href="#kind">kind</a> <code class="curie">gr:kind</code></h3>
   <p class="def">What kind of item this is in the resume&#x27;s own terms (Role, Education, Project, Skill, …). Several kinds share a schema.org type, for example Education and Certification are both schema:EducationalOccupationalCredential; kind keeps them apart.</p>
-  <dl><dt>IRI</dt><dd><code>https://rishirajani.github.io/Graph-Resume/vocab#kind</code></dd><dt>To</dt><dd><a href="http://www.w3.org/2001/XMLSchema#string"><code>xsd:string</code></a></dd><dt>In this resume</dt><dd>used 110 times</dd></dl>
+  <dl><dt>IRI</dt><dd><code>https://rishirajani.github.io/Graph-Resume/vocab#kind</code></dd><dt>To</dt><dd><a href="http://www.w3.org/2001/XMLSchema#string"><code>xsd:string</code></a></dd><dt>In this resume</dt><dd>used 111 times</dd></dl>
   <ul class='ex'><li><a href="https://rishirajani.github.io/Graph-Resume/#me">Rishi Rajani</a> <span class='rel'>kind</span> “Person”</li></ul>
 </section><section class="term" id="location">
   <h3><a class="anchor" href="#location">location</a> <code class="curie">gr:location</code></h3>

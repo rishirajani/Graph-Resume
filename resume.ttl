@@ -15,7 +15,7 @@ cv:me a schema:Person ;
     gr:workedAs cv:r-nobel, cv:r-flexmoney, cv:r-flexmoney-am, cv:r-vmlyr, cv:r-ubisoft, cv:r-hog, cv:r-oracle ;
     gr:received cv:a-ironman ;
     gr:studied cv:e-msc, cv:e-be, cv:e-rubika ;
-    gr:holds cv:c-udemy-python, cv:c-hackerrank-python ;
+    gr:holds cv:c-udemy-python, cv:c-hackerrank-python, cv:c-ielts ;
     gr:built cv:p-thesis, cv:p-loom, cv:p-heat, cv:p-arch, cv:p-rossmann ;
     gr:focusOn cv:g-gov, cv:g-kr, cv:g-de, cv:g-an, cv:g-sw, cv:g-games, cv:g-collab ;
     gr:speaks cv:l-en, cv:l-de, cv:l-hi, cv:l-mr, cv:l-sd .
@@ -136,7 +136,6 @@ cv:e-msc a schema:EducationalOccupationalCredential ;
     gr:kind "Education" ;
     schema:description "Focus: knowledge graphs, semantic web, ontology engineering, machine learning." ;
     schema:startDate "2024-04" ;
-    schema:endDate "2026-12" ;
     gr:location "Stuttgart, Germany" ;
     gr:at cv:sch-stuttgart ;
     gr:trainedIn cv:s-ontology, cv:s-dl, cv:s-kge, cv:s-rdfs, cv:s-shacl, cv:s-pytorch .
@@ -181,6 +180,11 @@ cv:c-hackerrank-python a schema:EducationalOccupationalCredential ;
     gr:kind "Certification" ;
     schema:description "Credential ID 9394CF9CC5B4" ;
     gr:shows cv:s-python .
+
+cv:c-ielts a schema:EducationalOccupationalCredential ;
+    schema:name "IELTS Academic, overall band 8.0 (CEFR C1)" ;
+    gr:kind "Certification" ;
+    schema:description "Listening 8.5, Reading 9.0, Writing 8.0, Speaking 7.0." .
 
 cv:p-thesis a schema:CreativeWork ;
     schema:name "Semantic Concept Learning in EL++ Knowledge Graphs using Box Embeddings" ;
