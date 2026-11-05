@@ -1,9 +1,9 @@
 {
-  "version": "1.6.4",
+  "version": "1.7.0",
   "date": "2026-11-05",
   "notes": [
-    "On wider screens the CV and letter scroll in their own area, separately from the page.",
-    "While you edit, each printed page is outlined on its own instead of the whole document as one block."
+    "Tailored links can be edited after they're live: the note, company and role, what's highlighted, hidden items and the end date. The address stays the same, so links you've already sent keep working.",
+    "The link form now lists the highlighted skills, so you can untick any you don't want to point at."
   ],
   "files": [
     "index.html",
