@@ -497,7 +497,6 @@
   // tracker/visits.json, written hourly from GoatCounter by .github/workflows/visits.yml.
   const APP_STATUS = ["Preparing", "Applied", "Interviewing", "Offer", "Accepted", "Rejected", "Withdrawn", "No reply"];
   const OPEN_STATUS = new Set(["Preparing", "Applied", "Interviewing", "Offer"]);
-  const STATUS_ORDER = { Offer: 0, Interviewing: 1, Applied: 2, Preparing: 3, Accepted: 4, "No reply": 5, Rejected: 6, Withdrawn: 7 };
   const todayIso = () => new Date().toISOString().slice(0, 10);
   const fmtDay = (d) => { if (!d) return ""; const x = new Date(d + "T12:00:00Z"); return isNaN(x) ? d : x.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }); };
   const daysSince = (d) => (d ? Math.round((Date.parse(todayIso()) - Date.parse(d)) / 864e5) : null);
@@ -536,7 +535,7 @@
           ${APP_STATUS.map((s) => `<option${s === a.status ? " selected" : ""}>${s}</option>`).join("")}</select>
       </header>
       <p class="app-meta">${a.applied ? `Applied ${esc(fmtDay(a.applied))}${age != null && age >= 0 ? ` <span class="vis-meta">(${age === 0 ? "today" : age === 1 ? "yesterday" : age + " days ago"})</span>` : ""}` : "Not applied yet"}
-        ${a.salary ? ` · Salary asked: ${esc(a.salary)}` : ""}${url ? ` · <a href="${esc(url)}" target="_blank" rel="noopener">Job posting</a>` : ""}</p>
+        ${a.salary ? ` · Salary asked: ${esc(/^\d{4,7}$/.test(String(a.salary).trim()) ? "€" + Number(a.salary).toLocaleString("en-GB") : a.salary)}` : ""}${url ? ` · <a href="${esc(url)}" target="_blank" rel="noopener">Job posting</a>` : ""}</p>
       ${a.link ? `<div class="app-link">${link ? `Tailored link <code>${esc(link.id)}</code>${link.off ? " (switched off)" : ""}` : `Tailored link <code>${esc(a.link)}</code> (no longer in your links)`} · ${visitsHtml(v, a.link)}</div>` : ""}
       <div class="app-foot">
         <div class="app-follow${due ? " due" : ""}"><label>Follow up on <input type="date" data-f="followUp" value="${esc(a.followUp || "")}"></label>${due ? ` <b>Due</b>` : ""}</div>
@@ -626,7 +625,8 @@
     $("#apps-summary").innerHTML = list.length ? `<p class="apps-counts">${[["Applied", count("Applied")], ["Interviewing", count("Interviewing")], ["Offer", count("Offer") + count("Accepted")], ["Closed", count("Rejected") + count("Withdrawn") + count("No reply")]]
       .map(([k, n]) => `<span><b>${n}</b> ${k.toLowerCase()}</span>`).join("")}<span><b>${totalVisitors}</b> link visitor${totalVisitors === 1 ? "" : "s"}</span></p>
       <p class="help">${visits ? `Visitor counts come from GoatCounter every hour${visits.updated ? `; the last new visit was recorded ${esc(fmtDay(visits.updated.slice(0, 10)))}` : ""}. People who block trackers aren't counted, so a link can be opened without showing up here.` : "Visitor counts appear here once the hourly <code>Visit counts</code> workflow has run (it needs the <code>GOATCOUNTER_TOKEN</code> secret)."}</p>` : "";
-    const sorted = list.slice().sort((a, b) => (STATUS_ORDER[a.status] ?? 9) - (STATUS_ORDER[b.status] ?? 9) || String(b.applied || "9").localeCompare(String(a.applied || "9")));
+    // newest first: by the date you applied (not applied yet counts as today), then most recently added
+    const sorted = list.map((a, i) => [a, i]).sort(([a, i], [b, j]) => String(b.applied || todayIso()).localeCompare(String(a.applied || todayIso())) || j - i).map(([a]) => a);
     body.innerHTML = (unlinked.length ? `<div class="note apps-unlinked"><b>Tailored links without an application:</b> ${unlinked.map((l) => `<button class="btn ghost small" type="button" data-from-link="${esc(l.id)}">Add ${esc(l.company || l.id)}</button>`).join(" ")}</div>` : "")
       + (sorted.length ? sorted.map((a) => appCard(a, links, visits)).join("") : `<p class="help">No applications yet. Add one with <b>New application</b>.</p>`);
 

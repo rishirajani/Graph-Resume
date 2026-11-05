@@ -1,9 +1,9 @@
 {
-  "version": "1.9.2",
+  "version": "1.9.3",
   "date": "2026-11-05",
   "notes": [
-    "CVs list projects, education, awards and certificates newest first, like experience (ongoing ones on top). The model still chooses which projects to include.",
-    "Fix: when a CV mentions only one role of a promotion (for example the later title), it now still shows the whole stay at that company, with both titles and the full dates."
+    "Applications are listed newest first: by the date you applied, then the one you added most recently. A status no longer moves an application to the top or bottom.",
+    "CVs list projects, education, awards and certificates newest first, like experience (ongoing ones on top). The model still chooses which projects to include."
   ],
   "files": [
     "index.html",
