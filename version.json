@@ -1,9 +1,9 @@
 {
-  "version": "1.8.0",
+  "version": "1.9.0",
   "date": "2026-11-05",
   "notes": [
-    "The graph is now described with Weft, an open vocabulary for career graphs with its own permanent address (w3id.org/weft). Downloads use the weft: prefix in place of gr:; the terms are the same.",
-    "The text view links to Weft's documentation."
+    "New in the studio: Applications, a private list of the jobs you've applied for, with status, follow-up dates, notes and the tailored link you sent. It's saved in your private repository (needs the private master connected).",
+    "Tailored links and Applications show how many people opened each link, when your private repository runs the hourly visit-count workflow."
   ],
   "files": [
     "index.html",

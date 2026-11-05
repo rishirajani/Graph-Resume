@@ -70,7 +70,7 @@
   async function enterStudio() {
     await ready;
     checkForUpdate();
-    ["#gate", "#settings", "#workspace", "#visibility", "#links", "#customize"].forEach((s) => ($(s).hidden = true));
+    ["#gate", "#settings", "#workspace", "#visibility", "#links", "#customize", "#apps"].forEach((s) => ($(s).hidden = true));
     if (runtime.inArtifact && !runtime.isOwner) {
       $("#gate").hidden = false;
       $("#gate").innerHTML = "<h2>Owner only</h2><p>The studio is available to the owner of this page.</p>";
@@ -133,7 +133,7 @@
   });
   ["#model", "#base-url"].forEach((s) => $(s).addEventListener("input", () => ($("#preset").value = "")));
   $("#base-url").addEventListener("change", () => ($("#api-key").value = getKey($("#provider").value, $("#base-url").value)));
-  $("#studio-settings-btn").addEventListener("click", () => { ["#visibility", "#links", "#customize"].forEach((x) => ($(x).hidden = true)); openSettings(); });
+  $("#studio-settings-btn").addEventListener("click", () => { ["#visibility", "#links", "#customize", "#apps"].forEach((x) => ($(x).hidden = true)); openSettings(); });
 
   /* ---------------- GitHub (private master) ---------------- */
   const ghHeaders = () => { const gh = LS.get("gh", {}) || {}; return { Authorization: `Bearer ${gh.token}`, Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" }; };
@@ -410,23 +410,24 @@
   }
 
   async function openLinks() {
-    ["#gate", "#settings", "#workspace", "#visibility", "#customize"].forEach((x) => ($(x).hidden = true));
+    ["#gate", "#settings", "#workspace", "#visibility", "#customize", "#apps"].forEach((x) => ($(x).hidden = true));
     $("#links").hidden = false;
     const body = $("#links-body"), st = (t) => ($("#links-status").textContent = t);
     $("#links-new").hidden = true; $("#links-new-box").hidden = true;
     if (!connected()) { body.innerHTML = notConnectedNote(); return; }
     body.innerHTML = `<p class="help">Loading…</p>`; st("");
     $("#links-new").hidden = false;
-    let reg;
-    try { reg = await readRegistry(); } catch (e) { body.innerHTML = ""; st(e.message); return; }
+    let reg, visits;
+    try { [reg, visits] = await Promise.all([readRegistry(), readVisits()]); } catch (e) { body.innerHTML = ""; st(e.message); return; }
+    const seen = (l) => { const d = visits?.links?.[l.id]; return d?.visitors ? `${d.visitors}<br><span class="vis-meta">last ${esc(fmtDay(d.last))}</span>` : visits ? "0" : "—"; };
     const today = new Date().toISOString().slice(0, 10);
     const links = reg.data.links.slice().reverse();
     if (!links.length) { body.innerHTML = `<p class="help">No tailored links yet. Make one with <b>New link</b>, or from a CV in its <b>Tailored link</b> tab.</p>`; return; }
     const state = (l) => (l.off ? "Switched off" : l.expires && l.expires < today ? "Ended" : "Active");
-    body.innerHTML = `<table class="links-table"><thead><tr><th>Company and role</th><th>Code</th><th>Made</th><th>Works until</th><th>State</th><th></th></tr></thead><tbody>${
+    body.innerHTML = `<table class="links-table"><thead><tr><th>Company and role</th><th>Code</th><th>Made</th><th>Works until</th><th>State</th><th>Visitors</th><th></th></tr></thead><tbody>${
       links.map((l) => `<tr data-id="${esc(l.id)}" class="${state(l) === "Active" ? "" : "state-off"}">
         <td><b>${esc(l.company || "—")}</b><br>${esc(l.role || "")}</td><td><code>${esc(l.id)}</code></td><td class="nowrap">${esc(l.created || "")}</td>
-        <td><input type="date" value="${esc(l.expires || "")}" aria-label="Works until"></td><td>${state(l)}</td>
+        <td><input type="date" value="${esc(l.expires || "")}" aria-label="Works until"></td><td>${state(l)}</td><td>${seen(l)}</td>
         <td><div class="link-actions"><button class="btn ghost small" data-act="copy" type="button">Copy link</button>${openBtn(linkUrl(l))}<button class="btn ghost small" data-act="edit" type="button">Edit</button>
           <button class="btn ghost small" data-act="toggle" type="button">${l.off ? "Switch on" : "Switch off"}</button></div></td></tr>`).join("")
     }</tbody></table>`;
@@ -490,6 +491,173 @@
   });
   $("#links-back").addEventListener("click", () => { $("#links").hidden = true; enterStudio(); });
 
+  /* ---------------- applications ---------------- */
+  // A private list of the jobs you've applied for, kept in applications.json in your private
+  // repository (never published). Each can point at its tailored link, whose visitors come from
+  // tracker/visits.json, written hourly from GoatCounter by .github/workflows/visits.yml.
+  const APP_STATUS = ["Preparing", "Applied", "Interviewing", "Offer", "Accepted", "Rejected", "Withdrawn", "No reply"];
+  const OPEN_STATUS = new Set(["Preparing", "Applied", "Interviewing", "Offer"]);
+  const STATUS_ORDER = { Offer: 0, Interviewing: 1, Applied: 2, Preparing: 3, Accepted: 4, "No reply": 5, Rejected: 6, Withdrawn: 7 };
+  const todayIso = () => new Date().toISOString().slice(0, 10);
+  const fmtDay = (d) => { if (!d) return ""; const x = new Date(d + "T12:00:00Z"); return isNaN(x) ? d : x.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }); };
+  const daysSince = (d) => (d ? Math.round((Date.parse(todayIso()) - Date.parse(d)) / 864e5) : null);
+  const appId = () => "a-" + linkCode();
+  const safeUrl = (u) => (/^https?:\/\//i.test(String(u || "").trim()) ? String(u).trim() : "");
+
+  async function readApps() {
+    const f = await ghGet("applications.json");
+    return { sha: f?.sha, data: f ? JSON.parse(f.text) : { applications: [] } };
+  }
+  async function readVisits() {
+    try { const f = await ghGet("tracker/visits.json"); return f ? JSON.parse(f.text) : null; } catch { return null; }
+  }
+  function visitsHtml(v, code) {
+    if (!code) return "";
+    const d = v?.links?.[code];
+    if (!d || !d.visitors) return `<span class="app-visits none">No visitors yet</span>`;
+    const pages = (d.pages || []).map((p) => {
+      const n = byId.get(p.page), name = p.page === "read" ? "Read as text" : n ? (n.short || n.label || n.name || p.page).replace(/\n/g, " ") : (p.title || p.page);
+      return `<li>${esc(name)} <span class="vis-meta">${p.visitors}</span></li>`;
+    }).join("");
+    const days = Object.entries(d.days || {}).map(([day, n]) => `<li>${esc(fmtDay(day))} <span class="vis-meta">${n}</span></li>`).join("");
+    return `<details class="app-visits"><summary><b>${d.visitors}</b> visitor${d.visitors === 1 ? "" : "s"}, last ${esc(fmtDay(d.last))}</summary>
+      <div class="app-visits-body"><div><h4>By day</h4><ul>${days}</ul></div>${pages ? `<div><h4>What they opened</h4><ul>${pages}</ul></div>` : ""}</div></details>`;
+  }
+  function appCard(a, links, v) {
+    const link = a.link && links.find((l) => l.id === a.link);
+    const age = daysSince(a.applied);
+    const due = a.followUp && a.followUp <= todayIso() && OPEN_STATUS.has(a.status);
+    const url = safeUrl(a.url);
+    const hist = (a.history || []).map((h) => `${esc(h.status)} ${esc(fmtDay(h.date))}`).join(" → ");
+    return `<article class="app ${OPEN_STATUS.has(a.status) ? "" : "closed"}" data-id="${esc(a.id)}">
+      <header class="app-head">
+        <div><h3>${esc(a.company || "—")}</h3><p class="app-role">${esc(a.role || "")}</p></div>
+        <select data-f="status" aria-label="Status for ${esc(a.company || "this application")}" class="app-status s-${esc((a.status || "").toLowerCase().replace(/\s+/g, "-"))}">
+          ${APP_STATUS.map((s) => `<option${s === a.status ? " selected" : ""}>${s}</option>`).join("")}</select>
+      </header>
+      <p class="app-meta">${a.applied ? `Applied ${esc(fmtDay(a.applied))}${age != null && age >= 0 ? ` <span class="vis-meta">(${age === 0 ? "today" : age === 1 ? "yesterday" : age + " days ago"})</span>` : ""}` : "Not applied yet"}
+        ${a.salary ? ` · Salary asked: ${esc(a.salary)}` : ""}${url ? ` · <a href="${esc(url)}" target="_blank" rel="noopener">Job posting</a>` : ""}</p>
+      ${a.link ? `<div class="app-link">${link ? `Tailored link <code>${esc(link.id)}</code>${link.off ? " (switched off)" : ""}` : `Tailored link <code>${esc(a.link)}</code> (no longer in your links)`} · ${visitsHtml(v, a.link)}</div>` : ""}
+      <div class="app-foot">
+        <div class="app-follow${due ? " due" : ""}"><label>Follow up on <input type="date" data-f="followUp" value="${esc(a.followUp || "")}"></label>${due ? ` <b>Due</b>` : ""}</div>
+        <details class="app-notes"${a.notes ? " open" : ""}><summary>Notes${hist ? " and history" : ""}</summary>
+          <textarea data-f="notes" rows="2" placeholder="Who you talked to, what's next…">${esc(a.notes || "")}</textarea>
+          ${hist ? `<p class="help">${hist}</p>` : ""}</details>
+        <div class="app-actions">${link ? `<button class="btn ghost small" data-act="copy" type="button">Copy link</button>${openBtn(linkUrl(link))}` : ""}
+          <button class="btn ghost small" data-act="edit" type="button">Edit</button>
+          <button class="btn ghost small" data-act="delete" type="button">Delete</button></div>
+      </div>
+    </article>`;
+  }
+  function appForm(a, links) {
+    const opt = (l) => `<option value="${esc(l.id)}"${l.id === a.link ? " selected" : ""}>${esc(l.company || "—")} · ${esc(l.role || "")} (${esc(l.id)})</option>`;
+    return `<form class="app-form">
+      <div class="grid2">
+        <div class="field"><label for="af-company">Company</label><input id="af-company" type="text" required value="${esc(a.company || "")}"></div>
+        <div class="field"><label for="af-role">Role</label><input id="af-role" type="text" value="${esc(a.role || "")}"></div>
+        <div class="field"><label for="af-applied">Applied on <span class="opt">empty if not yet</span></label><input id="af-applied" type="date" value="${esc(a.applied || "")}"></div>
+        <div class="field"><label for="af-status">Status</label><select id="af-status">${APP_STATUS.map((s) => `<option${s === (a.status || "Applied") ? " selected" : ""}>${s}</option>`).join("")}</select></div>
+        <div class="field"><label for="af-link">Tailored link <span class="opt">optional</span></label><select id="af-link"><option value="">None</option>${links.slice().reverse().map(opt).join("")}</select></div>
+        <div class="field"><label for="af-salary">Salary you asked for <span class="opt">optional</span></label><input id="af-salary" type="text" value="${esc(a.salary || "")}" placeholder="e.g. €63,000"></div>
+        <div class="field"><label for="af-url">Job posting <span class="opt">optional</span></label><input id="af-url" type="url" value="${esc(a.url || "")}" placeholder="https://…"></div>
+        <div class="field"><label for="af-follow">Follow up on <span class="opt">optional</span></label><input id="af-follow" type="date" value="${esc(a.followUp || "")}"></div>
+      </div>
+      <div class="field"><label for="af-notes">Notes <span class="opt">optional</span></label><textarea id="af-notes" rows="3">${esc(a.notes || "")}</textarea></div>
+      <div class="row end"><button class="btn ghost small" type="button" data-act="cancel">Cancel</button><button class="btn ink small" type="submit">Save</button></div>
+    </form>`;
+  }
+  async function openApps() {
+    ["#gate", "#settings", "#workspace", "#visibility", "#links", "#customize"].forEach((x) => ($(x).hidden = true));
+    $("#apps").hidden = false;
+    const body = $("#apps-body"), box = $("#apps-form-box"), st = (t) => ($("#apps-status").textContent = t);
+    $("#apps-new").hidden = true; box.hidden = true; box.innerHTML = "";
+    if (!connected()) { body.innerHTML = notConnectedNote(); $("#apps-summary").innerHTML = ""; return; }
+    body.innerHTML = `<p class="help">Loading…</p>`; st("");
+    let apps, reg, visits;
+    try { [apps, reg, visits] = await Promise.all([readApps(), readRegistry(), readVisits()]); }
+    catch (e) { body.innerHTML = ""; st(e.message); return; }
+    $("#apps-new").hidden = false;
+    const links = reg.data.links, list = apps.data.applications || [];
+    // one save at a time, so a note and a status changed together don't overwrite each other
+    let chain = Promise.resolve();
+    const save = (mutate, msg, after) => (chain = chain.then(() => saveNow(mutate, msg, after)));
+    const saveNow = async (mutate, msg, after) => {
+      st("Saving…");
+      try { const r = await readApps(); r.data.applications = r.data.applications || []; mutate(r.data.applications); await ghPut("applications.json", JSON.stringify(r.data, null, 2) + "\n", r.sha, msg); st("Saved."); after ? after() : openApps(); }
+      catch (e) { st(e.message); }
+    };
+    const showForm = (a, isNew) => {
+      box.hidden = false; $("#apps-new").hidden = true;
+      box.innerHTML = `<h3 style="margin:0 0 10px">${isNew ? "New application" : `Edit ${esc(a.company || "application")}`}</h3>${appForm(a, links)}`;
+      const f = box.querySelector("form");
+      f.querySelector('[data-act="cancel"]').addEventListener("click", () => { box.hidden = true; box.innerHTML = ""; $("#apps-new").hidden = false; });
+      // choosing a link fills in its company and role if they're still empty
+      f.querySelector("#af-link").addEventListener("change", (e) => {
+        const l = links.find((x) => x.id === e.target.value); if (!l) return;
+        if (!$("#af-company").value) $("#af-company").value = l.company || "";
+        if (!$("#af-role").value) $("#af-role").value = l.role || "";
+      });
+      f.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const val = (id) => $(id).value.trim();
+        const next = { company: val("#af-company"), role: val("#af-role"), applied: val("#af-applied"), status: val("#af-status"),
+          link: val("#af-link"), salary: val("#af-salary"), url: val("#af-url"), followUp: val("#af-follow"), notes: $("#af-notes").value.trim() };
+        Object.keys(next).forEach((k) => { if (next[k] === "" && k !== "company") delete next[k]; });
+        if (isNew) {
+          const item = { id: appId(), ...next, history: [{ status: next.status, date: next.applied || todayIso() }] };
+          save((as) => as.push(item), `Application: ${next.company}${next.role ? ", " + next.role : ""}`);
+        } else {
+          save((as) => {
+            const x = as.find((y) => y.id === a.id); if (!x) throw new Error("This application was deleted in the meantime.");
+            if (x.status !== next.status) (x.history = x.history || []).push({ status: next.status, date: todayIso() });
+            for (const k of ["company", "role", "applied", "status", "link", "salary", "url", "followUp", "notes"]) { if (k in next) x[k] = next[k]; else delete x[k]; }
+          }, `Application ${a.company}: edited`);
+        }
+      });
+      box.scrollIntoView({ behavior: "smooth", block: "start" });
+      $("#af-company").focus({ preventScroll: true });
+    };
+    $("#apps-new").onclick = () => showForm({ status: "Applied", applied: todayIso() }, true);
+
+    // summary: where things stand, and links that have no application yet
+    const count = (s) => list.filter((a) => a.status === s).length;
+    const totalVisitors = Object.values(visits?.links || {}).reduce((n, d) => n + (d.visitors || 0), 0);
+    const unlinked = links.filter((l) => !l.off && !list.some((a) => a.link === l.id));
+    $("#apps-summary").innerHTML = list.length ? `<p class="apps-counts">${[["Applied", count("Applied")], ["Interviewing", count("Interviewing")], ["Offer", count("Offer") + count("Accepted")], ["Closed", count("Rejected") + count("Withdrawn") + count("No reply")]]
+      .map(([k, n]) => `<span><b>${n}</b> ${k.toLowerCase()}</span>`).join("")}<span><b>${totalVisitors}</b> link visitor${totalVisitors === 1 ? "" : "s"}</span></p>
+      <p class="help">${visits ? `Visitor counts come from GoatCounter every hour${visits.updated ? `; the last new visit was recorded ${esc(fmtDay(visits.updated.slice(0, 10)))}` : ""}. People who block trackers aren't counted, so a link can be opened without showing up here.` : "Visitor counts appear here once the hourly <code>Visit counts</code> workflow has run (it needs the <code>GOATCOUNTER_TOKEN</code> secret)."}</p>` : "";
+    const sorted = list.slice().sort((a, b) => (STATUS_ORDER[a.status] ?? 9) - (STATUS_ORDER[b.status] ?? 9) || String(b.applied || "9").localeCompare(String(a.applied || "9")));
+    body.innerHTML = (unlinked.length ? `<div class="note apps-unlinked"><b>Tailored links without an application:</b> ${unlinked.map((l) => `<button class="btn ghost small" type="button" data-from-link="${esc(l.id)}">Add ${esc(l.company || l.id)}</button>`).join(" ")}</div>` : "")
+      + (sorted.length ? sorted.map((a) => appCard(a, links, visits)).join("") : `<p class="help">No applications yet. Add one with <b>New application</b>.</p>`);
+
+    $$("#apps-body [data-from-link]").forEach((b) => b.addEventListener("click", () => {
+      const l = links.find((x) => x.id === b.dataset.fromLink);
+      showForm({ company: l.company, role: l.role, link: l.id, status: "Applied", applied: (l.created || todayIso()).slice(0, 10) }, true);
+    }));
+    $$("#apps-body article.app").forEach((el) => {
+      const id = el.dataset.id, a = list.find((x) => x.id === id);
+      const link = a.link && links.find((l) => l.id === a.link);
+      const setField = (field, value, msg) => save((as) => {
+        const x = as.find((y) => y.id === id); if (!x) throw new Error("This application was deleted in the meantime.");
+        if (field === "status" && x.status !== value) (x.history = x.history || []).push({ status: value, date: todayIso() });
+        if (value) x[field] = value; else delete x[field];
+      }, msg, field === "notes" ? () => {} : undefined);
+      el.querySelector('[data-f="status"]').addEventListener("change", (e) => setField("status", e.target.value, `Application ${a.company}: ${e.target.value}`));
+      el.querySelector('[data-f="followUp"]').addEventListener("change", (e) => setField("followUp", e.target.value, `Application ${a.company}: follow up ${e.target.value || "cleared"}`));
+      el.querySelector('[data-f="notes"]').addEventListener("change", (e) => setField("notes", e.target.value.trim(), `Application ${a.company}: notes`));
+      el.querySelector('[data-act="edit"]').addEventListener("click", () => showForm(a, false));
+      const del = el.querySelector('[data-act="delete"]');
+      del.addEventListener("click", () => {
+        if (del.dataset.armed) return save((as) => { const i = as.findIndex((y) => y.id === id); if (i >= 0) as.splice(i, 1); }, `Application ${a.company}: deleted`);
+        del.dataset.armed = "1"; del.textContent = "Delete for good?"; del.classList.add("danger");
+        setTimeout(() => { if (del.isConnected) { delete del.dataset.armed; del.textContent = "Delete"; del.classList.remove("danger"); } }, 4000);
+      });
+      if (link) el.querySelector('[data-act="copy"]').addEventListener("click", () => G.copyText(linkUrl(link)).then(() => toast("Link copied")));
+    });
+  }
+  $("#studio-apps-btn").addEventListener("click", openApps);
+  $("#apps-back").addEventListener("click", () => { $("#apps").hidden = true; enterStudio(); });
+
   /* ---------------- what visitors see ---------------- */
   const VIS_GROUPS = [
     ["Experience", ["Role", "Break"]], ["Education", ["Education"]], ["Projects", ["Project"]],
@@ -512,7 +680,7 @@
   }
 
   function openVisibility() {
-    ["#gate", "#settings", "#workspace", "#links", "#customize"].forEach((x) => ($(x).hidden = true));
+    ["#gate", "#settings", "#workspace", "#links", "#customize", "#apps"].forEach((x) => ($(x).hidden = true));
     $("#visibility").hidden = false;
     const O = window.GR_OWNER || {};
     if (!G.ownerView || !O.configured) {
