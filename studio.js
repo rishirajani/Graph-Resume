@@ -1509,22 +1509,26 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     return parts.join("  |  ");
   }
   // Experience as shown on a CV: newest first, and a role combined with the roles it was promoted from
+  // One CV entry per job: a role and the roles it was promoted from (or to) are shown together,
+  // under the latest title, with the dates of the whole stay. The model may pick any one of them;
+  // the rest of the chain comes from the graph so the dates and titles are never cut short.
   function experienceView(list) {
     const items = (list || []).filter((x) => byId.has(x.id));
     const inList = new Map(items.map((x) => [x.id, x]));
-    const absorbed = new Set();
-    const view = items.map((x) => {
-      const n = byId.get(x.id), earlier = [];
-      let bul = [...(x.bullets || [])], start = n.start, p = n.promotedFrom;
-      while (p && inList.has(p) && !absorbed.has(p)) {
-        const e = byId.get(p); absorbed.add(p); earlier.push(e);
-        bul = bul.concat(inList.get(p).bullets || []);
-        if (e.start && (!start || e.start < start)) start = e.start;
-        p = e.promotedFrom;
-      }
+    const promotedTo = new Map();
+    for (const n of allNodes) if (n.promotedFrom && byId.has(n.promotedFrom)) promotedTo.set(n.promotedFrom, n.id);
+    const topOf = (id) => { const seen = new Set([id]); while (promotedTo.has(id) && !seen.has(promotedTo.get(id))) { id = promotedTo.get(id); seen.add(id); } return id; };
+    const groups = new Map();
+    for (const x of items) { const t = topOf(x.id); if (!groups.has(t)) groups.set(t, []); groups.get(t).push(x); }
+    const view = [...groups.entries()].map(([topId, picked]) => {
+      const chain = [];
+      for (let id = topId, seen = new Set(); id && byId.has(id) && !seen.has(id); id = byId.get(id).promotedFrom) { seen.add(id); chain.push(byId.get(id)); }
+      const n = chain[0], earlier = chain.slice(1);
+      let bul = chain.flatMap((c) => (inList.get(c.id)?.bullets || []));
       if (earlier.length) bul = bul.filter((b) => !/^(promoted|befördert)\b/i.test(String(b).trim()));
-      return { id: x.id, node: n, earlier, bullets: bul, start };
-    }).filter((e) => !absorbed.has(e.id));
+      const start = chain.map((c) => c.start).filter(Boolean).sort()[0] || n.start;
+      return { id: n.id, node: n, earlier, bullets: bul, start, order: Math.min(...picked.map((x) => items.indexOf(x))) };
+    });
     const key = (e) => String(e.start || "0000");
     return view.sort((a, b) => key(b).localeCompare(key(a)) || String(b.node.end || "9999").localeCompare(String(a.node.end || "9999")));
   }
