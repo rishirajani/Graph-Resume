@@ -1373,7 +1373,14 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
       let cut = from + perPage;
       // an entry isn't split across pages, and a heading stays with what follows it
       const item = keep.find((n) => n.matches(WHOLE) && y(n) < cut && yb(n) > cut && y(n) > from);
-      if (item) cut = y(item);
+      if (item) {
+        // an entry with four or more bullets may break between bullets, keeping its title with the
+        // first two and the last two together (the same rules styles.css gives the printer)
+        const lis = item.matches(".p-item") ? [...item.querySelectorAll(":scope > ul > li")] : [];
+        let k = -1;
+        if (lis.length >= 4) for (let i = 2; i <= lis.length - 2; i++) if (yb(lis[i - 1]) <= cut + 0.5 && y(lis[i]) > from + 1) k = i;
+        cut = k > 0 ? y(lis[k]) : y(item);
+      }
       const head = keep.find((n) => n.nodeName === "H2" && y(n) < cut && (!firstAfter(n) || y(firstAfter(n)) >= cut - 1) && y(n) > from);
       if (head) cut = y(head);
       // the block that starts the next page, by its place in the page (same order on screen)

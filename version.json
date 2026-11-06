@@ -1,9 +1,9 @@
 {
-  "version": "1.10.1",
+  "version": "1.10.2",
   "date": "2026-11-05",
   "notes": [
-    "Jobs: each posting links to the real job page (the employer's site, or the agency's listing), never a site's home page; descriptions come in full from the employer's job system when it has a public one (Ashby, Greenhouse, Lever, SmartRecruiters); postings first listed more than three months ago are marked.",
-    "New in the studio: Jobs. Every morning a job search in your private repository looks for new postings that fit the role types, places and limits in jobs/preferences.json, ranks them against your graph's skills, and lists them here with the reasons and warnings (for example German required). From each you can write a CV and letter, add it to Applications, save it or set it aside."
+    "CVs waste less space at page ends: an entry with four or more bullets can continue on the next page (its title stays with the first two bullets, the last two stay together), on screen and in the PDF alike. The page number between sheets is centred.",
+    "Jobs: each posting links to the real job page (the employer's site, or the agency's listing), never a site's home page; descriptions come in full from the employer's job system when it has a public one (Ashby, Greenhouse, Lever, SmartRecruiters); postings first listed more than three months ago are marked."
   ],
   "files": [
     "index.html",

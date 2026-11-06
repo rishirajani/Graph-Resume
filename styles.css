@@ -304,7 +304,7 @@ a.btn { text-decoration: none; color: var(--ink); display: inline-flex; align-it
 .page-guide.gap { border: 0; opacity: 1; background: var(--paper-2); box-sizing: border-box; }
 /* while you edit, each sheet gets its own outline: the gap between sheets covers the page's outline there and draws the sheet edges */
 .paper-wrap:has(.paper:focus-visible) .page-guide.gap { border-top: 2px solid var(--c-role); border-bottom: 2px solid var(--c-role); }
-.page-guide.gap span { top: 2px; right: auto; left: 50%; transform: translateX(-50%); background: transparent; color: var(--muted); }
+.page-guide.gap span { top: 50%; right: auto; left: 50%; transform: translate(-50%, -50%); line-height: 1; padding: 0; background: transparent; color: var(--muted); }
 .page-guide span { position: absolute; right: 4px; top: -8px; font: 650 9.5px/14px var(--sans); color: #B03A2E; background: #fff; padding: 0 4px; white-space: nowrap; }
 .paper {
   --cv-accent: #1D2A40;
@@ -326,6 +326,12 @@ a.btn { text-decoration: none; color: var(--ink); display: inline-flex; align-it
 .paper.letter p { orphans: 2; widows: 2; }
 .paper.letter .l-head, .paper.letter .l-meta { break-inside: avoid; }
 .paper .p-item { margin: 0 0 7pt; break-inside: avoid; }
+/* an entry with four or more bullets may continue on the next page: its title stays with the first
+   two bullets and the last two stay together (studio.js pageCuts follows the same rules) */
+.paper .p-item:has(> ul > li:nth-child(4)) { break-inside: auto; }
+.paper .p-item .p-row, .paper .p-item .p-sub { break-after: avoid; }
+.paper .p-item li { break-inside: avoid; }
+.paper .p-item li:nth-child(2), .paper .p-item li:last-child { break-before: avoid; }
 .paper .p-row { display: flex; justify-content: space-between; gap: 10pt; }
 .paper .p-title { font-weight: 650; }
 .paper .p-dates { color: #444; white-space: nowrap; font-size: 9.4pt; }
