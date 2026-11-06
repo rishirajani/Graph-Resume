@@ -991,6 +991,7 @@
       ? "At most 3 bullets per role, at most 2 projects with at most 2 bullets each, profile summary at most 55 words, at most 4 skill groups."
       : "At most 5 bullets per role, at most 4 projects with at most 3 bullets each, profile summary at most 80 words.";
     const lang = input.lang === "auto" ? "the same language as the job description" : input.lang;
+    const british = input.lang === "British English";
     const system = `You write CVs and cover letters for one specific job, using ONLY the candidate's knowledge graph (JSON below).
 
 Hard rules
@@ -1002,6 +1003,7 @@ Hard rules
 6. Choose projects by relevance to this job. The app lists projects, education, awards and certifications newest first, and experience newest first and combines a role with the role it was promoted from (promotedFrom), so list experience in any order and do not write a bullet that only states a promotion. Leave out nodes that do not help this application, with one exception: always include current roles (no end date), even unrelated ones, with at least one short bullet, so the timeline has no apparent gap. Likewise include a "Break" node in experience (using its id, with its summary condensed into one bullet) whenever omitting it would leave an unexplained gap of six months or more between the roles you list.
 7. Keep the graph's limiting words when you rephrase a fact: "proof of concept", "prototype", "pilot", "co-defined", "together with", "supported", "part-time", "coursework" and the like stay attached to that fact in the CV and the letter. Never turn a proof of concept into a production system or a shared result into a solo one.
 8. Skills with "evidence": "coursework only" were learned in a degree, not used in work or projects. Include one only if the job asks for it, and then only in a skill group named for coursework (in ${lang}, e.g. "Coursework"), never in bullets or the profile as practical experience.
+8b. In English, use ${british ? "British spelling (organise, recognised, modelling, colour, centre)" : "American spelling (organize, recognized, analyze, modeling, color, center), as the graph does"} consistently in the CV and the letter.
 9. If the candidate's availability is given, state it once, in the cover letter's last paragraph, in your own words. Otherwise say nothing about start dates.
 10. The cover letter is 230 to 340 words, 3 or 4 paragraphs, specific to this company and role. No clichés such as "I am writing to express my interest". Do not include the address block, date or signature; the app adds them.
 11. Write everything in ${lang}. Return section titles in that language too.
@@ -1131,6 +1133,20 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
   }
 
   /* ================= grounding check ================= */
+  // common British spellings in CVs and letters, and their American forms
+  const BRITISH_STEMS = "organi|recogni|prioriti|optimi|standardi|visuali|utili|speciali|summari|minimi|maximi|customi|centrali|normali|categori|characteri|finali|initiali|authori|emphasi|mobili|moneti|personali|operationali|productioni|containeri|digitali|synchroni|tokeni|vectori|apologi|familiari|moderni|industriali|capitali|stabili|generali|formali";
+  const BRITISH_RE = new RegExp(`\\b(?:(?:${BRITISH_STEMS})s(?:e|ed|es|ing|ation|ations|er|ers)|(?:analy|paraly|cataly)s(?:e|ed|ing)|model+ing|modelled|labelled|labelling|travelled|travelling|cancelled|behaviours?|colours?|favour(?:ed|ite|able)?|honour(?:ed)?|labour|centres?|programmes?|licenced|catalogue|judgement|enrolment|fulfilment|defence|neighbour(?:ing|hood)?)\\b`, "gi");
+  function toAmerican(w) {
+    const lower = w.toLowerCase(), cap = (x) => (w[0] === w[0].toUpperCase() ? x[0].toUpperCase() + x.slice(1) : x);
+    const map = { modelling: "modeling", modelled: "modeled", labelled: "labeled", labelling: "labeling", travelled: "traveled", travelling: "traveling", cancelled: "canceled",
+      labour: "labor", catalogue: "catalog", judgement: "judgment", enrolment: "enrollment", fulfilment: "fulfillment", defence: "defense", licenced: "licensed" };
+    if (map[lower]) return cap(map[lower]);
+    if (/^(?:analy|paraly|cataly)s/.test(lower)) return cap(lower.replace(/s(e|ed|es|ing)$/, "z$1"));
+    if (/our/.test(lower)) return cap(lower.replace("our", "or"));
+    if (/^centre/.test(lower)) return cap(lower.replace("centre", "center"));
+    if (/^programme/.test(lower)) return cap(lower.replace("programme", "program"));
+    return cap(lower.replace(/is(e|ed|es|ing|ation|ations|er|ers)$/, "iz$1"));
+  }
   function groundingCheck(result) {
     const warnings = [];
     const known = (id) => byId.has(id);
@@ -1166,6 +1182,12 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
       if (!lowerCorpus.includes(m.toLowerCase().replace(/\s+/g, " "))) yearClaims.add(m);
     }));
     if (yearClaims.size) warnings.push(`Years-of-experience claims your graph doesn't state: ${[...yearClaims].join(", ")}. Add dates to your roles or remove the claim.`);
+    // spelling: the graph is written in American English, so British forms in an American CV stand out
+    if (/^en/i.test(result.job?.languageCode || "en") && result.spelling !== "British") {
+      const found = new Map();
+      texts.forEach((t) => (String(t).match(BRITISH_RE) || []).forEach((w) => found.set(w, toAmerican(w))));
+      if (found.size) warnings.push(`British spellings in an American-English CV or letter: ${[...found].map(([b, a]) => `${b} → ${a}`).join(", ")}. Fix them in the text, or choose British spelling before generating.`);
+    }
 
     // drafts used
     const used = new Set([...(cv.experience || []), ...(cv.projects || []), ...(cv.education || [])].map((x) => x.id));
@@ -1227,6 +1249,7 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
       const out = await callModel(buildPrompt(input), (n, note) => status(note || `Writing from your graph… ${(n / 1000).toFixed(1)}k characters`));
       const result = parseModelJson(out.text);
       result.writtenBy = out.model;
+      result.spelling = input.lang === "British English" ? "British" : "American";
       result.warnings = groundingCheck(result);
       current = { input, result, at: Date.now() };
       saveHistory(current);

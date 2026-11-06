@@ -1,9 +1,9 @@
 {
-  "version": "1.10.2",
+  "version": "1.10.3",
   "date": "2026-11-05",
   "notes": [
-    "CVs waste less space at page ends: an entry with four or more bullets can continue on the next page (its title stays with the first two bullets, the last two stay together), on screen and in the PDF alike. The page number between sheets is centred.",
-    "Jobs: each posting links to the real job page (the employer's site, or the agency's listing), never a site's home page; descriptions come in full from the employer's job system when it has a public one (Ashby, Greenhouse, Lever, SmartRecruiters); postings first listed more than three months ago are marked."
+    "English CVs and letters now use American spelling consistently (organize, recognized, modeling), like the graph, and the studio warns about any British forms that slip in. Choose \"English (British spelling)\" for a UK employer. The Job description button is now called CV & letter.",
+    "CVs waste less space at page ends: an entry with four or more bullets can continue on the next page (its title stays with the first two bullets, the last two stay together), on screen and in the PDF alike. The page number between sheets is centred."
   ],
   "files": [
     "index.html",
