@@ -1,8 +1,8 @@
 {
-  "version": "1.10.4",
+  "version": "1.10.5",
   "date": "2026-11-07",
   "notes": [
-    "With British spelling chosen, the parts of a CV taken straight from your graph (skill names, skill groups, award notes and project titles) now use British spelling too, so a UK CV no longer mixes \"Recognized\" and \"modelling\". Names of organisations, schools and job titles stay as written. The studio also warns about American spellings that slip into a British CV or letter."
+    "The PDF now has the same pages as the preview. The printed copy breaks exactly where the preview shows a new page, and the preview leaves a few millimetres spare on each page, because browsers lay text out slightly differently on paper (fonts, zoom and operating system all play a part). Before, a CV that showed two pages could print on three. Some CVs that only just fitted will now show an extra page in the preview; that is what would have printed."
   ],
   "files": [
     "index.html",

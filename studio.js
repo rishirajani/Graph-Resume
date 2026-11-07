@@ -1385,11 +1385,21 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
   const SHEET_GAP = 18; // px of grey between sheets on screen
   const BLOCKS = "h1, h2, .p-item, .p-skills > p, .p-summary, .l-head, .l-meta, p, ul > li";
   const pageMargin = (el) => (el.classList.contains("cv-compact") ? 11 : 15);
+  const PRINT_SLACK_MM = 6;
   // a copy of the page without the on-screen sheet spacing, for exports and measuring
   function cleanCopy(paper) {
     const c = paper.cloneNode(true);
     c.removeAttribute("contenteditable"); c.style.removeProperty("min-height"); c.classList.remove("sheets");
     c.querySelectorAll(".pg-start").forEach((e) => { e.classList.remove("pg-start"); e.style.removeProperty("margin-top"); if (!e.getAttribute("class")) e.removeAttribute("class"); if (!e.getAttribute("style")) e.removeAttribute("style"); });
+    return c;
+  }
+  // the copy that goes to the printer: page breaks forced where the screen shows them, so the PDF has
+  // the same pages as the preview instead of the browser working them out again
+  function printCopy(paper) {
+    const c = cleanCopy(paper);
+    if (!paper.textContent.trim()) return c;
+    const blocks = [...c.querySelectorAll(BLOCKS)];
+    pageCuts(paper).forEach((cut) => { const b = cut.at >= 0 ? blocks[cut.at] : null; if (b) b.style.breakBefore = "page"; });
     return c;
   }
   function pageCuts(paper) {
@@ -1400,7 +1410,9 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     el.style.cssText += `;width:210mm !important;min-height:0 !important;padding:0 ${side}mm !important;margin:0 !important;box-sizing:border-box !important`;
     probe.appendChild(el); document.body.appendChild(probe);
     const pr = el.getBoundingClientRect(), mm = pr.width / 210;
-    const perPage = (297 - 2 * pageMargin(el)) * mm;
+    // a little short of the sheet: browsers lay text out a few pixels differently on screen and on
+    // paper (fonts, zoom, operating system), and the printed copy breaks exactly where the screen does
+    const perPage = (297 - 2 * pageMargin(el) - PRINT_SLACK_MM) * mm;
     const y = (n) => n.getBoundingClientRect().top - pr.top, yb = (n) => n.getBoundingClientRect().bottom - pr.top;
     const blocks = [...el.querySelectorAll(BLOCKS)];
     // blocks printed whole (styles.css keeps them together): entries, skill lines, summaries, letter heads
@@ -1882,7 +1894,7 @@ ${fontLink()}
 @media print{.paper{width:auto;min-height:0;margin:0;padding-top:0!important;padding-bottom:0!important}.paper.cv-compact{page:compact}.print-hint{display:none}}
 .print-hint{font:14px/1.45 system-ui,sans-serif;background:#FFF6D6;border-bottom:1px solid #E8D48A;padding:10px 16px;text-align:center}
 @media screen{body{background:#DCE1E7}.paper{margin:20px auto;box-shadow:0 1px 4px rgba(0,0,0,.15)}}</style></head>
-<body><div class="print-hint">This is a print-ready page, not the PDF yet. Press <b>Ctrl+P</b> (<b>⌘P</b> on a Mac), choose <b>Save as PDF</b> and paper size <b>A4</b>, with margins left at default.</div>${cleanCopy(root).outerHTML}<script>document.fonts.ready.then(()=>setTimeout(()=>print(),300))<\/script></body></html>`;
+<body><div class="print-hint">This is a print-ready page, not the PDF yet. Press <b>Ctrl+P</b> (<b>⌘P</b> on a Mac), choose <b>Save as PDF</b> and paper size <b>A4</b>, with margins left at default.</div>${printCopy(root).outerHTML}<script>document.fonts.ready.then(()=>setTimeout(()=>print(),300))<\/script></body></html>`;
   }
 
   async function doPrint(root, title) {
@@ -1894,7 +1906,7 @@ ${fontLink()}
       return;
     }
     const pr = $("#print-root");
-    pr.innerHTML = ""; pr.appendChild(cleanCopy(root));
+    pr.innerHTML = ""; pr.appendChild(printCopy(root));
     const old = document.title; document.title = title;
     setTimeout(() => { window.print(); document.title = old; pr.innerHTML = ""; }, 60);
   }
