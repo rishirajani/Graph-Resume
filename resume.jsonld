@@ -779,22 +779,35 @@
       "weft:kind": "Project",
       "startDate": "2026-05",
       "endDate": "2026-09",
-      "url": "https://github.com/rishirajani/UrbanHeatRiskReasoning",
+      "url": "https://github.com/adam979/HeatRiskReasoning",
       "weft:highlight": [
-        "Integrated CityGML, OpenStreetMap, climate, vegetation and building data into RDF representations; applied SPARQL and semantic reasoning to assess urban heat risk and identify vulnerable buildings."
+        "In a two-person team, built an RDF/OWL knowledge graph of heat risk in Stuttgart-Mitte that links CityGML LoD2 buildings, climate observations, OpenStreetMap vegetation, terrain and satellite land cover through shared zone and building URIs, reusing BOT, GeoSPARQL and SOSA/SSN; it covers 5,801 buildings in about 222,000 triples and is queried with SPARQL.",
+        "Reworked the ontology (an assessment-node pattern, the class hierarchy and the namespaces) and restructured the pipeline around it: wrote the composite risk score and the pipeline orchestrator, added OpenStreetMap enrichment, and refactored the CityGML converter, climate ingestion and reasoner.",
+        "Replaced hard-coded indicators with measured data: topographic exposure from DGM1 terrain (TPI) instead of fixed per-zone basin depths, and Copernicus CLMS tree canopy and imperviousness instead of a fixed imperviousness of 0.80.",
+        "Added a 100 m sub-zone grid of 400 cells that re-resolves four of the six indicators per cell, turning four flat zone scores into a continuous risk gradient.",
+        "Validated the ranking against a published benchmark (Theeuwes et al., 2017) and Landsat 8/9 surface temperature, handling scene selection, cloud masking and overpass-time checks (Spearman ρ = 0.61 across 400 grid cells), and tested robustness with a ±25% weight sensitivity analysis."
       ],
       "weft:used": [
         {
           "@id": "cv:s-rdf"
         },
         {
+          "@id": "cv:s-owl"
+        },
+        {
           "@id": "cv:s-sparql"
+        },
+        {
+          "@id": "cv:s-ontology"
+        },
+        {
+          "@id": "cv:s-semmodel"
         },
         {
           "@id": "cv:s-integration"
         },
         {
-          "@id": "cv:s-semmodel"
+          "@id": "cv:s-python"
         },
         {
           "@id": "cv:s-git"
@@ -809,7 +822,9 @@
       "startDate": "2026-04",
       "endDate": "2026-09",
       "weft:highlight": [
-        "Designed Turtle ontologies for crane navigation and urban landscape analysis; loaded RDF into Neo4j with neosemantics for Cypher-based querying of spatial relationships and constraints."
+        "Designed Turtle ontologies for crane navigation and urban landscape analysis.",
+        "Imported the spider-crane navigation ontology into Neo4j's labeled property graph with neosemantics (438 RDF triples, with registered namespace prefixes so labels stay readable) and explored its classes, zone transitions and mobility modes in Cypher.",
+        "Because neosemantics does not execute SWRL rules, represented the rule-based inferences as materialized triples and equivalent Cypher MERGE operations."
       ],
       "weft:used": [
         {
