@@ -394,7 +394,8 @@ window.RESUME = {
       "start": "2026-10",
       "url": "https://w3id.org/weft",
       "highlights": [
-        "Designed Weft, an OWL vocabulary of 28 terms extending Schema.org that links each skill to the roles, projects, courses and certifications behind it; published it under CC BY 4.0 with permanent w3id.org IRIs that resolve by content negotiation to documentation in HTML, Turtle, JSON-LD and RDF/XML, versioned IRIs for each release (weft/1.0) with a changelog, plus a JSON-LD context and an example that uses every term.",
+        "Designed Weft, an OWL vocabulary of 28 terms extending Schema.org that links each skill to the roles, projects, courses and certifications behind it; published it under CC BY 4.0 with documentation in HTML, Turtle, JSON-LD and RDF/XML, a JSON-LD context and an example that uses every term.",
+        "Gave every term a permanent w3id.org IRI that resolves by content negotiation, with versioned IRIs for each release (weft/1.0) and a changelog.",
         "Linked 69 skills and 5 languages to Wikidata and ESCO with SKOS exactMatch/closeMatch mappings.",
         "Validated the published graph with SHACL shapes and domain/range checks in a GitHub Actions pipeline that blocks publishing on violations."
       ],
