@@ -1,9 +1,8 @@
 {
-  "version": "1.10.3",
-  "date": "2026-11-05",
+  "version": "1.10.4",
+  "date": "2026-11-07",
   "notes": [
-    "English CVs and letters now use American spelling consistently (organize, recognized, modeling), like the graph, and the studio warns about any British forms that slip in. Choose \"English (British spelling)\" for a UK employer. The Job description button is now called CV & letter.",
-    "CVs waste less space at page ends: an entry with four or more bullets can continue on the next page (its title stays with the first two bullets, the last two stay together), on screen and in the PDF alike. The page number between sheets is centred."
+    "With British spelling chosen, the parts of a CV taken straight from your graph (skill names, skill groups, award notes and project titles) now use British spelling too, so a UK CV no longer mixes \"Recognized\" and \"modelling\". Names of organisations, schools and job titles stay as written. The studio also warns about American spellings that slip into a British CV or letter."
   ],
   "files": [
     "index.html",

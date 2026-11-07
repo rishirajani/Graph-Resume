@@ -1134,7 +1134,7 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
 
   /* ================= grounding check ================= */
   // common British spellings in CVs and letters, and their American forms
-  const BRITISH_STEMS = "organi|recogni|prioriti|optimi|standardi|visuali|utili|speciali|summari|minimi|maximi|customi|centrali|normali|categori|characteri|finali|initiali|authori|emphasi|mobili|moneti|personali|operationali|productioni|containeri|digitali|synchroni|tokeni|vectori|apologi|familiari|moderni|industriali|capitali|stabili|generali|formali";
+  const BRITISH_STEMS = "organi|recogni|reali|prioriti|optimi|standardi|visuali|utili|speciali|summari|minimi|maximi|customi|centrali|normali|categori|characteri|finali|initiali|authori|emphasi|mobili|moneti|personali|operationali|productioni|containeri|digitali|synchroni|tokeni|vectori|apologi|familiari|moderni|industriali|capitali|stabili|generali|formali";
   const BRITISH_RE = new RegExp(`\\b(?:(?:${BRITISH_STEMS})s(?:e|ed|es|ing|ation|ations|er|ers)|(?:analy|paraly|cataly)s(?:e|ed|ing)|model+ing|modelled|labelled|labelling|travelled|travelling|cancelled|behaviours?|colours?|favour(?:ed|ite|able)?|honour(?:ed)?|labour|centres?|programmes?|licenced|catalogue|judgement|enrolment|fulfilment|defence|neighbour(?:ing|hood)?)\\b`, "gi");
   function toAmerican(w) {
     const lower = w.toLowerCase(), cap = (x) => (w[0] === w[0].toUpperCase() ? x[0].toUpperCase() + x.slice(1) : x);
@@ -1147,6 +1147,19 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     if (/^programme/.test(lower)) return cap(lower.replace("programme", "program"));
     return cap(lower.replace(/is(e|ed|es|ing|ation|ations|er|ers)$/, "iz$1"));
   }
+  // the reverse: American forms (as the graph writes them) and their British spellings
+  const AMERICAN_RE = new RegExp(`\\b(?:(?:${BRITISH_STEMS})z(?:e|ed|es|ing|ation|ations|er|ers)|(?:analy|paraly|cataly)z(?:e|ed|es|ing)|modeling|modeled|labeled|labeling|traveled|traveling|canceled|behaviors?|colors?|favor(?:ed|ite|able)?|honor(?:ed)?|labor|centers?|catalog|defense|enrollment|fulfillment)\\b`, "gi");
+  function toBritish(w) {
+    const lower = w.toLowerCase(), cap = (x) => (w[0] === w[0].toUpperCase() ? x[0].toUpperCase() + x.slice(1) : x);
+    const map = { modeling: "modelling", modeled: "modelled", labeled: "labelled", labeling: "labelling", traveled: "travelled", traveling: "travelling", canceled: "cancelled",
+      labor: "labour", catalog: "catalogue", defense: "defence", enrollment: "enrolment", fulfillment: "fulfilment" };
+    if (map[lower]) return cap(map[lower]);
+    if (/^(?:analy|paraly|cataly)z/.test(lower)) return cap(lower.replace(/z(e|ed|es|ing)$/, "s$1"));
+    if (/^(?:behavior|color|favor|honor)/.test(lower)) return cap(lower.replace("or", "our"));
+    if (/^center/.test(lower)) return cap(lower.replace("center", "centre"));
+    return cap(lower.replace(/iz(e|ed|es|ing|ation|ations|er|ers)$/, "is$1"));
+  }
+  const britishText = (t) => String(t).replace(AMERICAN_RE, toBritish);
   function groundingCheck(result) {
     const warnings = [];
     const known = (id) => byId.has(id);
@@ -1187,6 +1200,12 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
       const found = new Map();
       texts.forEach((t) => (String(t).match(BRITISH_RE) || []).forEach((w) => found.set(w, toAmerican(w))));
       if (found.size) warnings.push(`British spellings in an American-English CV or letter: ${[...found].map(([b, a]) => `${b} → ${a}`).join(", ")}. Fix them in the text, or choose British spelling before generating.`);
+    }
+    // and the reverse; skill names, award notes and project titles from the graph are converted when the CV is drawn
+    if (/^en/i.test(result.job?.languageCode || "en") && result.spelling === "British") {
+      const found = new Map();
+      texts.forEach((t) => (String(t).match(AMERICAN_RE) || []).forEach((w) => found.set(w, toBritish(w))));
+      if (found.size) warnings.push(`American spellings in a British-English CV or letter: ${[...found].map(([a, b]) => `${a} → ${b}`).join(", ")}. Fix them in the text, or choose American spelling before generating.`);
     }
 
     // drafts used
@@ -1689,6 +1708,9 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     const bullets = (b) => ((b || []).length ? `<ul>${b.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : "");
 
     const english_ = english;
+    // text taken straight from the graph (written in American English) follows the chosen spelling;
+    // names of organisations, schools, issuers and job titles are left as they are
+    const sp = english && result.spelling === "British" ? britishText : (x) => x;
     const exp = experienceView(cv.experience).map((e) => {
       const n = e.node, org = byId.get(n.org);
       const promo = e.earlier.length ? (english_ ? "Promoted from " : "Befördert von ") + e.earlier.map((r) => `${r.label}, ${G.dateRange(r)}`).join("; ") : "";
@@ -1702,16 +1724,16 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     const node = (x) => byId.get(typeof x === "string" ? x : x.id) || {};
     const proj = (cv.projects || []).filter((x) => byId.has(x.id)).sort(newest(node)).map((x) => {
       const n = byId.get(x.id);
-      return `<div class="p-item">${row(esc(n.label), G.dateRange(n) || n.status)}${bullets(x.bullets)}</div>`;
+      return `<div class="p-item">${row(esc(sp(n.label)), G.dateRange(n) || n.status)}${bullets(x.bullets)}</div>`;
     }).join("");
     const edu = (cv.education || []).filter((x) => byId.has(x.id)).sort(newest(node)).map((x) => {
       const n = byId.get(x.id); const s = byId.get(n.school);
       return `<div class="p-item">${row(esc(n.label), G.dateRange(n))}${s ? `<div class="p-sub">${esc(s.label)}</div>` : ""}${x.note ? `<p class="p-summary">${esc(x.note)}</p>` : ""}</div>`;
     }).join("");
-    const skills = (cv.skills || []).map((g) => `<p><b>${esc(g.group)}:</b> ${g.ids.map((id) => esc(byId.get(id).label)).join(", ")}</p>`).join("");
+    const skills = (cv.skills || []).map((g) => `<p><b>${esc(sp(g.group))}:</b> ${g.ids.map((id) => esc(sp(byId.get(id).label))).join(", ")}</p>`).join("");
     const awards = (cv.awards || []).filter((id) => byId.has(id)).sort(newest(node)).map((id) => {
       const n = byId.get(id); const o = byId.get(n.org);
-      return `<div class="p-item">${row(esc(n.label) + (o ? `, ${esc(o.label)}` : ""), G.fmtDate(n.date))}${n.summary ? `<p class="p-summary">${esc(n.summary)}</p>` : ""}</div>`;
+      return `<div class="p-item">${row(esc(n.label) + (o ? `, ${esc(o.label)}` : ""), G.fmtDate(n.date))}${n.summary ? `<p class="p-summary">${esc(sp(n.summary))}</p>` : ""}</div>`;
     }).join("");
     const certs = (cv.certifications || []).filter((id) => byId.has(id)).sort(newest(node)).map((id) => {
       const n = byId.get(id);
