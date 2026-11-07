@@ -473,8 +473,8 @@ window.RESUME = {
       "end": "2026-09",
       "highlights": [
         "Designed Turtle ontologies for crane navigation and urban landscape analysis.",
-        "Imported the spider-crane navigation ontology into Neo4j's labeled property graph with neosemantics (438 RDF triples, with registered namespace prefixes so labels stay readable) and explored its classes, zone transitions and mobility modes in Cypher.",
-        "Because neosemantics does not execute SWRL rules, represented the rule-based inferences as materialized triples and equivalent Cypher MERGE operations."
+        "Modelled terrain-aware navigation for a construction-site spider crane as an application-level OWL ontology extending the BIRS framework (SUMO, CORA/CORAX and IEEE 1873 map concepts): 27 classes and 50 properties covering terrain zones and profiles, dynamic ground conditions, sensors, tasks and mobility modes, plus seven SWRL rules that infer the mobility mode from slope, aggregate and surface evenness.",
+        "Imported the ontology into Neo4j's labeled property graph with neosemantics to visualize its individuals; neosemantics carries the triples but not the OWL or SWRL semantics, so rule-based inference does not happen in Neo4j."
       ],
       "skills": [
         "s-turtle",
