@@ -76,7 +76,7 @@
   };
 
   // version of the shared code; must match release.json (checked when publishing)
-  const VERSION = "1.10.5";
+  const VERSION = "1.10.6";
   // where released versions are announced (copies of the code check this for updates)
   const UPSTREAM = "https://rishirajani.github.io/Graph-Resume/";
   // relations come from Weft, an open vocabulary with permanent IRIs (https://w3id.org/weft)

@@ -1,8 +1,8 @@
 {
-  "version": "1.10.5",
+  "version": "1.10.6",
   "date": "2026-11-07",
   "notes": [
-    "The PDF now has the same pages as the preview. The printed copy breaks exactly where the preview shows a new page, and the preview leaves a few millimetres spare on each page, because browsers lay text out slightly differently on paper (fonts, zoom and operating system all play a part). Before, a CV that showed two pages could print on three. Some CVs that only just fitted will now show an extra page in the preview; that is what would have printed."
+    "A promotion now appears the way application forms expect: the employer once, then each title on its own line with its own dates, latest first, followed by the bullets. Before, the later title carried the dates of the whole stay with a \"Promoted from …\" note beside it, and forms that read your CV turned that note into a second job and gave the later title the wrong dates."
   ],
   "files": [
     "index.html",

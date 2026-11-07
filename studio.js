@@ -1725,10 +1725,15 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     const sp = english && result.spelling === "British" ? britishText : (x) => x;
     const exp = experienceView(cv.experience).map((e) => {
       const n = e.node, org = byId.get(n.org);
-      const promo = e.earlier.length ? (english_ ? "Promoted from " : "Befördert von ") + e.earlier.map((r) => `${r.label}, ${G.dateRange(r)}`).join("; ") : "";
-      const sub = [[n.location, n.employment].filter(Boolean).join(", "), promo].filter(Boolean).join(" · ");
-      const dates = G.dateRange({ start: e.start, end: n.end });
-      return `<div class="p-item">${row(esc(n.label) + (org ? `, ${esc(org.label)}` : ""), dates)}${sub ? `<div class="p-sub">${esc(sub)}</div>` : ""}${bullets(e.bullets)}</div>`;
+      const sub = [n.location, n.employment].filter(Boolean).join(", ");
+      if (!e.earlier.length) {
+        return `<div class="p-item">${row(esc(n.label) + (org ? `, ${esc(org.label)}` : ""), G.dateRange(n))}${sub ? `<div class="p-sub">${esc(sub)}</div>` : ""}${bullets(e.bullets)}</div>`;
+      }
+      // a promotion: the employer once, then each title on its own line with its own dates, latest first.
+      // This is how application forms that read CVs expect it; a "Promoted from …" note beside one set of
+      // dates was read by them as a second job, and gave the later title the dates of the whole stay.
+      const roles = [n, ...e.earlier].map((r) => `<div class="p-row p-role"><span class="p-title">${esc(r.label)}</span><span class="p-dates">${esc(G.dateRange(r))}</span></div>`).join("");
+      return `<div class="p-item p-chain">${row(org ? esc(org.label) : esc(n.label), "")}${sub ? `<div class="p-sub">${esc(sub)}</div>` : ""}${roles}${bullets(e.bullets)}</div>`;
     }).join("");
     // newest first, like experience: ongoing items on top, then by end date, then by start date
     const when = (n) => [n.end || (n.start ? "9999" : n.date || ""), n.start || n.date || ""];

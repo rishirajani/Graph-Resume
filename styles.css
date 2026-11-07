@@ -336,6 +336,9 @@ a.btn { text-decoration: none; color: var(--ink); display: inline-flex; align-it
 .paper .p-title { font-weight: 650; }
 .paper .p-dates { color: #444; white-space: nowrap; font-size: 9.4pt; }
 .paper .p-sub { color: #444; font-size: 9.6pt; }
+/* a promotion: the employer once, then each title with its own dates */
+.paper .p-chain .p-role { margin-top: 1.5pt; }
+.paper .p-chain .p-role .p-title { font-weight: 600; }
 .paper ul { margin: 2pt 0 0; padding-left: 13pt; }
 .paper li { margin: 0 0 1.5pt; }
 .paper .p-skills p { margin: 0 0 2pt; }
