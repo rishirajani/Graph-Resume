@@ -4,6 +4,8 @@
 
 **Live: [rishirajani.github.io/Graph-Resume](https://rishirajani.github.io/Graph-Resume/)**
 
+The story behind it: [My CV Is a Knowledge Graph Now](https://rishi-rajani.medium.com/my-cv-is-a-knowledge-graph-now-140f447fde92) (Medium).
+
 Your resume as an explorable knowledge graph, plus a private studio that writes a CV and cover letter for a specific job description using **only** the facts in your graph.
 
 - **Public**: anyone with the link can explore the graph, read it as plain text, open a link to a single node, and download the graph as JSON-LD or Turtle.
