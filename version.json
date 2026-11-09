@@ -1,8 +1,8 @@
 {
-  "version": "1.10.6",
-  "date": "2026-11-07",
+  "version": "1.10.7",
+  "date": "2026-11-09",
   "notes": [
-    "A promotion now appears the way application forms expect: the employer once, then each title on its own line with its own dates, latest first, followed by the bullets. Before, the later title carried the dates of the whole stay with a \"Promoted from …\" note beside it, and forms that read your CV turned that note into a second job and gave the later title the wrong dates."
+    "Volunteering: a new Volunteer item for unpaid roles. It shows in the graph and the text view, and tailored CVs get a Volunteering section (before Languages) that you can hide per CV under Sections. In the exported graph it is a schema:OrganizationRole with weft:kind \"Volunteer\", so Weft needs no new terms."
   ],
   "files": [
     "index.html",

@@ -14,7 +14,7 @@
 
   const LOOK_KEYS = ["theme", "fonts", "colors", "labelSize"];       // apply live in the preview
   const COLOR_LABELS = { role: "Experience", org: "Organisations", edu: "Education", project: "Projects", skill: "Skills", other: "More", highlight: "Highlight" };
-  const SECTION_LABELS = { profile: "Profile", experience: "Experience", projects: "Projects", education: "Education", skills: "Skills", awards: "Awards", certifications: "Certifications", languages: "Languages" };
+  const SECTION_LABELS = { profile: "Profile", experience: "Experience", projects: "Projects", education: "Education", skills: "Skills", awards: "Awards", certifications: "Certifications", volunteering: "Volunteering", languages: "Languages" };
   const GROUPS = [["exp", "Experience"], ["edu", "Education"], ["proj", "Projects"], ["other", "More (languages, certificates, awards)"]];
 
   /* ---------------- preview ---------------- */
@@ -41,6 +41,7 @@
         skills: groups,
         certifications: pick("Certification", 2).map((n) => n.id),
         awards: pick("Award", 1).map((n) => n.id),
+        volunteering: pick("Volunteer", 1).map((n) => ({ id: n.id, bullets: (n.highlights || []).slice(0, 1) })),
         languages: pub.filter((n) => n.type === "Language").map((n) => n.id)
       },
       coverLetter: {

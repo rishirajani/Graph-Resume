@@ -44,7 +44,7 @@
     system: { label: "System fonts (nothing to download)", sans: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif', serif: 'Georgia, "Times New Roman", serif', href: "" }
   };
 
-  const CV_SECTIONS = ["profile", "experience", "projects", "education", "skills", "awards", "certifications", "languages"];
+  const CV_SECTIONS = ["profile", "experience", "projects", "education", "skills", "awards", "certifications", "volunteering", "languages"];
   const DEFAULTS = {
     theme: "ink",                 // ink | paper | forest | slate | auto
     fonts: "grotesk",             // grotesk | inter | work | plex | system
@@ -69,7 +69,12 @@
     const colors = {};
     Object.keys(COLOR_VARS).forEach((k) => { if (hex(u.colors?.[k])) colors[k] = u.colors[k]; });
     const order = Array.isArray(u.cv?.order) ? u.cv.order.filter((s) => CV_SECTIONS.includes(s)) : [];
-    CV_SECTIONS.forEach((s) => { if (!order.includes(s)) order.push(s); });
+    // a section added in a later version goes where it sits by default, not after everything
+    CV_SECTIONS.forEach((s, i) => {
+      if (order.includes(s)) return;
+      const next = CV_SECTIONS.slice(i + 1).find((x) => order.includes(x));
+      next ? order.splice(order.indexOf(next), 0, s) : order.push(s);
+    });
     const titles = {};
     CV_SECTIONS.forEach((s) => { const t = u.cv?.titles?.[s]; if (typeof t === "string" && t.trim()) titles[s] = t.trim().slice(0, 40); });
     return {

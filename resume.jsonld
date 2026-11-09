@@ -43,6 +43,11 @@
           "@id": "cv:a-ironman"
         }
       ],
+      "weft:worksAs": [
+        {
+          "@id": "cv:v-embassy"
+        }
+      ],
       "weft:studied": [
         {
           "@id": "cv:e-msc"
@@ -509,6 +514,29 @@
       "weft:awardedBy": [
         {
           "@id": "cv:o-flexmoney"
+        }
+      ]
+    },
+    {
+      "@id": "cv:o-embassy-india",
+      "@type": "Organization",
+      "name": "Embassy of India, Berlin",
+      "weft:kind": "Organization"
+    },
+    {
+      "@id": "cv:v-embassy",
+      "@type": "OrganizationRole",
+      "name": "University Representative",
+      "weft:kind": "Volunteer",
+      "startDate": "2025-01",
+      "weft:location": "Stuttgart, Germany",
+      "weft:highlight": [
+        "Serve as the Embassy's point of contact for Indian students at Universität Stuttgart, answering newcomers' questions about studying and settling in Germany.",
+        "Pass Embassy notices and announcements on to Indian students and help organize Embassy events for them."
+      ],
+      "weft:at": [
+        {
+          "@id": "cv:o-embassy-india"
         }
       ]
     },

@@ -38,6 +38,7 @@
     for (const n of nodes) {
       switch (n.type) {
         case "Role": add("me", n.end || !n.start ? "workedAs" : "worksAs", n.id); add(n.id, "at", n.org); if (n.promotedFrom) add(n.id, "promotedFrom", n.promotedFrom); if (n.via) add(n.via, "ledTo", n.id); break;
+        case "Volunteer": add("me", n.end || !n.start ? "workedAs" : "worksAs", n.id); add(n.id, "at", n.org); break;
         case "Education": add("me", "studied", n.id); add(n.id, "at", n.school); if (n.partner) add(n.id, "runWith", n.partner); break;
         case "Project": add("me", "built", n.id); if (n.partOf) add(n.id, "partOf", n.partOf); break;
         case "Skill": add(n.id, "inGroup", n.group); break;
@@ -69,14 +70,14 @@
   }
 
   const SCHEMA_TYPE = {
-    Person: "Person", Role: "OrganizationRole", Organization: "Organization", Education: "EducationalOccupationalCredential",
+    Person: "Person", Role: "OrganizationRole", Volunteer: "OrganizationRole", Organization: "Organization", Education: "EducationalOccupationalCredential",
     School: "CollegeOrUniversity", Project: "CreativeWork", Skill: "DefinedTerm", SkillGroup: "DefinedTermSet",
     Language: "Language", Certification: "EducationalOccupationalCredential", Award: "weft:Award", Publication: "ScholarlyArticle",
     Break: "weft:CareerBreak"
   };
 
   // version of the shared code; must match release.json (checked when publishing)
-  const VERSION = "1.10.6";
+  const VERSION = "1.10.7";
   // where released versions are announced (copies of the code check this for updates)
   const UPSTREAM = "https://rishirajani.github.io/Graph-Resume/";
   // relations come from Weft, an open vocabulary with permanent IRIs (https://w3id.org/weft)

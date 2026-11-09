@@ -14,6 +14,7 @@ cv:me a schema:Person ;
     weft:location "Stuttgart, Germany (open to relocation)" ;
     weft:workedAs cv:r-nobel, cv:r-flexmoney, cv:r-flexmoney-am, cv:r-vmlyr, cv:r-ubisoft, cv:r-hog, cv:r-oracle ;
     weft:received cv:a-ironman ;
+    weft:worksAs cv:v-embassy ;
     weft:studied cv:e-msc, cv:e-be, cv:e-rubika ;
     weft:holds cv:c-udemy-python, cv:c-hackerrank-python, cv:c-ielts ;
     weft:built cv:p-thesis, cv:p-weft, cv:p-loom, cv:p-heat, cv:p-arch, cv:p-rossmann ;
@@ -126,6 +127,18 @@ cv:a-ironman a weft:Award ;
     schema:description "Recognized for driving innovation in analytics, introducing new automated insights workflows, and supporting company-wide growth initiatives." ;
     weft:location "Mumbai, India" ;
     weft:awardedBy cv:o-flexmoney .
+
+cv:o-embassy-india a schema:Organization ;
+    schema:name "Embassy of India, Berlin" ;
+    weft:kind "Organization" .
+
+cv:v-embassy a schema:OrganizationRole ;
+    schema:name "University Representative" ;
+    weft:kind "Volunteer" ;
+    schema:startDate "2025-01" ;
+    weft:location "Stuttgart, Germany" ;
+    weft:highlight "Serve as the Embassy's point of contact for Indian students at Universität Stuttgart, answering newcomers' questions about studying and settling in Germany.", "Pass Embassy notices and announcements on to Indian students and help organize Embassy events for them." ;
+    weft:at cv:o-embassy-india .
 
 cv:sch-stuttgart a schema:CollegeOrUniversity ;
     schema:name "Universität Stuttgart" ;

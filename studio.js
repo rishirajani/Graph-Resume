@@ -176,7 +176,7 @@
   const siteBase = () => (G.R.site?.baseIri || location.href.split("#")[0]).replace(/[?#].*$/, "");
   const linkUrl = (l) => `${siteBase()}#for/${l.id}.${l.key}`;
   const plusMonths = (m) => { const d = new Date(); d.setMonth(d.getMonth() + m); return d.toISOString().slice(0, 10); };
-  const LINK_TYPES = ["Role", "Break", "Education", "Project", "Certification", "Award", "Publication", "Language"];
+  const LINK_TYPES = ["Role", "Break", "Volunteer", "Education", "Project", "Certification", "Award", "Publication", "Language"];
   const publicIds = () => new Set(G.publicNodes.map((n) => n.id));
 
   // a hidden item plus whatever it needs to show properly (its company, school, skills)
@@ -194,7 +194,7 @@
   // what a tailored CV contains: its items and its skills
   function cvContents(result) {
     const cv = result?.cv || {};
-    const items = [...(cv.experience || []), ...(cv.projects || []), ...(cv.education || [])].map((x) => x.id)
+    const items = [...(cv.experience || []), ...(cv.projects || []), ...(cv.education || []), ...(cv.volunteering || [])].map((x) => x.id)
       .concat(cv.certifications || [], cv.awards || [], cv.languages || []);
     const skills = (cv.skills || []).flatMap((g) => g.ids || []);
     const ok = (id) => byId.has(id);
@@ -777,7 +777,7 @@
 
   /* ---------------- what visitors see ---------------- */
   const VIS_GROUPS = [
-    ["Experience", ["Role", "Break"]], ["Education", ["Education"]], ["Projects", ["Project"]],
+    ["Experience", ["Role", "Break"]], ["Volunteering", ["Volunteer"]], ["Education", ["Education"]], ["Projects", ["Project"]],
     ["Certificates, awards and publications", ["Certification", "Award", "Publication"]], ["Languages", ["Language"]], ["Skills", ["Skill"]]
   ];
   const REF = ["org", "school", "skills", "group", "partOf", "promotedFrom", "via", "partner", "includes"];
@@ -1000,7 +1000,7 @@ Hard rules
 3. When the job asks for something the graph does not support, record it as a "gap" in fit. Do not imply that experience in the CV. In the cover letter, write at most one sentence about gaps, framed as what the candidate wants to learn next; never claim the experience, never open a paragraph with a gap or an apology ("To be candid", "Although I have not"), and never compare the candidate's years of experience with the job's.
 4. Refer to roles, projects, education, skills and languages by their exact node "id". The app fills in titles, organisations and dates from the graph, so do not repeat them in bullets.
 5. Bullets start with a strong past-tense verb (present tense for current work), are concrete, at most 28 words. ${limits}
-6. Choose projects by relevance to this job. The app lists projects, education, awards and certifications newest first, and experience newest first and combines a role with the role it was promoted from (promotedFrom), so list experience in any order and do not write a bullet that only states a promotion. Leave out nodes that do not help this application, with one exception: always include current roles (no end date), even unrelated ones, with at least one short bullet, so the timeline has no apparent gap. Likewise include a "Break" node in experience (using its id, with its summary condensed into one bullet) whenever omitting it would leave an unexplained gap of six months or more between the roles you list.
+6. Choose projects by relevance to this job. The app lists projects, education, awards and certifications newest first, and experience newest first and combines a role with the role it was promoted from (promotedFrom), so list experience in any order and do not write a bullet that only states a promotion. Leave out nodes that do not help this application, with one exception: always include current roles (no end date), even unrelated ones, with at least one short bullet, so the timeline has no apparent gap. "Volunteer" nodes never go in experience; list each current one in "volunteering" with one or two short bullets (the candidate removes the section per CV when it doesn't help), and a finished one only when it helps this application. Likewise include a "Break" node in experience (using its id, with its summary condensed into one bullet) whenever omitting it would leave an unexplained gap of six months or more between the roles you list.
 7. Keep the graph's limiting words when you rephrase a fact: "proof of concept", "prototype", "pilot", "co-defined", "together with", "supported", "part-time", "coursework" and the like stay attached to that fact in the CV and the letter. Never turn a proof of concept into a production system or a shared result into a solo one.
 8. Skills with "evidence": "coursework only" were learned in a degree, not used in work or projects. Include one only if the job asks for it, and then only in a skill group named for coursework (in ${lang}, e.g. "Coursework"), never in bullets or the profile as practical experience.
 8b. In English, use ${british ? "British spelling (organise, recognised, modelling, colour, centre)" : "American spelling (organize, recognized, analyze, modeling, color, center), as the graph does"} consistently in the CV and the letter.
@@ -1019,12 +1019,13 @@ Hard rules
     "summary": "profile paragraph",
     "experience": [ { "id": "role-node-id", "bullets": [""] } ],
     "projects": [ { "id": "project-node-id", "bullets": [""] } ],
+    "volunteering": [ { "id": "volunteer-node-id", "bullets": [""] } ],
     "education": [ { "id": "education-node-id", "note": "optional one line, e.g. thesis relevant to this job" } ],
     "skills": [ { "group": "group name", "ids": ["skill-node-id"] } ],
     "languages": ["language-node-id"],
     "awards": ["award-node-id"],
     "certifications": ["certification-node-id"],
-    "sectionTitles": { "profile": "", "experience": "", "projects": "", "education": "", "skills": "", "languages": "", "awards": "", "certifications": "" }
+    "sectionTitles": { "profile": "", "experience": "", "projects": "", "education": "", "skills": "", "languages": "", "awards": "", "certifications": "", "volunteering": "" }
   },
   "coverLetter": { "subject": "", "greeting": "", "paragraphs": [""], "closing": "" }
 }
@@ -1171,6 +1172,7 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     const cv = result.cv || {};
     cv.experience = drop(cv.experience, "role").filter((x) => ["Role", "Break"].includes(byId.get(x.id).type));
     cv.projects = drop(cv.projects, "project");
+    cv.volunteering = drop(cv.volunteering, "volunteering").filter((x) => byId.get(x.id).type === "Volunteer");
     cv.education = drop(cv.education, "education");
     cv.languages = drop(cv.languages, "language");
     cv.awards = drop(cv.awards, "award");
@@ -1184,7 +1186,7 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     const norm = (s) => s.replace(",", ".").replace(/\.0+$/, "");
     const graphNums = new Set((corpus.match(/\d+(?:[.,]\d+)?/g) || []).map(norm));
     const texts = [cv.headline, cv.summary, ...(cv.experience || []).flatMap((x) => x.bullets || []), ...(cv.projects || []).flatMap((x) => x.bullets || []),
-      ...(cv.education || []).map((x) => x.note), ...(result.coverLetter?.paragraphs || []), result.coverLetter?.subject].filter(Boolean);
+      ...(cv.volunteering || []).flatMap((x) => x.bullets || []), ...(cv.education || []).map((x) => x.note), ...(result.coverLetter?.paragraphs || []), result.coverLetter?.subject].filter(Boolean);
     const unknownNums = new Set();
     texts.forEach((t) => (String(t).match(/\d+(?:[.,]\d+)?/g) || []).forEach((n) => { if (!graphNums.has(norm(n))) unknownNums.add(n); }));
     if (unknownNums.size) warnings.push(`These numbers aren't in your graph; check or remove them: ${[...unknownNums].join(", ")}.`);
@@ -1209,7 +1211,7 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     }
 
     // drafts used
-    const used = new Set([...(cv.experience || []), ...(cv.projects || []), ...(cv.education || [])].map((x) => x.id));
+    const used = new Set([...(cv.experience || []), ...(cv.projects || []), ...(cv.education || []), ...(cv.volunteering || [])].map((x) => x.id));
     (cv.languages || []).forEach((id) => used.add(id));
     const drafts = [...used].map((id) => byId.get(id)).filter((n) => n?.draft);
     if (drafts.length) warnings.push(`Uses nodes still marked draft, so their details may be incomplete: ${drafts.map((n) => n.label + (n.org ? ` (${byId.get(n.org)?.label})` : "")).join(", ")}.`);
@@ -1306,10 +1308,10 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
   }
 
   /* ================= render results ================= */
-  const TITLES_EN = { profile: "Profile", experience: "Experience", projects: "Projects", education: "Education", skills: "Skills", languages: "Languages", awards: "Awards", certifications: "Certifications" };
+  const TITLES_EN = { profile: "Profile", experience: "Experience", projects: "Projects", education: "Education", skills: "Skills", languages: "Languages", awards: "Awards", certifications: "Certifications", volunteering: "Volunteering" };
   function chipFor(id) {
     const n = byId.get(id); if (!n) return "";
-    const org = n.type === "Role" ? byId.get(n.org)?.label : "";
+    const org = ["Role", "Volunteer"].includes(n.type) ? byId.get(n.org)?.label : "";
     return `<button type="button" class="chip" data-node="${esc(id)}" style="--c:var(${G.TYPE[n.type]?.color || "--c-other"})"><span class="dot"></span>${esc(n.label)}${org ? `, ${esc(org)}` : ""}</button>`;
   }
 
@@ -1372,7 +1374,7 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
   $$('#results [role="tab"]').forEach((b) => b.addEventListener("click", () => selectTab(b.dataset.tab)));
 
   // CV and letter style from the site settings (ui.js): layout, accent, section order, titles
-  const CVUI = () => (window.GRUI ? window.GRUI.ui.cv : { layout: "classic", accent: "", order: ["profile", "experience", "projects", "education", "skills", "awards", "certifications", "languages"], titles: {} });
+  const CVUI = () => (window.GRUI ? window.GRUI.ui.cv : { layout: "classic", accent: "", order: ["profile", "experience", "projects", "education", "skills", "awards", "certifications", "volunteering", "languages"], titles: {} });
   const CV_ACCENT = { classic: "#1D2A40", modern: "#2C46C7", compact: "#1D2A40" };
   function styleCv(el, cvui = CVUI()) {
     el.classList.remove("cv-classic", "cv-modern", "cv-compact");
@@ -1743,6 +1745,11 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
       const n = byId.get(x.id);
       return `<div class="p-item">${row(esc(sp(n.label)), G.dateRange(n) || n.status)}${bullets(x.bullets)}</div>`;
     }).join("");
+    const vol = (cv.volunteering || []).filter((x) => byId.has(x.id)).sort(newest(node)).map((x) => {
+      const n = byId.get(x.id), org = byId.get(n.org);
+      const sub = [n.location, n.employment].filter(Boolean).join(", ");
+      return `<div class="p-item">${row(esc(n.label) + (org ? `, ${esc(org.label)}` : ""), G.dateRange(n))}${sub ? `<div class="p-sub">${esc(sub)}</div>` : ""}${bullets(x.bullets)}</div>`;
+    }).join("");
     const edu = (cv.education || []).filter((x) => byId.has(x.id)).sort(newest(node)).map((x) => {
       const n = byId.get(x.id); const s = byId.get(n.school);
       return `<div class="p-item">${row(esc(n.label), G.dateRange(n))}${s ? `<div class="p-sub">${esc(s.label)}</div>` : ""}${x.note ? `<p class="p-summary">${esc(x.note)}</p>` : ""}</div>`;
@@ -1766,6 +1773,7 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
       skills: () => sec(T.skills, skills ? `<div class="p-skills">${skills}</div>` : ""),
       awards: () => sec(T.awards, awards),
       certifications: () => sec(T.certifications, certs),
+      volunteering: () => sec(T.volunteering, vol),
       languages: () => sec(T.languages, langs ? `<p class="p-summary">${langs}</p>` : "")
     };
     return `

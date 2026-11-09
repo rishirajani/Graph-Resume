@@ -12,6 +12,7 @@
   const TYPE = {
     Person:        { color: "--c-person",  size: 58 },
     Role:          { color: "--c-role",    size: 34, kind: "Role" },
+    Volunteer:     { color: "--c-role",    size: 26, kind: "Volunteering" },
     Organization:  { color: "--c-org",     size: 24, kind: "Organization" },
     Education:     { color: "--c-edu",     size: 34, kind: "Education" },
     School:        { color: "--c-edu",     size: 24, kind: "School" },
@@ -26,7 +27,7 @@
   };
   // Legend filters group types the way a reader thinks about a CV.
   const FILTERS = [
-    { key: "exp",   label: "Experience", types: ["Role", "Organization", "Break"], color: "--c-role" },
+    { key: "exp",   label: "Experience", types: ["Role", "Organization", "Break", "Volunteer"], color: "--c-role" },
     { key: "edu",   label: "Education",  types: ["Education", "School"],  color: "--c-edu" },
     { key: "proj",  label: "Projects",   types: ["Project"],              color: "--c-project" },
     { key: "skill", label: "Skills",     types: ["Skill", "SkillGroup"],  color: "--c-skill" },
@@ -304,7 +305,7 @@
       const x = angles.reduce((s, a) => s + Math.cos(a), 0), y = angles.reduce((s, a) => s + Math.sin(a), 0);
       return Math.hypot(x, y) < 1e-6 ? angles[0] : Math.atan2(y, x);
     };
-    const ITEM = ["Role", "Break", "Education", "Project", "Award", "Certification", "Publication", "Language"];
+    const ITEM = ["Role", "Break", "Volunteer", "Education", "Project", "Award", "Certification", "Publication", "Language"];
     const items = shownNodes.filter((n) => ITEM.includes(n.type) && visible.has(n.id));
     const want = {};
     items.forEach((n) => { want[n.id] = mean((n.skills || []).map((s) => aAng[byId.get(s)?.group]).filter((a) => a != null)); });
@@ -365,7 +366,7 @@
     radialLayout(v, showSkills);
     return frame(v);
     // 1) deterministic rings by kind (same picture on every visit), 2) a force pass from there to untangle
-    const ring = { Person: 4, Role: 3, Education: 3, Project: 3, SkillGroup: 2, Organization: 1.5, School: 1.5, Language: 2, Certification: 2, Award: 2, Publication: 2, Skill: 0 };
+    const ring = { Person: 4, Role: 3, Volunteer: 3, Education: 3, Project: 3, SkillGroup: 2, Organization: 1.5, School: 1.5, Language: 2, Certification: 2, Award: 2, Publication: 2, Skill: 0 };
     const vis = cy.elements(":visible");
     vis.layout({ name: "concentric", animate: false, fit: false, minNodeSpacing: 34, concentric: (n) => ring[n.data("type")] ?? 0, levelWidth: () => 1, startAngle: -Math.PI / 2 }).run();
     vis.layout({
@@ -487,7 +488,7 @@
       ${matchesHtml(n)}
       ${triples.length ? `<h3>How it connects</h3><ul class="triples">${triples.map((t) => {
         const o = byId.get(t.other);
-        return `<li><button type="button" data-goto="${esc(t.other)}"><span class="pred">${esc(t.pred)}</span><span class="obj" style="--c:${colorOf(o)}"><span class="dot"></span>${esc(o.label || o.name)}${o.type === "Role" && byId.get(o.org) ? `, ${esc(byId.get(o.org).label)}` : ""}</span></button></li>`;
+        return `<li><button type="button" data-goto="${esc(t.other)}"><span class="pred">${esc(t.pred)}</span><span class="obj" style="--c:${colorOf(o)}"><span class="dot"></span>${esc(o.label || o.name)}${["Role", "Volunteer"].includes(o.type) && byId.get(o.org) ? `, ${esc(byId.get(o.org).label)}` : ""}</span></button></li>`;
       }).join("")}</ul>` : ""}
     `;
     $$("#drawer-body [data-goto]").forEach((b) => b.addEventListener("click", () => go(b.dataset.goto)));
@@ -582,6 +583,7 @@
     const roles = [...nodesOf("Role"), ...nodesOf("Break")].sort(byDateDesc).map((n) => item(n, meta(n).join(", "))).join("");
     const edu = nodesOf("Education").sort(byDateDesc).map((n) => item(n, meta(n).join(", "))).join("");
     const proj = nodesOf("Project").map((n) => item(n, meta(n).join(", "))).join("");
+    const vol = nodesOf("Volunteer").sort(byDateDesc).map((n) => item(n, meta(n).join(", "))).join("");
     const groups = nodesOf("SkillGroup").map((g) => {
       const skills = shownNodes.filter((s) => s.type === "Skill" && s.group === g.id);
       return `<div><h3>${esc(g.label)}</h3><div class="links">${skills.map((s) => chip(s.id)).join("")}</div></div>`;
@@ -599,6 +601,7 @@
       ${section("experience", "Experience", "--c-role", roles, nodesOf("Role").length + nodesOf("Break").length)}
       ${section("projects", "Projects", "--c-project", proj, nodesOf("Project").length)}
       ${section("education", "Education", "--c-edu", edu, nodesOf("Education").length)}
+      ${section("volunteering", "Volunteering", "--c-role", vol, nodesOf("Volunteer").length)}
       ${section("skills", "Skills", "--c-skill", groups || ungrouped.length ? `<div class="skills-grid">${groups}${ungrouped.length ? `<div><h3>Other</h3><div class="links">${ungrouped.map((s) => chip(s.id)).join("")}</div></div>` : ""}</div>` : "", shownNodes.filter((n) => n.type === "Skill").length)}
       ${section("more", "Languages and more", "--c-other", more, ["Certification", "Award", "Publication", "Language"].flatMap(nodesOf).length)}
       ${R.site?.allowPublicGraphExport !== false && UI.features.download ? `<p class="read-foot"><button class="btn ghost small" type="button" id="read-download">Download this graph as JSON-LD or Turtle</button> <a class="read-vocab" href="${esc(window.GRCORE.WEFT_DOCS)}">How the graph is described: the Weft vocabulary</a></p>` : ""}

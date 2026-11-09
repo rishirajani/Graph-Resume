@@ -272,6 +272,26 @@ window.RESUME = {
       "summary": "Recognized for driving innovation in analytics, introducing new automated insights workflows, and supporting company-wide growth initiatives."
     },
     {
+      "id": "o-embassy-india",
+      "type": "Organization",
+      "label": "Embassy of India, Berlin",
+      "short": "Embassy of India"
+    },
+    {
+      "id": "v-embassy",
+      "type": "Volunteer",
+      "label": "University Representative",
+      "short": "University\nRepresentative",
+      "org": "o-embassy-india",
+      "start": "2025-01",
+      "location": "Stuttgart, Germany",
+      "employment": "Remote",
+      "highlights": [
+        "Serve as the Embassy's point of contact for Indian students at Universität Stuttgart, answering newcomers' questions about studying and settling in Germany.",
+        "Pass Embassy notices and announcements on to Indian students and help organize Embassy events for them."
+      ]
+    },
+    {
       "id": "sch-stuttgart",
       "type": "School",
       "label": "Universität Stuttgart"
