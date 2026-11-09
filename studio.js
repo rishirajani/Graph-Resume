@@ -1005,7 +1005,7 @@ Hard rules
 8. Skills with "evidence": "coursework only" were learned in a degree, not used in work or projects. Include one only if the job asks for it, and then only in a skill group named for coursework (in ${lang}, e.g. "Coursework"), never in bullets or the profile as practical experience.
 8b. In English, use ${british ? "British spelling (organise, recognised, modelling, colour, centre)" : "American spelling (organize, recognized, analyze, modeling, color, center), as the graph does"} consistently in the CV and the letter.
 9. If the candidate's availability is given, state it once, in the cover letter's last paragraph, in your own words. Otherwise say nothing about start dates.
-10. The cover letter is 230 to 340 words, 3 or 4 paragraphs, specific to this company and role. No clichés such as "I am writing to express my interest". Do not include the address block, date or signature; the app adds them.
+10. The cover letter is 230 to 340 words, 3 or 4 paragraphs, specific to this company and role. Open with something the candidate did (a graph fact) that answers the job's central need, not with a description of the job, the team or the company. Make it specific through which facts you choose and how you connect them, not by echoing the job ad: never repeat more than four consecutive words of the job description (tool names and the job title excepted), and do not reuse its internal names and jargon (project names, acronyms, initiatives). Give reasons for wanting this job only if the candidate's notes state them; never make one up from the job ad. No clichés such as "I am writing to express my interest". Do not include the address block, date or signature; the app adds them.
 11. Write everything in ${lang}. Return section titles in that language too.
 12. Respond with one JSON object only, no markdown, matching this shape:
 {
@@ -1161,7 +1161,7 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     return cap(lower.replace(/iz(e|ed|es|ing|ation|ations|er|ers)$/, "is$1"));
   }
   const britishText = (t) => String(t).replace(AMERICAN_RE, toBritish);
-  function groundingCheck(result) {
+  function groundingCheck(result, input) {
     const warnings = [];
     const known = (id) => byId.has(id);
     const drop = (arr, label) => (arr || []).filter((x) => {
@@ -1242,6 +1242,21 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
         });
       }));
     });
+    // letter sentences that echo the job ad: a large share of a sentence's three-word
+    // sequences also appear in the description (catches shortened copies, not just exact ones)
+    const jd = String(input?.jd || "");
+    if (jd) {
+      const toks = (t) => (t.toLowerCase().match(/[\p{L}\p{N}]+(?:[-'’][\p{L}\p{N}]+)*/gu) || []);
+      const tri = (t) => t.slice(0, -2).map((w, i) => `${w} ${t[i + 1]} ${t[i + 2]}`);
+      const jdTri = new Set(tri(toks(jd)));
+      letter.forEach((p, i) => {
+        const echoes = String(p).split(/(?<=[.!?])\s+/).filter((sen) => {
+          const g = tri(toks(sen)), shared = g.filter((x) => jdTri.has(x)).length;
+          return shared >= 4 && shared / g.length >= 0.3;
+        });
+        if (echoes.length) warnings.push(`Cover letter, paragraph ${i + 1}, echoes the job ad: “${echoes[0].trim().split(/\s+/).slice(0, 14).join(" ")}…”. Say it in your own words, or lead with what you did.`);
+      });
+    }
     // a letter paragraph that opens with a gap or an apology
     const opensWeak = /^(to be (candid|honest|frank)|admittedly|honestly|unfortunately|although i (have not|haven't|lack)|while i (have not|haven't|lack)|i have not yet|i do not (yet )?have|i don't (yet )?have)\b/i;
     letter.forEach((p, i) => { if (opensWeak.test(String(p).trim())) warnings.push(`Cover letter, paragraph ${i + 1}, opens with a gap. Lead with what you bring and keep the gap to one forward-looking sentence.`); });
@@ -1271,7 +1286,7 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
       const result = parseModelJson(out.text);
       result.writtenBy = out.model;
       result.spelling = input.lang === "British English" ? "British" : "American";
-      result.warnings = groundingCheck(result);
+      result.warnings = groundingCheck(result, input);
       current = { input, result, at: Date.now() };
       saveHistory(current);
       renderResult(current);
@@ -1939,7 +1954,7 @@ ${fontLink()}
   }));
 
   // test hook: lets the test suite render a result without calling a model
-  window.GR.studio = { renderResult: (x) => { x.result.warnings = groundingCheck(x.result); current = x; renderResult(x); }, buildPrompt, groundingCheck, toMarkdown, toBlocks, standaloneHtml, markPages,
+  window.GR.studio = { renderResult: (x) => { x.result.warnings = groundingCheck(x.result, x.input); current = x; renderResult(x); }, buildPrompt, groundingCheck, toMarkdown, toBlocks, standaloneHtml, markPages,
     // for customize.js
     renderCv, renderLetter, styleCv, getCurrent: () => current, ghGet, ghPut, connected, enterStudio };
 })();

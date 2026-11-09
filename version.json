@@ -1,8 +1,8 @@
 {
-  "version": "1.10.7",
+  "version": "1.10.8",
   "date": "2026-11-09",
   "notes": [
-    "Volunteering: a new Volunteer item for unpaid roles. It shows in the graph and the text view, and tailored CVs get a Volunteering section (before Languages) that you can hide per CV under Sections. In the exported graph it is a schema:OrganizationRole with weft:kind \"Volunteer\", so Weft needs no new terms."
+    "Cover letters no longer echo the job ad. The model is told to open with something you did, never repeat more than four consecutive words of the description, skip the company's internal jargon, and invent no reasons for wanting the job. A new check also flags any letter sentence that largely repeats the ad, even a shortened copy."
   ],
   "files": [
     "index.html",
