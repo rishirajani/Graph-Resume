@@ -761,12 +761,12 @@
     {
       "@id": "cv:p-jobmarket",
       "@type": "CreativeWork",
-      "name": "Job-market pipeline: dlt and dbt pipeline over German job ads",
+      "name": "Job-market pipeline: dlt and dbt pipeline over job ads",
       "weft:kind": "Project",
       "startDate": "2026-11",
       "url": "https://github.com/rishirajani/job-market-pipeline",
       "weft:highlight": [
-        "Building a daily pipeline over German job ads: dlt loaders for the Arbeitnow and Bundesagentur APIs into DuckDB, merged on each ad's ID.",
+        "Building a daily pipeline over job ads from public job APIs: dlt loaders (Arbeitnow and Bundesagentur für Arbeit so far) into DuckDB, merged on each ad's ID.",
         "Modeling the raw data in dbt, with staging models, declared sources and generic, relationship and singular tests."
       ],
       "weft:used": [

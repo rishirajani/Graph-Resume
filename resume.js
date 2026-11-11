@@ -436,12 +436,12 @@ window.RESUME = {
     {
       "id": "p-jobmarket",
       "type": "Project",
-      "label": "Job-market pipeline: dlt and dbt pipeline over German job ads",
+      "label": "Job-market pipeline: dlt and dbt pipeline over job ads",
       "short": "Job-market\npipeline",
       "start": "2026-11",
       "url": "https://github.com/rishirajani/job-market-pipeline",
       "highlights": [
-        "Building a daily pipeline over German job ads: dlt loaders for the Arbeitnow and Bundesagentur APIs into DuckDB, merged on each ad's ID.",
+        "Building a daily pipeline over job ads from public job APIs: dlt loaders (Arbeitnow and Bundesagentur für Arbeit so far) into DuckDB, merged on each ad's ID.",
         "Modeling the raw data in dbt, with staging models, declared sources and generic, relationship and singular tests."
       ],
       "skills": [

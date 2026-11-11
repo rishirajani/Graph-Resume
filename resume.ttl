@@ -218,11 +218,11 @@ cv:p-weft a schema:CreativeWork ;
     weft:used cv:s-ontology, cv:s-owl, cv:s-rdf, cv:s-rdfs, cv:s-shacl, cv:s-turtle, cv:s-semmodel, cv:s-python, cv:s-cicd, cv:s-git, cv:s-docs .
 
 cv:p-jobmarket a schema:CreativeWork ;
-    schema:name "Job-market pipeline: dlt and dbt pipeline over German job ads" ;
+    schema:name "Job-market pipeline: dlt and dbt pipeline over job ads" ;
     weft:kind "Project" ;
     schema:startDate "2026-11" ;
     schema:url "https://github.com/rishirajani/job-market-pipeline" ;
-    weft:highlight "Building a daily pipeline over German job ads: dlt loaders for the Arbeitnow and Bundesagentur APIs into DuckDB, merged on each ad's ID.", "Modeling the raw data in dbt, with staging models, declared sources and generic, relationship and singular tests." ;
+    weft:highlight "Building a daily pipeline over job ads from public job APIs: dlt loaders (Arbeitnow and Bundesagentur für Arbeit so far) into DuckDB, merged on each ad's ID.", "Modeling the raw data in dbt, with staging models, declared sources and generic, relationship and singular tests." ;
     weft:used cv:s-dbt, cv:s-dlt, cv:s-duckdb, cv:s-sql, cv:s-python, cv:s-etl, cv:s-rest, cv:s-dq, cv:s-git .
 
 cv:p-loom a schema:CreativeWork ;
