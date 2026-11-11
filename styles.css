@@ -577,3 +577,11 @@ a.btn { text-decoration: none; color: var(--ink); display: inline-flex; align-it
   #print-root .paper { width: auto; min-height: 0; margin: 0; box-shadow: none; padding: 0 17mm !important; }
   #print-root .paper.cv-compact { padding: 0 14mm !important; page: compact; }
 }
+
+/* Contact dialog */
+.contact-list { margin: 4px 0 14px; display: grid; gap: 10px; }
+.contact-list > div { display: grid; grid-template-columns: 84px 1fr; gap: 10px; align-items: baseline; }
+.contact-list dt { color: var(--muted); font-size: 13px; }
+.contact-list dd { margin: 0; overflow-wrap: anywhere; }
+.contact-list a { color: var(--c-role); }
+@media (max-width: 640px) { .contact-list > div { grid-template-columns: 1fr; gap: 1px; } }

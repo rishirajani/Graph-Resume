@@ -1,8 +1,8 @@
 {
-  "version": "1.10.8",
-  "date": "2026-11-09",
+  "version": "1.10.9",
+  "date": "2026-11-11",
   "notes": [
-    "Cover letters no longer echo the job ad. The model is told to open with something you did, never repeat more than four consecutive words of the description, skip the company's internal jargon, and invent no reasons for wanting the job. A new check also flags any letter sentence that largely repeats the ad, even a shortened copy."
+    "A Contact button beside Copy link opens your email, LinkedIn, GitHub and location. Before, these only showed in the text view, so a visitor looking at the graph had no way to reach you."
   ],
   "files": [
     "index.html",

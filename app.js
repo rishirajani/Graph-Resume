@@ -710,6 +710,17 @@
     });
   });
 
+  // Contact: the email and profile links, which otherwise only show in the text view
+  const contactRows = [
+    me.email ? ["Email", `<a href="mailto:${esc(me.email)}">${esc(me.email)}</a>`] : null,
+    ...(me.links || []).map((l) => [esc(l.label), `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(String(l.url).replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, ""))}</a>`]),
+    me.location ? ["Based in", esc(me.location)] : null
+  ].filter(Boolean);
+  if (contactRows.length) {
+    $("#contact-btn").hidden = false;
+    $("#contact-btn").addEventListener("click", () => modal(`Contact ${me.name || ""}`.trim(),
+      `<dl class="contact-list">${contactRows.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("")}</dl>`));
+  }
   $("#share-btn").addEventListener("click", async () => {
     await ready;
     if (runtime.inArtifact) { modal("Share this page", "<p>Use Share at the top of this page on claude.ai. The link it copies opens the node you have selected.</p>"); return; }
