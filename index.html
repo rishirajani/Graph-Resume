@@ -9,7 +9,7 @@
 <meta property="og:description" content="An explorable knowledge graph of experience, education, projects and skills.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="styles.css?v=0050eaa1d6">
+<link rel="stylesheet" href="styles.css?v=093b1bd28d">
 <link rel="alternate" type="text/turtle" href="resume.ttl" title="This resume as RDF (Turtle)">
 <link rel="alternate" type="application/ld+json" href="resume.jsonld" title="This resume as JSON-LD">
 </head>
@@ -300,6 +300,7 @@
         <input id="notes" type="text" placeholder="e.g. lead with ontology work, mention relocation is not needed">
       </div>
       <label class="check"><input type="checkbox" id="want-letter" checked> Also write a cover letter</label>
+      <label class="check" id="local-only-row" hidden><input type="checkbox" id="local-only"> Keep this CV and letter only on this device <span class="muted">(otherwise it is also saved to your private repository, so your other devices can open it)</span></label>
       <button class="btn ink wide" id="generate-btn">Write tailored CV</button>
       <p id="gen-status" class="status" role="status"></p>
       <div id="history" class="history"></div>
@@ -366,9 +367,9 @@
 <script src="resume.js"></script>
 <script src="owner.js?v=7d9c00eada"></script>
 <script src="ui.js?v=82a7ccb0ab"></script>
-<script src="core.js?v=5c5480e667"></script>
+<script src="core.js?v=b71883589c"></script>
 <script src="lib/cytoscape.min.js?v=081591ab73"></script>
-<script>window.GR_V = {"ui.js":"82a7ccb0ab","core.js":"5c5480e667","owner.js":"7d9c00eada","loader.js":"644fe75471","app.js":"a194b92bc5","studio.js":"c9bc9c1acc","customize.js":"320b13c631","styles.css":"0050eaa1d6","lib/cytoscape.min.js":"081591ab73","lib/docx.js":"e018e1d427","lib/qrcode.js":"18ae399f81"};</script>
+<script>window.GR_V = {"ui.js":"82a7ccb0ab","core.js":"b71883589c","owner.js":"7d9c00eada","loader.js":"644fe75471","app.js":"a194b92bc5","studio.js":"5224443ee5","customize.js":"320b13c631","styles.css":"093b1bd28d","lib/cytoscape.min.js":"081591ab73","lib/docx.js":"e018e1d427","lib/qrcode.js":"18ae399f81"};</script>
 <script src="loader.js?v=644fe75471"></script>
 </body>
 </html>

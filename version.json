@@ -1,8 +1,9 @@
 {
-  "version": "1.10.10",
+  "version": "1.11.0",
   "date": "2026-11-11",
   "notes": [
-    "Evidence map: an optional CV section that draws the graph behind the CV, for readers who aren't allowed to open links. It links the roles, projects and degrees on the CV to the skills listed, with a QR code to the live graph (your tailored link, when it's added to the CV). It is a plain drawing with no script, so it is safe in any PDF. Off by default: turn it on per CV under Sections. Word exports leave it out."
+    "Your CVs on every device: generated CVs and letters, with your edits, are now also saved to documents/ in your private repository, so any device you've connected shows them under Recent. Tick \"Keep this CV and letter only on this device\" before writing to keep one out. CVs made before this version stay on their device until you press \"Save … to your private repository\". The folder is never published.",
+    "The evidence map follows the page: delete a role or project by hand, hide a section, or remove a skill from the Skills text, and the drawing redraws without it. Word exports now include it as a picture."
   ],
   "files": [
     "index.html",

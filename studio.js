@@ -149,6 +149,7 @@
     if (r.status === 409 || r.status === 422) throw new Error(`${p} changed on GitHub in the meantime. Try again.`);
     if (r.status === 403 || r.status === 404) throw new Error("The token can read but not save. Give it Contents: Read and write on your private repository.");
     if (!r.ok) throw new Error(`GitHub answered ${r.status} when saving ${p}.`);
+    try { return (await r.json())?.content?.sha; } catch { return undefined; }
   }
   const connected = () => !!(window.GR_OWNER?.configured && G.ownerView);
   // why this page can't save to your private master, in words you can act on
@@ -402,6 +403,7 @@
     const h = LS.get("history", []);
     const i = h.findIndex((x) => x.at === current.at);
     if (i >= 0) { h[i] = current; LS.set("history", h); }
+    queueDoc(current);
   }
 
   async function readRegistry() {
@@ -1274,7 +1276,8 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     e.preventDefault();
     const input = {
       jd: $("#jd").value.trim(), company: $("#company").value.trim(), contact: $("#contact").value.trim(),
-      lang: $("#lang").value, length: $("#length").value, notes: $("#notes").value.trim(), wantLetter: $("#want-letter").checked
+      lang: $("#lang").value, length: $("#length").value, notes: $("#notes").value.trim(), wantLetter: $("#want-letter").checked,
+      ...($("#local-only")?.checked ? { localOnly: true } : {})
     };
     if (input.jd.length < 80) { status("Paste the full job description, at least a few lines.", true); return; }
     const btn = $("#generate-btn"); btn.disabled = true;
@@ -1301,24 +1304,91 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
   function status(msg, err) { const s = $("#gen-status"); s.textContent = msg; s.classList.toggle("err", !!err); }
 
   /* ================= history ================= */
-  function saveHistory(entry) {
-    const h = LS.get("history", []);
-    h.unshift({ at: entry.at, input: entry.input, result: entry.result });
-    LS.set("history", h.slice(0, 8));
+  // Generated CVs and letters are kept in this browser (the last 8) and, unless you tick "only on this
+  // device", in documents/ in your private repository, so your other connected devices show them too.
+  // That folder is never copied to the public site.
+  const docSlug = (t) => String(t || "").normalize("NFKD").replace(/[^\w\s-]/g, "").trim().toLowerCase().replace(/[\s_]+/g, "-").replace(/-+/g, "-").slice(0, 40) || "x";
+  const docPath = (x) => `documents/${x.at}--${docSlug(x.result?.job?.company)}--${docSlug(x.result?.job?.title)}.json`;
+  const docsOn = (x) => connected() && !runtime.inArtifact && !x?.input?.localOnly;
+  const docSha = new Map(), docTimers = new Map();
+  let remoteDocs = null, remoteDocsError = "";
+  async function pushDoc(x) {
+    if (!docsOn(x)) return;
+    const p = docPath(x), body = JSON.stringify({ v: 1, at: x.at, input: x.input, result: x.result, sections: x.sections, edits: x.edits, link: x.link }) + "\n";
+    const put = async () => { const sha = await ghPut(p, body, docSha.get(p), `Document: ${x.result?.job?.company || "?"}, ${x.result?.job?.title || "?"}`); docSha.set(p, sha || (await ghGet(p))?.sha); };
+    try { await put(); }
+    catch (e) { if (!/changed on GitHub/.test(e.message)) throw e; docSha.set(p, (await ghGet(p))?.sha); await put(); }   // saved from another device meanwhile: ours is the newer text
+    if (remoteDocs && !remoteDocs.some((d) => d.path === p)) { remoteDocs.unshift(docEntry(p)); renderHistory(); }
+  }
+  function queueDoc(x, wait = 5000) {
+    if (!docsOn(x)) return;
+    const p = docPath(x); clearTimeout(docTimers.get(p));
+    docTimers.set(p, setTimeout(() => pushDoc(x).catch((e) => toast("Couldn't save this CV to your private repository: " + e.message, 6000)), wait));
+  }
+  const docEntry = (path) => { const m = path.match(/^documents\/(\d+)--(.*?)--(.*)\.json$/); return m ? { path, at: +m[1], company: m[2].replace(/-/g, " "), title: m[3].replace(/-/g, " ") } : null; };
+  async function loadRemoteDocs() {
+    if (!connected() || runtime.inArtifact) return;
+    try {
+      const r = await fetch(ghUrl("documents"), { headers: ghHeaders(), cache: "no-store" });
+      if (r.status === 404) { remoteDocs = []; }
+      else if (!r.ok) throw new Error(`GitHub answered ${r.status}.`);
+      else { const list = await r.json(); list.forEach((f) => docSha.set(f.path, f.sha)); remoteDocs = list.map((f) => docEntry(f.path)).filter(Boolean).sort((a, b) => b.at - a.at); }
+      remoteDocsError = "";
+    } catch (e) { remoteDocsError = e.message; }
     renderHistory();
   }
+  function keepLocal(x) {
+    const h = LS.get("history", []).filter((y) => y.at !== x.at);
+    h.unshift(x); LS.set("history", h.slice(0, 8));
+  }
+  function openEntry(x) {
+    current = x;
+    Object.entries({ jd: "jd", company: "company", contact: "contact", lang: "lang", length: "length", notes: "notes" }).forEach(([k, id]) => ($("#" + id).value = x.input[k] ?? ""));
+    $("#want-letter").checked = !!x.input.wantLetter;
+    if ($("#local-only")) $("#local-only").checked = !!x.input.localOnly;
+    renderResult(x);
+  }
+  function saveHistory(entry) {
+    keepLocal({ at: entry.at, input: entry.input, result: entry.result });
+    renderHistory();
+    queueDoc(entry, 0);
+  }
+  let showAllDocs = false, docsAsked = false;
   function renderHistory() {
-    const h = LS.get("history", []);
-    $("#history").innerHTML = h.length ? `<h3>Recent</h3>` + h.map((x, i) => {
+    const h = LS.get("history", []), here = new Set(h.map((x) => x.at));
+    const remote = (remoteDocs || []).filter((d) => !here.has(d.at));
+    const inRepo = new Set((remoteDocs || []).map((d) => d.at));
+    const cap = (s) => s.replace(/\b\p{L}/gu, (c) => c.toUpperCase());
+    const shownRemote = showAllDocs ? remote : remote.slice(0, 6);
+    const sync = connected() && !runtime.inArtifact;
+    if ($("#local-only-row")) $("#local-only-row").hidden = !sync;
+    if (sync && !docsAsked) { docsAsked = true; loadRemoteDocs(); }
+    const unsaved = sync && remoteDocs ? h.filter((x) => !x.input?.localOnly && !inRepo.has(x.at)) : [];
+    $("#history").innerHTML = (h.length || remote.length ? `<h3>Recent</h3>` : "") + h.map((x, i) => {
       const j = x.result?.job || {};
-      return `<button type="button" data-h="${i}">${esc(j.title || "Untitled role")}${j.company ? `, ${esc(j.company)}` : ""}<br><span>${new Date(x.at).toLocaleDateString()}</span></button>`;
-    }).join("") : "";
-    $$("#history [data-h]").forEach((b) => b.addEventListener("click", () => {
-      const x = LS.get("history", [])[+b.dataset.h]; if (!x) return;
-      current = x;
-      Object.entries({ jd: "jd", company: "company", contact: "contact", lang: "lang", length: "length", notes: "notes" }).forEach(([k, id]) => ($("#" + id).value = x.input[k] ?? ""));
-      $("#want-letter").checked = !!x.input.wantLetter;
-      renderResult(x);
+      const where = !sync ? "" : x.input?.localOnly ? " · this device only" : !remoteDocs || inRepo.has(x.at) ? "" : " · this device only so far";
+      return `<button type="button" data-h="${i}">${esc(j.title || "Untitled role")}${j.company ? `, ${esc(j.company)}` : ""}<br><span>${new Date(x.at).toLocaleDateString()}${where}</span></button>`;
+    }).join("") + shownRemote.map((d) => `<button type="button" data-doc="${esc(d.path)}">${esc(cap(d.title))}, ${esc(cap(d.company))}<br><span>${new Date(d.at).toLocaleDateString()} · from another device</span></button>`).join("")
+      + (remote.length > shownRemote.length ? `<button type="button" class="more" data-docs-all>Show ${remote.length - shownRemote.length} older</button>` : "")
+      + (unsaved.length ? `<button type="button" class="more" data-docs-save>Save ${unsaved.length === 1 ? "this earlier CV" : `these ${unsaved.length} earlier CVs`} to your private repository</button>` : "")
+      + (remoteDocsError ? `<p class="help">Couldn't list the CVs in your private repository: ${esc(remoteDocsError)}</p>` : "");
+    $$("#history [data-h]").forEach((b) => b.addEventListener("click", () => { const x = LS.get("history", [])[+b.dataset.h]; if (x) openEntry(x); }));
+    $("#history [data-docs-all]")?.addEventListener("click", () => { showAllDocs = true; renderHistory(); });
+    $("#history [data-docs-save]")?.addEventListener("click", async (e) => {
+      e.target.disabled = true; e.target.textContent = "Saving…";
+      try { for (const x of unsaved) await pushDoc(x); toast("Saved to your private repository"); }
+      catch (err) { toast("Couldn't save: " + err.message, 6000); }
+      renderHistory();
+    });
+    $$("#history [data-doc]").forEach((b) => b.addEventListener("click", async () => {
+      b.disabled = true;
+      try {
+        const f = await ghGet(b.dataset.doc); if (!f) throw new Error("It is no longer in the repository.");
+        docSha.set(b.dataset.doc, f.sha);
+        const d = JSON.parse(f.text), x = { at: d.at, input: d.input, result: d.result, ...(d.sections ? { sections: d.sections } : {}), ...(d.edits ? { edits: d.edits } : {}), ...(d.link ? { link: d.link } : {}) };
+        x.result.warnings = groundingCheck(x.result, x.input);
+        keepLocal(x); renderHistory(); openEntry(LS.get("history", [])[0]);
+      } catch (e) { b.disabled = false; toast("Couldn't open it: " + e.message, 5000); }
     }));
   }
 
@@ -1565,7 +1635,7 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     let t, t2;
     el.addEventListener("input", () => {
       clearTimeout(t); t = setTimeout(() => markPages(el), 250);
-      clearTimeout(t2); t2 = setTimeout(() => saveEdits(sel === "#cv-paper" ? "cv" : "cl"), 400);
+      clearTimeout(t2); t2 = setTimeout(() => { if (sel === "#cv-paper") refreshGraph(); saveEdits(sel === "#cv-paper" ? "cv" : "cl"); }, 400);
     });
   });
   window.addEventListener("resize", () => ["#cv-paper", "#cl-paper"].forEach((sel) => $(sel) && markPages($(sel))));
@@ -1603,6 +1673,7 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
       if (hidden.includes(k)) sectionStash.set(k, nodes);
       else { sectionStash.delete(k); nodes.forEach((n) => paper.appendChild(n)); }
     });
+    refreshGraph();
     markPages(paper);
   }
   function setSections(order, hidden) {
@@ -1737,28 +1808,42 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (q.isDark(r, c)) d += `M${(x + (c + quiet) * m).toFixed(2)} ${(y + (r + quiet) * m).toFixed(2)}h${m.toFixed(2)}v${m.toFixed(2)}h-${m.toFixed(2)}z`;
     return `<rect x="${x}" y="${y}" width="${size}" height="${size}" fill="#fff"/><path d="${d}" fill="#111"/>`;
   }
-  function cvGraphHtml(result) {
+  // What the page really shows right now: the items still on it (hand-deleted ones and hidden sections
+  // are gone) and the skills still named in its Skills section. null where the page can't say.
+  function paperScope() {
+    const paper = $("#cv-paper"); if (!paper) return null;
+    const tagged = [...paper.querySelectorAll(".p-item[data-node]")];
+    const everTagged = tagged.length || [...sectionStash.values()].some((nodes) => nodes.some((n) => n.nodeType === 1 && (n.matches?.(".p-item[data-node]") || n.querySelector?.(".p-item[data-node]"))));
+    const sk = paper.querySelector(".p-skills");
+    return { ids: everTagged ? new Set(tagged.filter((e) => e.textContent.trim()).map((e) => e.dataset.node)) : null,
+             skillText: sk ? " " + sk.textContent.toLowerCase().replace(/\s+/g, " ") + " " : null };
+  }
+  function cvGraphHtml(result, scope) {
     const cv = result.cv || {};
+    const on = (id) => !scope?.ids || scope.ids.has(id);
+    const named = (id) => { if (!scope?.skillText) return true; const l = byId.get(id).label.toLowerCase(); return scope.skillText.includes(l) || scope.skillText.includes(britishText(byId.get(id).label).toLowerCase()); };
     const cut = (s, n) => { s = String(s || "").replace(/\s+/g, " ").trim(); return s.length > n ? s.slice(0, n - 1).trimEnd() + "…" : s; };
     const name = (n) => cut(n.short || n.label, 38);
     const items = [];
-    experienceView(cv.experience).forEach((e) => items.push({ kind: "role", label: name(e.node), sub: byId.get(e.node.org)?.label, skills: [e.node, ...e.earlier].flatMap((n) => n.skills || []) }));
-    (cv.projects || []).filter((x) => byId.has(x.id)).forEach((x) => { const n = byId.get(x.id); items.push({ kind: "project", label: name(n), sub: "Project", skills: n.skills || [] }); });
-    (cv.education || []).filter((x) => byId.has(x.id)).forEach((x) => { const n = byId.get(x.id); items.push({ kind: "edu", label: name(n), sub: byId.get(n.school)?.label, skills: n.skills || [] }); });
-    const listed = [...new Set((cv.skills || []).flatMap((g) => g.ids || []))].filter((id) => byId.get(id)?.type === "Skill");
+    experienceView(cv.experience).filter((e) => on(e.node.id)).forEach((e) => items.push({ kind: "role", label: name(e.node), sub: byId.get(e.node.org)?.label, skills: [e.node, ...e.earlier].flatMap((n) => n.skills || []) }));
+    (cv.projects || []).filter((x) => byId.has(x.id) && on(x.id)).forEach((x) => { const n = byId.get(x.id); items.push({ kind: "project", label: name(n), sub: "Project", skills: n.skills || [] }); });
+    (cv.education || []).filter((x) => byId.has(x.id) && on(x.id)).forEach((x) => { const n = byId.get(x.id); items.push({ kind: "edu", label: name(n), sub: byId.get(n.school)?.label, skills: n.skills || [] }); });
+    const listed = [...new Set((cv.skills || []).flatMap((g) => g.ids || []))].filter((id) => byId.get(id)?.type === "Skill" && named(id));
     const degree = new Map(listed.map((id) => [id, items.filter((it) => it.skills.includes(id)).length]));
     let skills = listed.filter((id) => degree.get(id) > 0);
     const more = Math.max(0, skills.length - FIG_MAX_SKILLS);
     if (more) { const keep = new Set([...skills].sort((a, b) => degree.get(b) - degree.get(a)).slice(0, FIG_MAX_SKILLS)); skills = skills.filter((id) => keep.has(id)); }
     const shown = items.filter((it) => it.skills.some((id) => skills.includes(id)));
-    if (shown.length < 2 || skills.length < 3) return "";
+    if (shown.length < 2 || skills.length < 3) return scope ? `<div class="p-graph" contenteditable="false"><p class="p-graph-none">Too few linked items are left on this CV to draw the map. Untick it under Sections.</p></div>` : "";
     // skills ordered by where their items sit, so the lines cross as little as possible
     const pos = (id) => { const at = shown.map((it, i) => (it.skills.includes(id) ? i : -1)).filter((i) => i >= 0); return at.reduce((a, b) => a + b, 0) / at.length; };
     skills.sort((a, b) => pos(a) - pos(b));
 
     const W = 660, top = 26, xi = 236, xs = 382, qr = 104, qx = W - qr - 12;
-    const H = Math.max(skills.length * 15, shown.length * 30, qr + 44) + top + 6;
-    const yI = (i) => top + ((i + 0.5) * (H - top - 6)) / shown.length, yS = (i) => top + ((i + 0.5) * (H - top - 6)) / skills.length;
+    const foot = more ? 14 : 0;
+    const H = Math.max(skills.length * 15, shown.length * 30, qr + 44) + top + 6 + foot;
+    const body = H - top - 6 - foot;
+    const yI = (i) => top + ((i + 0.5) * body) / shown.length, yS = (i) => top + ((i + 0.5) * body) / skills.length;
     const head = (x, t, anchor) => `<text x="${x}" y="11" font-size="8" fill="#666" letter-spacing=".06em" text-anchor="${anchor}">${esc(t.toUpperCase())}</text>`;
     const edges = shown.map((it, i) => skills.map((id, j) => (it.skills.includes(id)
       ? `<path d="M${xi} ${yI(i).toFixed(1)}C${xi + 62} ${yI(i).toFixed(1)} ${xs - 62} ${yS(j).toFixed(1)} ${xs} ${yS(j).toFixed(1)}" fill="none" stroke="${FIG_COLOR[it.kind]}" stroke-opacity=".38" stroke-width=".9"/>` : "")).join("")).join("");
@@ -1767,25 +1852,27 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
       ${it.sub ? `<text x="${xi - 11}" y="${(yI(i) + 10).toFixed(1)}" font-size="8.4" fill="#555" text-anchor="end">${esc(cut(it.sub, 44))}</text>` : ""}`).join("");
     const right = skills.map((id, j) => `<circle cx="${xs}" cy="${yS(j).toFixed(1)}" r="3" fill="#fff" stroke="${FIG_COLOR.skill}" stroke-width="1.4"/>
       <text x="${xs + 9}" y="${(yS(j) + 3.4).toFixed(1)}" font-size="10" fill="#111">${esc(cut(byId.get(id).label, 32))}</text>`).join("");
-    const link = graphLink(), qy = top + (H - top - 6 - qr - 34) / 2;
+    const link = graphLink(), qy = top + (body - qr - 34) / 2;
     const code = qrPath(link, qx, qy, qr);
     const scan = code ? `${code}
       <text x="${qx + qr / 2}" y="${qy + qr + 12}" font-size="9" font-weight="600" fill="#111" text-anchor="middle">Scan for the live graph</text>
       <text x="${qx + qr / 2}" y="${qy + qr + 23}" font-size="7.2" fill="#555" text-anchor="middle">${esc(cut(siteBase().replace(/^https?:\/\//, "").replace(/\/$/, ""), 34))}</text>` : "";
-    return `<p class="p-summary p-graph-cap">Each line links a skill on this CV to the work or study where it was used. Drawn from the knowledge graph this CV is generated from${more ? `; ${more} more skill${more === 1 ? "" : "s"} not shown` : ""}.</p>
+    const rest = more ? `<text x="${xs + 9}" y="${(H - 5).toFixed(0)}" font-size="8.4" fill="#555">+ ${more} more skill${more === 1 ? "" : "s"} on this CV</text>` : "";
+    return `<p class="p-summary p-graph-cap">Each line links a skill on this CV to the work or study where it was used. Drawn from the knowledge graph this CV is generated from.</p>
       <div class="p-graph" contenteditable="false"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H.toFixed(0)}" role="img" aria-label="Diagram linking ${shown.length} roles, projects and degrees to ${skills.length} skills">
       ${head(xi - 11, "Work and study", "end")}${head(xs + 9, "Skills used there", "start")}
-      ${edges}${left}${right}${scan}</svg></div>`;
+      ${edges}${left}${right}${rest}${scan}</svg></div>`;
   }
   // redraw the map where it stands (shown or set aside), e.g. when the QR code's link changes
   function refreshGraph() {
     if (!current?.result) return;
-    const t = document.createElement("template"); t.innerHTML = cvGraphHtml(current.result);
+    const t = document.createElement("template"); t.innerHTML = cvGraphHtml(current.result, paperScope());
     const fresh = t.content.querySelector(".p-graph");
     const old = $("#cv-paper .p-graph") || (sectionStash.get("graph") || []).find((n) => n.nodeType === 1 && n.matches?.(".p-graph"));
-    if (!fresh || !old) return;
+    if (!fresh || !old || old.innerHTML === fresh.innerHTML) return;
     old.innerHTML = fresh.innerHTML;
     if (current.edits?.cv) saveEdits("cv");
+    markPages($("#cv-paper"));
   }
   // Experience as shown on a CV: newest first, and a role combined with the roles it was promoted from
   // One CV entry per job: a role and the roles it was promoted from (or to) are shown together,
@@ -1828,13 +1915,13 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
       const n = e.node, org = byId.get(n.org);
       const sub = [n.location, n.employment].filter(Boolean).join(", ");
       if (!e.earlier.length) {
-        return `<div class="p-item">${row(esc(n.label) + (org ? `, ${esc(org.label)}` : ""), G.dateRange(n))}${sub ? `<div class="p-sub">${esc(sub)}</div>` : ""}${bullets(e.bullets)}</div>`;
+        return `<div class="p-item" data-node="${esc(n.id)}">${row(esc(n.label) + (org ? `, ${esc(org.label)}` : ""), G.dateRange(n))}${sub ? `<div class="p-sub">${esc(sub)}</div>` : ""}${bullets(e.bullets)}</div>`;
       }
       // a promotion: the employer once, then each title on its own line with its own dates, latest first.
       // This is how application forms that read CVs expect it; a "Promoted from …" note beside one set of
       // dates was read by them as a second job, and gave the later title the dates of the whole stay.
       const roles = [n, ...e.earlier].map((r) => `<div class="p-row p-role"><span class="p-title">${esc(r.label)}</span><span class="p-dates">${esc(G.dateRange(r))}</span></div>`).join("");
-      return `<div class="p-item p-chain">${row(org ? esc(org.label) : esc(n.label), "")}${sub ? `<div class="p-sub">${esc(sub)}</div>` : ""}${roles}${bullets(e.bullets)}</div>`;
+      return `<div class="p-item p-chain" data-node="${esc(n.id)}">${row(org ? esc(org.label) : esc(n.label), "")}${sub ? `<div class="p-sub">${esc(sub)}</div>` : ""}${roles}${bullets(e.bullets)}</div>`;
     }).join("");
     // newest first, like experience: ongoing items on top, then by end date, then by start date
     const when = (n) => [n.end || (n.start ? "9999" : n.date || ""), n.start || n.date || ""];
@@ -1842,7 +1929,7 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     const node = (x) => byId.get(typeof x === "string" ? x : x.id) || {};
     const proj = (cv.projects || []).filter((x) => byId.has(x.id)).sort(newest(node)).map((x) => {
       const n = byId.get(x.id);
-      return `<div class="p-item">${row(esc(sp(n.label)), G.dateRange(n) || n.status)}${bullets(x.bullets)}</div>`;
+      return `<div class="p-item" data-node="${esc(n.id)}">${row(esc(sp(n.label)), G.dateRange(n) || n.status)}${bullets(x.bullets)}</div>`;
     }).join("");
     const vol = (cv.volunteering || []).filter((x) => byId.has(x.id)).sort(newest(node)).map((x) => {
       const n = byId.get(x.id), org = byId.get(n.org);
@@ -1851,7 +1938,7 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     }).join("");
     const edu = (cv.education || []).filter((x) => byId.has(x.id)).sort(newest(node)).map((x) => {
       const n = byId.get(x.id); const s = byId.get(n.school);
-      return `<div class="p-item">${row(esc(n.label), G.dateRange(n))}${s ? `<div class="p-sub">${esc(s.label)}</div>` : ""}${x.note ? `<p class="p-summary">${esc(x.note)}</p>` : ""}</div>`;
+      return `<div class="p-item" data-node="${esc(n.id)}">${row(esc(n.label), G.dateRange(n))}${s ? `<div class="p-sub">${esc(s.label)}</div>` : ""}${x.note ? `<p class="p-summary">${esc(x.note)}</p>` : ""}</div>`;
     }).join("");
     const skills = (cv.skills || []).map((g) => `<p><b>${esc(sp(g.group))}:</b> ${g.ids.map((id) => esc(sp(byId.get(id).label))).join(", ")}</p>`).join("");
     const awards = (cv.awards || []).filter((id) => byId.has(id)).sort(newest(node)).map((id) => {
@@ -1921,10 +2008,12 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     };
     const walk = (el) => {
       for (const c of el.children) {
+        if (c.classList.contains("p-graph")) continue;   // a drawing: no text to carry over
         if (c.nodeName === "H1") blocks.push({ kind: "title", runs: runs(c) });
         else if (c.nodeName === "H2") blocks.push({ kind: "heading", runs: runs(c) });
         else if (c.nodeName === "UL") [...c.children].forEach((li) => blocks.push({ kind: "bullet", runs: runs(li) }));
         else if (c.classList.contains("p-row")) blocks.push({ kind: "row", left: c.children[0]?.innerText || "", right: c.children[1]?.innerText || "" });
+        else if (c.classList.contains("p-graph-img")) blocks.push({ kind: "figure", runs: [] });
         else if (c.nodeName === "P" || c.classList.contains("p-sub")) blocks.push({ kind: c.classList.contains("p-sub") ? "sub" : c.classList.contains("p-headline") ? "lead" : c.classList.contains("p-contact") ? "contact" : "para", runs: runs(c) });
         else if (c.children.length) walk(c);
         else if (c.textContent.trim()) blocks.push({ kind: "para", runs: runs(c) });
@@ -1936,6 +2025,8 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
 
   function toMarkdown(root) {
     const md = (rs) => rs.map((r) => (r.href ? `[${r.text}](${r.href})` : r.bold ? `**${r.text.trim()}** ` : r.italic ? `*${r.text}*` : r.text)).join("").replace(/\n/g, "  \n").trim();
+    root = root.cloneNode(true);   // text only: the evidence map and its heading stay behind
+    root.querySelector('h2[data-sec="graph"]')?.remove(); root.querySelector(".p-graph-cap")?.remove();
     return toBlocks(root).map((b) => {
       switch (b.kind) {
         case "title": return `# ${md(b.runs)}`;
@@ -1948,6 +2039,17 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     }).join("\n").replace(/\n{3,}/g, "\n\n").trim() + "\n";
   }
 
+  // a drawing on the page as a PNG (for Word, which can't hold it as a drawing)
+  async function svgToPng(svg, scale = 3) {
+    const c = svg.cloneNode(true), [, , w, h] = (c.getAttribute("viewBox") || "0 0 660 300").split(/\s+/).map(Number);
+    c.setAttribute("width", w); c.setAttribute("height", h); c.setAttribute("font-family", "Arial, Helvetica, sans-serif");
+    const url = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(new XMLSerializer().serializeToString(c));
+    const img = new Image(); await new Promise((res, rej) => { img.onload = res; img.onerror = () => rej(new Error("drawing")); img.src = url; });
+    const cv = document.createElement("canvas"); cv.width = w * scale; cv.height = h * scale;
+    const g = cv.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, cv.width, cv.height); g.drawImage(img, 0, 0, cv.width, cv.height);
+    const blob = await new Promise((res) => cv.toBlob(res, "image/png"));
+    return { data: new Uint8Array(await blob.arrayBuffer()), w, h };
+  }
   let docxLoading;
   function loadDocx() {
     if (window.docx) return Promise.resolve(window.docx);
@@ -1969,11 +2071,18 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
       const t = r.text.split("\n").map((t, i) => new TextRun({ text: t, bold: r.bold, italics: r.italic, break: i ? 1 : 0, ...extra, ...(r.href ? { underline: {} } : {}) }));
       return r.href && ExternalHyperlink ? [new ExternalHyperlink({ link: r.href, children: t })] : t;
     });
-    // Word gets the text only: the evidence map is a drawing, so it is left out there
+    // the evidence map goes into Word as a picture, in the place where the drawing stands
     root = root.cloneNode(true);
-    const gh = root.querySelector('h2[data-sec="graph"]');
-    if (gh) { for (let n = gh.nextSibling; n && !(n.nodeType === 1 && n.matches?.("h2[data-sec]")); ) { const nx = n.nextSibling; n.remove(); n = nx; } gh.remove(); }
-    const children = toBlocks(root).map((b) => {
+    const fig = root.querySelector(".p-graph"), svg = fig?.querySelector("svg");
+    let figure = null;
+    if (svg && d.ImageRun) { try { figure = await svgToPng(svg, 3); } catch { figure = null; } }
+    if (fig) { if (figure) { const mark = document.createElement("p"); mark.className = "p-graph-img"; fig.replaceWith(mark); } else { root.querySelector(".p-graph-cap")?.remove(); root.querySelector('h2[data-sec="graph"]')?.remove(); fig.remove(); } }
+    const blocks = toBlocks(root);
+    const children = blocks.map((b) => {
+      if (b.kind === "figure") {
+        const wPx = Math.round(textWidth / 15), hPx = Math.round((wPx * figure.h) / figure.w);   // 15 twips to the pixel
+        return new Paragraph({ children: [new d.ImageRun({ type: "png", data: figure.data, transformation: { width: wPx, height: hPx } })], spacing: { before: 60, after: 60 } });
+      }
       switch (b.kind) {
         case "title": return new Paragraph({ children: mk(b.runs, { bold: true, size: isLetter ? (compact ? 30 : 32) : compact ? 34 : modern ? 44 : 40, font, ...(modern ? { color: accent } : {}) }), spacing: { after: 40 } });
         case "lead": return new Paragraph({ children: mk(b.runs, { size: compact ? 20 : 22, ...(modern ? { color: accent } : {}) }), spacing: { after: 40 } });
@@ -2045,5 +2154,5 @@ ${fontLink()}
   // test hook: lets the test suite render a result without calling a model
   window.GR.studio = { renderResult: (x) => { x.result.warnings = groundingCheck(x.result, x.input); current = x; renderResult(x); }, buildPrompt, groundingCheck, toMarkdown, toBlocks, standaloneHtml, markPages,
     // for customize.js
-    renderCv, renderLetter, styleCv, getCurrent: () => current, ghGet, ghPut, connected, enterStudio };
+    renderCv, renderLetter, styleCv, toDocx, renderHistory, getCurrent: () => current, ghGet, ghPut, connected, enterStudio };
 })();

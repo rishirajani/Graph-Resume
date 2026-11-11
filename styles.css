@@ -590,3 +590,6 @@ a.btn { text-decoration: none; color: var(--ink); display: inline-flex; align-it
 .paper .p-graph { margin: 4pt 0 0; break-inside: avoid; user-select: none; }
 .paper .p-graph svg { display: block; width: 100%; height: auto; font-family: var(--sans); }
 .paper .p-graph-cap { font-size: 8.8pt; color: rgb(68, 68, 68); margin-bottom: 2pt; break-after: avoid; }
+.paper .p-graph-none { font-size: 8.8pt; color: rgb(110, 110, 110); font-style: italic; margin: 0; }
+.history button.more { color: var(--c-role); font-size: 13px; }
+#local-only-row .muted { color: var(--muted); font-size: 13px; }
