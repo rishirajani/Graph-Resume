@@ -1841,7 +1841,13 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
 
     const W = 660, top = 26, xi = 236, xs = 382, qr = 104, qx = W - qr - 12;
     const foot = more ? 14 : 0;
-    const H = Math.max(skills.length * 15, shown.length * 30, qr + 44) + top + 6 + foot;
+    // under the QR code: what it opens, and the address in full for anyone who'd rather type it
+    const link = graphLink(), tailored = link !== siteBase();
+    const bare = link.replace(/^https?:\/\//, "").replace(/\/$/, ""), at = bare.indexOf("#");
+    const note = [...(tailored ? ["Scan for the live graph,", "tailored to this role"] : ["Scan for the live graph"]).map((t) => ({ t, b: 1 })),
+      ...(at > 0 ? [bare.slice(0, at).replace(/\/$/, ""), "/" + bare.slice(at)] : [bare]).map((t) => ({ t: cut(t, 38) }))];
+    const noteH = note.reduce((h, l) => h + (l.b ? 11 : 9.5), 4);
+    const H = Math.max(skills.length * 15, shown.length * 30, qr + noteH + 8) + top + 6 + foot;
     const body = H - top - 6 - foot;
     const yI = (i) => top + ((i + 0.5) * body) / shown.length, yS = (i) => top + ((i + 0.5) * body) / skills.length;
     const head = (x, t, anchor) => `<text x="${x}" y="11" font-size="8" fill="#666" letter-spacing=".06em" text-anchor="${anchor}">${esc(t.toUpperCase())}</text>`;
@@ -1852,11 +1858,10 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
       ${it.sub ? `<text x="${xi - 11}" y="${(yI(i) + 10).toFixed(1)}" font-size="8.4" fill="#555" text-anchor="end">${esc(cut(it.sub, 44))}</text>` : ""}`).join("");
     const right = skills.map((id, j) => `<circle cx="${xs}" cy="${yS(j).toFixed(1)}" r="3" fill="#fff" stroke="${FIG_COLOR.skill}" stroke-width="1.4"/>
       <text x="${xs + 9}" y="${(yS(j) + 3.4).toFixed(1)}" font-size="10" fill="#111">${esc(cut(byId.get(id).label, 32))}</text>`).join("");
-    const link = graphLink(), qy = top + (body - qr - 34) / 2;
+    const qy = top + (body - qr - noteH) / 2;
     const code = qrPath(link, qx, qy, qr);
-    const scan = code ? `${code}
-      <text x="${qx + qr / 2}" y="${qy + qr + 12}" font-size="9" font-weight="600" fill="#111" text-anchor="middle">Scan for the live graph</text>
-      <text x="${qx + qr / 2}" y="${qy + qr + 23}" font-size="7.2" fill="#555" text-anchor="middle">${esc(cut(siteBase().replace(/^https?:\/\//, "").replace(/\/$/, ""), 34))}</text>` : "";
+    let ny = qy + qr + 1;
+    const scan = code ? code + note.map((l) => { ny += l.b ? 11 : 9.5; return `<text x="${qx + qr / 2}" y="${ny.toFixed(1)}" font-size="${l.b ? 9 : 6.4}" ${l.b ? 'font-weight="600" fill="#111"' : 'fill="#555"'} text-anchor="middle">${esc(l.t)}</text>`; }).join("") : "";
     const rest = more ? `<text x="${xs + 9}" y="${(H - 5).toFixed(0)}" font-size="8.4" fill="#555">+ ${more} more skill${more === 1 ? "" : "s"} on this CV</text>` : "";
     return `<p class="p-summary p-graph-cap">Each line links a skill on this CV to the work or study where it was used. Drawn from the knowledge graph this CV is generated from.</p>
       <div class="p-graph" contenteditable="false"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H.toFixed(0)}" role="img" aria-label="Diagram linking ${shown.length} roles, projects and degrees to ${skills.length} skills">
