@@ -86,4 +86,6 @@ Your key is stored only in your browser's local storage. It isn't in the site's 
 3. A grounding check runs on every answer. It drops references to nodes that don't exist, flags any number that isn't in your graph, flags "N years" claims your graph doesn't state, and lists draft nodes or roles without dates.
 4. The *Fit* tab shows each requirement with the graph evidence behind it, including gaps. *Highlight matches on the graph* lights up those nodes with a highlighter.
 
+**Evidence map:** under *Sections…* you can add a drawing of the graph behind the CV: its roles, projects and degrees linked to the skills it lists, with a QR code to the live graph. It is for readers who may not open links; it is a plain vector drawing (no script) and is left out of Word exports.
+
 Every text in the CV and letter preview is editable before export. **PDF** uses your browser's print dialog (choose "Save as PDF"); **Word** produces a .docx; recent results are kept in this browser under *Recent*.

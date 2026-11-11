@@ -1,8 +1,8 @@
 {
-  "version": "1.10.9",
+  "version": "1.10.10",
   "date": "2026-11-11",
   "notes": [
-    "A Contact button beside Copy link opens your email, LinkedIn, GitHub and location. Before, these only showed in the text view, so a visitor looking at the graph had no way to reach you."
+    "Evidence map: an optional CV section that draws the graph behind the CV, for readers who aren't allowed to open links. It links the roles, projects and degrees on the CV to the skills listed, with a QR code to the live graph (your tailored link, when it's added to the CV). It is a plain drawing with no script, so it is safe in any PDF. Off by default: turn it on per CV under Sections. Word exports leave it out."
   ],
   "files": [
     "index.html",

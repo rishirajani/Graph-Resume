@@ -44,7 +44,7 @@
     system: { label: "System fonts (nothing to download)", sans: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif', serif: 'Georgia, "Times New Roman", serif', href: "" }
   };
 
-  const CV_SECTIONS = ["profile", "experience", "projects", "education", "skills", "awards", "certifications", "volunteering", "languages"];
+  const CV_SECTIONS = ["profile", "experience", "projects", "education", "skills", "awards", "certifications", "volunteering", "languages", "graph"];
   const DEFAULTS = {
     theme: "ink",                 // ink | paper | forest | slate | auto
     fonts: "grotesk",             // grotesk | inter | work | plex | system

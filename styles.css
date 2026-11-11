@@ -585,3 +585,8 @@ a.btn { text-decoration: none; color: var(--ink); display: inline-flex; align-it
 .contact-list dd { margin: 0; overflow-wrap: anywhere; }
 .contact-list a { color: var(--c-role); }
 @media (max-width: 640px) { .contact-list > div { grid-template-columns: 1fr; gap: 1px; } }
+
+/* CV: the evidence map (a drawing of the graph behind the CV) */
+.paper .p-graph { margin: 4pt 0 0; break-inside: avoid; user-select: none; }
+.paper .p-graph svg { display: block; width: 100%; height: auto; font-family: var(--sans); }
+.paper .p-graph-cap { font-size: 8.8pt; color: rgb(68, 68, 68); margin-bottom: 2pt; break-after: avoid; }

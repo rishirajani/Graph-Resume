@@ -14,7 +14,7 @@
 
   const LOOK_KEYS = ["theme", "fonts", "colors", "labelSize"];       // apply live in the preview
   const COLOR_LABELS = { role: "Experience", org: "Organisations", edu: "Education", project: "Projects", skill: "Skills", other: "More", highlight: "Highlight" };
-  const SECTION_LABELS = { profile: "Profile", experience: "Experience", projects: "Projects", education: "Education", skills: "Skills", awards: "Awards", certifications: "Certifications", volunteering: "Volunteering", languages: "Languages" };
+  const SECTION_LABELS = { profile: "Profile", experience: "Experience", projects: "Projects", education: "Education", skills: "Skills", awards: "Awards", certifications: "Certifications", volunteering: "Volunteering", languages: "Languages", graph: "Evidence map" };
   const GROUPS = [["exp", "Experience"], ["edu", "Education"], ["proj", "Projects"], ["other", "More (languages, certificates, awards)"]];
 
   /* ---------------- preview ---------------- */

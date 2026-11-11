@@ -1323,7 +1323,7 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
   }
 
   /* ================= render results ================= */
-  const TITLES_EN = { profile: "Profile", experience: "Experience", projects: "Projects", education: "Education", skills: "Skills", languages: "Languages", awards: "Awards", certifications: "Certifications", volunteering: "Volunteering" };
+  const TITLES_EN = { profile: "Profile", experience: "Experience", projects: "Projects", education: "Education", skills: "Skills", languages: "Languages", awards: "Awards", certifications: "Certifications", volunteering: "Volunteering", graph: "Evidence map" };
   function chipFor(id) {
     const n = byId.get(id); if (!n) return "";
     const org = ["Role", "Volunteer"].includes(n.type) ? byId.get(n.org)?.label : "";
@@ -1400,7 +1400,7 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
   // Breaks are measured on an invisible copy laid out exactly like the printed page
   // (210 mm wide, print margins), so the window's width can't skew them.
   const SHEET_GAP = 18; // px of grey between sheets on screen
-  const BLOCKS = "h1, h2, .p-item, .p-skills > p, .p-summary, .l-head, .l-meta, p, ul > li";
+  const BLOCKS = "h1, h2, .p-item, .p-skills > p, .p-summary, .p-graph, .l-head, .l-meta, p, ul > li";
   const pageMargin = (el) => (el.classList.contains("cv-compact") ? 11 : 15);
   const PRINT_SLACK_MM = 6;
   // a copy of the page without the on-screen sheet spacing, for exports and measuring
@@ -1433,7 +1433,7 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     const y = (n) => n.getBoundingClientRect().top - pr.top, yb = (n) => n.getBoundingClientRect().bottom - pr.top;
     const blocks = [...el.querySelectorAll(BLOCKS)];
     // blocks printed whole (styles.css keeps them together): entries, skill lines, summaries, letter heads
-    const WHOLE = ".p-item, .p-skills > p, .p-summary, .l-head, .l-meta";
+    const WHOLE = ".p-item, .p-skills > p, .p-summary, .p-graph, .l-head, .l-meta";
     const keep = [...el.querySelectorAll(WHOLE + ", h2")];
     // what a heading must stay with: the first block of its section
     const firstAfter = (h) => { let n = h.nextElementSibling; while (n && !n.matches(WHOLE) && n.firstElementChild) n = n.firstElementChild; return n; };
@@ -1575,7 +1575,9 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     const base = CVUI().order;
     const own = current?.sections;
     const order = own?.order ? [...own.order.filter((k) => base.includes(k)), ...base.filter((k) => !own.order.includes(k))] : [...base];
-    return { order, hidden: (own?.hidden || []).filter((k) => order.includes(k)), custom: !!own };
+    // the evidence map is off unless this CV turns it on (also for CVs arranged before it existed)
+    const hidden = own ? (own.g ? own.hidden || [] : [...(own.hidden || []), "graph"]) : ["graph"];
+    return { order, hidden: [...new Set(hidden)].filter((k) => order.includes(k)), custom: !!own };
   }
   function cvLook() { const c = cvSections(); return Object.assign({}, CVUI(), { order: c.order, hidden: c.hidden }); }
   // which sections this CV has content for, with their titles as shown
@@ -1604,7 +1606,7 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     markPages(paper);
   }
   function setSections(order, hidden) {
-    current.sections = order ? { order, hidden } : undefined;
+    current.sections = order ? { order, hidden, g: 1 } : undefined;
     updateHistoryItem(); applySections(); renderSectionPanel();
     if (current.edits?.cv) saveEdits("cv");
   }
@@ -1673,6 +1675,7 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     const cv = $("#cv-paper .p-contact"), cl = $("#cl-paper .l-head p");
     if (cv) cv.innerHTML = contactLine();
     if (cl) cl.innerHTML = contactLine();
+    refreshGraph();
     if (current?.edits?.cv) saveEdits("cv");
     if (current?.edits?.cl) saveEdits("cl");
     ["#cv-paper", "#cl-paper"].forEach((sel) => markPages($(sel)));
@@ -1684,8 +1687,15 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     if (ed.cv) {
       $("#cv-paper").innerHTML = ed.cv;
       Object.entries(ed.cvHidden || {}).forEach(([k, html]) => { const t = document.createElement("template"); t.innerHTML = html; sectionStash.set(k, [...t.content.childNodes]); });
+      // a CV edited before the evidence map existed has no such section saved: draw it now, set aside
+      if (!$('#cv-paper h2[data-sec="graph"]') && !sectionStash.has("graph")) {
+        const t = document.createElement("template"); t.innerHTML = renderCv(result, Object.assign(cvLook(), { order: ["graph"], hidden: [] }));
+        const h = t.content.querySelector('h2[data-sec="graph"]');
+        if (h) { const nodes = [h]; for (let n = h.nextSibling; n; n = n.nextSibling) nodes.push(n); sectionStash.set("graph", nodes); }
+      }
     } else $("#cv-paper").innerHTML = renderCv(result, Object.assign(cvLook(), { hidden: [] }));
     styleCv($("#cv-paper"));
+    if (!window.qrcode) loadQr().then(() => { refreshGraph(); markPages($("#cv-paper")); }).catch(() => {});
     applySections(); renderSectionPanel();
     if (result.coverLetter) { $("#cl-paper").innerHTML = ed.cl || renderLetter(result, input); styleCv($("#cl-paper")); }
     showEditState();
@@ -1702,6 +1712,80 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
     ].filter(Boolean);
     if (current?.link?.inCv && current.link.url) parts.push(`<a href="${esc(current.link.url)}">${esc(CVUI().linkLabel || "Portfolio")}</a>`);
     return parts.join("  |  ");
+  }
+
+  /* ----- the evidence map: a picture of the graph behind this CV, for readers who can't open links ----- */
+  // Left: the work and study this CV lists. Right: the skills it lists. A line means that item used
+  // that skill in the graph. Plain SVG (no script), so it prints as sharp vector and is safe in any PDF.
+  const FIG_COLOR = { role: "#2C46C7", project: "#A1275D", edu: "#A86A12", skill: "#0D7776" };
+  const FIG_MAX_SKILLS = 18;
+  let qrLoading;
+  function loadQr() {
+    if (window.qrcode) return Promise.resolve(window.qrcode);
+    return (qrLoading ||= new Promise((res, rej) => {
+      const s = document.createElement("script"); s.src = window.GR_V?.["lib/qrcode.js"] ? `lib/qrcode.js?v=${window.GR_V["lib/qrcode.js"]}` : "lib/qrcode.js";
+      s.onload = () => res(window.qrcode); s.onerror = () => rej(new Error("Couldn't load the QR code maker."));
+      document.head.appendChild(s);
+    }));
+  }
+  const graphLink = () => (current?.link?.inCv && current.link.url ? current.link.url : siteBase());
+  function qrPath(text, x, y, size) {
+    if (!window.qrcode) return "";
+    const q = window.qrcode(0, "M"); q.addData(text); q.make();
+    const n = q.getModuleCount(), quiet = 4, m = size / (n + 2 * quiet);
+    let d = "";
+    for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (q.isDark(r, c)) d += `M${(x + (c + quiet) * m).toFixed(2)} ${(y + (r + quiet) * m).toFixed(2)}h${m.toFixed(2)}v${m.toFixed(2)}h-${m.toFixed(2)}z`;
+    return `<rect x="${x}" y="${y}" width="${size}" height="${size}" fill="#fff"/><path d="${d}" fill="#111"/>`;
+  }
+  function cvGraphHtml(result) {
+    const cv = result.cv || {};
+    const cut = (s, n) => { s = String(s || "").replace(/\s+/g, " ").trim(); return s.length > n ? s.slice(0, n - 1).trimEnd() + "…" : s; };
+    const name = (n) => cut(n.short || n.label, 38);
+    const items = [];
+    experienceView(cv.experience).forEach((e) => items.push({ kind: "role", label: name(e.node), sub: byId.get(e.node.org)?.label, skills: [e.node, ...e.earlier].flatMap((n) => n.skills || []) }));
+    (cv.projects || []).filter((x) => byId.has(x.id)).forEach((x) => { const n = byId.get(x.id); items.push({ kind: "project", label: name(n), sub: "Project", skills: n.skills || [] }); });
+    (cv.education || []).filter((x) => byId.has(x.id)).forEach((x) => { const n = byId.get(x.id); items.push({ kind: "edu", label: name(n), sub: byId.get(n.school)?.label, skills: n.skills || [] }); });
+    const listed = [...new Set((cv.skills || []).flatMap((g) => g.ids || []))].filter((id) => byId.get(id)?.type === "Skill");
+    const degree = new Map(listed.map((id) => [id, items.filter((it) => it.skills.includes(id)).length]));
+    let skills = listed.filter((id) => degree.get(id) > 0);
+    const more = Math.max(0, skills.length - FIG_MAX_SKILLS);
+    if (more) { const keep = new Set([...skills].sort((a, b) => degree.get(b) - degree.get(a)).slice(0, FIG_MAX_SKILLS)); skills = skills.filter((id) => keep.has(id)); }
+    const shown = items.filter((it) => it.skills.some((id) => skills.includes(id)));
+    if (shown.length < 2 || skills.length < 3) return "";
+    // skills ordered by where their items sit, so the lines cross as little as possible
+    const pos = (id) => { const at = shown.map((it, i) => (it.skills.includes(id) ? i : -1)).filter((i) => i >= 0); return at.reduce((a, b) => a + b, 0) / at.length; };
+    skills.sort((a, b) => pos(a) - pos(b));
+
+    const W = 660, top = 26, xi = 236, xs = 382, qr = 104, qx = W - qr - 12;
+    const H = Math.max(skills.length * 15, shown.length * 30, qr + 44) + top + 6;
+    const yI = (i) => top + ((i + 0.5) * (H - top - 6)) / shown.length, yS = (i) => top + ((i + 0.5) * (H - top - 6)) / skills.length;
+    const head = (x, t, anchor) => `<text x="${x}" y="11" font-size="8" fill="#666" letter-spacing=".06em" text-anchor="${anchor}">${esc(t.toUpperCase())}</text>`;
+    const edges = shown.map((it, i) => skills.map((id, j) => (it.skills.includes(id)
+      ? `<path d="M${xi} ${yI(i).toFixed(1)}C${xi + 62} ${yI(i).toFixed(1)} ${xs - 62} ${yS(j).toFixed(1)} ${xs} ${yS(j).toFixed(1)}" fill="none" stroke="${FIG_COLOR[it.kind]}" stroke-opacity=".38" stroke-width=".9"/>` : "")).join("")).join("");
+    const left = shown.map((it, i) => `<circle cx="${xi}" cy="${yI(i).toFixed(1)}" r="4.2" fill="${FIG_COLOR[it.kind]}"/>
+      <text x="${xi - 11}" y="${(yI(i) + (it.sub ? -1 : 3.5)).toFixed(1)}" font-size="10.5" font-weight="600" fill="#111" text-anchor="end">${esc(it.label)}</text>
+      ${it.sub ? `<text x="${xi - 11}" y="${(yI(i) + 10).toFixed(1)}" font-size="8.4" fill="#555" text-anchor="end">${esc(cut(it.sub, 44))}</text>` : ""}`).join("");
+    const right = skills.map((id, j) => `<circle cx="${xs}" cy="${yS(j).toFixed(1)}" r="3" fill="#fff" stroke="${FIG_COLOR.skill}" stroke-width="1.4"/>
+      <text x="${xs + 9}" y="${(yS(j) + 3.4).toFixed(1)}" font-size="10" fill="#111">${esc(cut(byId.get(id).label, 32))}</text>`).join("");
+    const link = graphLink(), qy = top + (H - top - 6 - qr - 34) / 2;
+    const code = qrPath(link, qx, qy, qr);
+    const scan = code ? `${code}
+      <text x="${qx + qr / 2}" y="${qy + qr + 12}" font-size="9" font-weight="600" fill="#111" text-anchor="middle">Scan for the live graph</text>
+      <text x="${qx + qr / 2}" y="${qy + qr + 23}" font-size="7.2" fill="#555" text-anchor="middle">${esc(cut(siteBase().replace(/^https?:\/\//, "").replace(/\/$/, ""), 34))}</text>` : "";
+    return `<p class="p-summary p-graph-cap">Each line links a skill on this CV to the work or study where it was used. Drawn from the knowledge graph this CV is generated from${more ? `; ${more} more skill${more === 1 ? "" : "s"} not shown` : ""}.</p>
+      <div class="p-graph" contenteditable="false"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H.toFixed(0)}" role="img" aria-label="Diagram linking ${shown.length} roles, projects and degrees to ${skills.length} skills">
+      ${head(xi - 11, "Work and study", "end")}${head(xs + 9, "Skills used there", "start")}
+      ${edges}${left}${right}${scan}</svg></div>`;
+  }
+  // redraw the map where it stands (shown or set aside), e.g. when the QR code's link changes
+  function refreshGraph() {
+    if (!current?.result) return;
+    const t = document.createElement("template"); t.innerHTML = cvGraphHtml(current.result);
+    const fresh = t.content.querySelector(".p-graph");
+    const old = $("#cv-paper .p-graph") || (sectionStash.get("graph") || []).find((n) => n.nodeType === 1 && n.matches?.(".p-graph"));
+    if (!fresh || !old) return;
+    old.innerHTML = fresh.innerHTML;
+    if (current.edits?.cv) saveEdits("cv");
   }
   // Experience as shown on a CV: newest first, and a role combined with the roles it was promoted from
   // One CV entry per job: a role and the roles it was promoted from (or to) are shown together,
@@ -1789,13 +1873,14 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
       awards: () => sec(T.awards, awards),
       certifications: () => sec(T.certifications, certs),
       volunteering: () => sec(T.volunteering, vol),
-      languages: () => sec(T.languages, langs ? `<p class="p-summary">${langs}</p>` : "")
+      languages: () => sec(T.languages, langs ? `<p class="p-summary">${langs}</p>` : ""),
+      graph: () => sec(T.graph, cvGraphHtml(result))
     };
     return `
       <h1>${esc(me.name)}</h1>
       <p class="p-headline">${esc(cv.headline || me.headline || "")}</p>
       <p class="p-contact">${contactLine()}</p>
-      ${cvui.order.filter((k) => !(cvui.hidden || []).includes(k)).map((k) => (SECTIONS[k] ? SECTIONS[k]().replace("<h2>", `<h2 data-sec="${k}">`) : "")).join("\n")}`;
+      ${cvui.order.filter((k) => !(cvui.hidden || ["graph"]).includes(k)).map((k) => (SECTIONS[k] ? SECTIONS[k]().replace("<h2>", `<h2 data-sec="${k}">`) : "")).join("\n")}`;
   }
 
   function renderLetter(result, input) {
@@ -1884,6 +1969,10 @@ ${input.company ? `Company: ${input.company}\n` : ""}${input.contact ? `Hiring c
       const t = r.text.split("\n").map((t, i) => new TextRun({ text: t, bold: r.bold, italics: r.italic, break: i ? 1 : 0, ...extra, ...(r.href ? { underline: {} } : {}) }));
       return r.href && ExternalHyperlink ? [new ExternalHyperlink({ link: r.href, children: t })] : t;
     });
+    // Word gets the text only: the evidence map is a drawing, so it is left out there
+    root = root.cloneNode(true);
+    const gh = root.querySelector('h2[data-sec="graph"]');
+    if (gh) { for (let n = gh.nextSibling; n && !(n.nodeType === 1 && n.matches?.("h2[data-sec]")); ) { const nx = n.nextSibling; n.remove(); n = nx; } gh.remove(); }
     const children = toBlocks(root).map((b) => {
       switch (b.kind) {
         case "title": return new Paragraph({ children: mk(b.runs, { bold: true, size: isLetter ? (compact ? 30 : 32) : compact ? 34 : modern ? 44 : 40, font, ...(modern ? { color: accent } : {}) }), spacing: { after: 40 } });
