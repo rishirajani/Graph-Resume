@@ -434,6 +434,29 @@ window.RESUME = {
       ]
     },
     {
+      "id": "p-jobmarket",
+      "type": "Project",
+      "label": "Job-market pipeline: dlt and dbt pipeline over German job ads",
+      "short": "Job-market\npipeline",
+      "start": "2026-11",
+      "url": "https://github.com/rishirajani/job-market-pipeline",
+      "highlights": [
+        "Building a daily pipeline over German job ads: dlt loaders for the Arbeitnow and Bundesagentur APIs into DuckDB, merged on each ad's ID.",
+        "Modeling the raw data in dbt, with staging models, declared sources and generic, relationship and singular tests."
+      ],
+      "skills": [
+        "s-dbt",
+        "s-dlt",
+        "s-duckdb",
+        "s-sql",
+        "s-python",
+        "s-etl",
+        "s-rest",
+        "s-dq",
+        "s-git"
+      ]
+    },
+    {
       "id": "p-loom",
       "type": "Project",
       "label": "Loom: open-source CSV-to-RDF ontology mapping tool",
@@ -796,6 +819,24 @@ window.RESUME = {
         "wd:Q192490",
         "esco:a8d07b5a-c1a1-42c6-9d53-db9c7a2ca996"
       ]
+    },
+    {
+      "id": "s-dbt",
+      "type": "Skill",
+      "label": "dbt",
+      "group": "g-de"
+    },
+    {
+      "id": "s-dlt",
+      "type": "Skill",
+      "label": "dlt (data load tool)",
+      "group": "g-de"
+    },
+    {
+      "id": "s-duckdb",
+      "type": "Skill",
+      "label": "DuckDB",
+      "group": "g-de"
     },
     {
       "id": "s-sap",

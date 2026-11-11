@@ -17,7 +17,7 @@ cv:me a schema:Person ;
     weft:worksAs cv:v-embassy ;
     weft:studied cv:e-msc, cv:e-be, cv:e-rubika ;
     weft:holds cv:c-udemy-python, cv:c-hackerrank-python, cv:c-ielts ;
-    weft:built cv:p-thesis, cv:p-weft, cv:p-loom, cv:p-heat, cv:p-arch, cv:p-rossmann ;
+    weft:built cv:p-thesis, cv:p-weft, cv:p-jobmarket, cv:p-loom, cv:p-heat, cv:p-arch, cv:p-rossmann ;
     weft:focusOn cv:g-gov, cv:g-kr, cv:g-de, cv:g-an, cv:g-sw, cv:g-games, cv:g-collab ;
     weft:speaks cv:l-en, cv:l-de, cv:l-hi, cv:l-mr, cv:l-sd .
 
@@ -216,6 +216,14 @@ cv:p-weft a schema:CreativeWork ;
     schema:url "https://w3id.org/weft" ;
     weft:highlight "Designed Weft, an OWL vocabulary of 28 terms extending Schema.org that links each skill to the roles, projects, courses and certifications behind it; published it under CC BY 4.0 with documentation in HTML, Turtle, JSON-LD and RDF/XML, a JSON-LD context and an example that uses every term.", "Gave every term a permanent w3id.org IRI that resolves by content negotiation, with versioned IRIs for each release (weft/1.0) and a changelog.", "Linked 69 skills and 5 languages to Wikidata and ESCO with SKOS exactMatch/closeMatch mappings.", "Validated the published graph with SHACL shapes and domain/range checks in a GitHub Actions pipeline that blocks publishing on violations." ;
     weft:used cv:s-ontology, cv:s-owl, cv:s-rdf, cv:s-rdfs, cv:s-shacl, cv:s-turtle, cv:s-semmodel, cv:s-python, cv:s-cicd, cv:s-git, cv:s-docs .
+
+cv:p-jobmarket a schema:CreativeWork ;
+    schema:name "Job-market pipeline: dlt and dbt pipeline over German job ads" ;
+    weft:kind "Project" ;
+    schema:startDate "2026-11" ;
+    schema:url "https://github.com/rishirajani/job-market-pipeline" ;
+    weft:highlight "Building a daily pipeline over German job ads: dlt loaders for the Arbeitnow and Bundesagentur APIs into DuckDB, merged on each ad's ID.", "Modeling the raw data in dbt, with staging models, declared sources and generic, relationship and singular tests." ;
+    weft:used cv:s-dbt, cv:s-dlt, cv:s-duckdb, cv:s-sql, cv:s-python, cv:s-etl, cv:s-rest, cv:s-dq, cv:s-git .
 
 cv:p-loom a schema:CreativeWork ;
     schema:name "Loom: open-source CSV-to-RDF ontology mapping tool" ;
@@ -417,6 +425,21 @@ cv:s-postgres a schema:DefinedTerm ;
     schema:name "PostgreSQL" ;
     weft:kind "Skill" ;
     skos:exactMatch wd:Q192490, esco:a8d07b5a-c1a1-42c6-9d53-db9c7a2ca996 ;
+    weft:inGroup cv:g-de .
+
+cv:s-dbt a schema:DefinedTerm ;
+    schema:name "dbt" ;
+    weft:kind "Skill" ;
+    weft:inGroup cv:g-de .
+
+cv:s-dlt a schema:DefinedTerm ;
+    schema:name "dlt (data load tool)" ;
+    weft:kind "Skill" ;
+    weft:inGroup cv:g-de .
+
+cv:s-duckdb a schema:DefinedTerm ;
+    schema:name "DuckDB" ;
+    weft:kind "Skill" ;
     weft:inGroup cv:g-de .
 
 cv:s-sap a schema:DefinedTerm ;

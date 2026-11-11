@@ -78,6 +78,9 @@
           "@id": "cv:p-weft"
         },
         {
+          "@id": "cv:p-jobmarket"
+        },
+        {
           "@id": "cv:p-loom"
         },
         {
@@ -756,6 +759,47 @@
       ]
     },
     {
+      "@id": "cv:p-jobmarket",
+      "@type": "CreativeWork",
+      "name": "Job-market pipeline: dlt and dbt pipeline over German job ads",
+      "weft:kind": "Project",
+      "startDate": "2026-11",
+      "url": "https://github.com/rishirajani/job-market-pipeline",
+      "weft:highlight": [
+        "Building a daily pipeline over German job ads: dlt loaders for the Arbeitnow and Bundesagentur APIs into DuckDB, merged on each ad's ID.",
+        "Modeling the raw data in dbt, with staging models, declared sources and generic, relationship and singular tests."
+      ],
+      "weft:used": [
+        {
+          "@id": "cv:s-dbt"
+        },
+        {
+          "@id": "cv:s-dlt"
+        },
+        {
+          "@id": "cv:s-duckdb"
+        },
+        {
+          "@id": "cv:s-sql"
+        },
+        {
+          "@id": "cv:s-python"
+        },
+        {
+          "@id": "cv:s-etl"
+        },
+        {
+          "@id": "cv:s-rest"
+        },
+        {
+          "@id": "cv:s-dq"
+        },
+        {
+          "@id": "cv:s-git"
+        }
+      ]
+    },
+    {
       "@id": "cv:p-loom",
       "@type": "CreativeWork",
       "name": "Loom: open-source CSV-to-RDF ontology mapping tool",
@@ -1382,6 +1426,39 @@
           "@id": "http://data.europa.eu/esco/skill/a8d07b5a-c1a1-42c6-9d53-db9c7a2ca996"
         }
       ],
+      "weft:inGroup": [
+        {
+          "@id": "cv:g-de"
+        }
+      ]
+    },
+    {
+      "@id": "cv:s-dbt",
+      "@type": "DefinedTerm",
+      "name": "dbt",
+      "weft:kind": "Skill",
+      "weft:inGroup": [
+        {
+          "@id": "cv:g-de"
+        }
+      ]
+    },
+    {
+      "@id": "cv:s-dlt",
+      "@type": "DefinedTerm",
+      "name": "dlt (data load tool)",
+      "weft:kind": "Skill",
+      "weft:inGroup": [
+        {
+          "@id": "cv:g-de"
+        }
+      ]
+    },
+    {
+      "@id": "cv:s-duckdb",
+      "@type": "DefinedTerm",
+      "name": "DuckDB",
+      "weft:kind": "Skill",
       "weft:inGroup": [
         {
           "@id": "cv:g-de"
