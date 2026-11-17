@@ -663,27 +663,38 @@
   // Postings found by the daily job search (.github/workflows/jobs.yml → jobs/inbox.json), ranked
   // against jobs/preferences.json and your graph. What you save or dismiss is kept in
   // jobs/state.json in your private repository.
-  const JOB_FILTERS = [["review", "To review"], ["saved", "Saved"], ["dismissed", "Dismissed"], ["all", "All"]];
+  // "Job closed" is for postings you found gone yourself; it's kept apart from "Not for me" (a
+  // judgement about fit), with company and title so a repost of the same role can be recognised
+  const JOB_FILTERS = [["review", "To review"], ["saved", "Saved"], ["dismissed", "Dismissed"], ["closed", "Closed"], ["all", "All"]];
+  const jobTitleKey = (t) => String(t || "").toLowerCase().replace(/\((?:[mwfdx*:]\s*\/?\s*)+\)|\(all genders\)/gi, " ").replace(/[^a-z0-9äöüß]+/g, " ").trim();
+  const jobCompanyKey = (c) => String(c || "").toLowerCase().replace(/\b(gmbh|ag|se|kg|co|mbh|inc|ltd|llc|group|deutschland|germany)\b|[^a-z0-9äöüß]+/g, " ").replace(/\s+/g, " ").trim();
   let jobsView = { filter: "review", hideGerman: false };
   async function readJobState() {
     const f = await ghGet("jobs/state.json");
     const data = f ? JSON.parse(f.text) : {};
-    return { sha: f?.sha, data: { saved: data.saved || [], dismissed: data.dismissed || [], lastLooked: data.lastLooked || "" } };
+    return { sha: f?.sha, data: { saved: data.saved || [], dismissed: data.dismissed || [], closed: data.closed || [], lastLooked: data.lastLooked || "" } };
   }
   function jobCard(j, st, isNew) {
     const saved = st.saved.includes(j.refnr), dismissed = st.dismissed.includes(j.refnr);
+    const closedByYou = st.closed.find((c) => c.refnr === j.refnr);
+    // a posting like one you marked closed: probably the same role, relisted
+    const likeClosed = !closedByYou && st.closed.find((c) => c.refnr !== j.refnr && jobCompanyKey(c.company) === jobCompanyKey(j.company) && jobTitleKey(c.title) === jobTitleKey(j.title));
     const age = daysSince(j.posted);
-    const tag = (t) => `<span class="job-tag${/German required|Pay up to|Listed since/.test(t) ? " warn" : /applied/i.test(t) ? " done" : ""}">${esc(t)}</span>`;
+    const tag = (t) => `<span class="job-tag${/German required|Pay up to|Listed since|No longer listed|closed/i.test(t) ? " warn" : /applied/i.test(t) ? " done" : ""}">${esc(t)}</span>`;
+    const tags = [...(j.tags || []),
+      ...(closedByYou ? [`You marked it closed ${fmtDay(closedByYou.date)}`] : []),
+      ...(likeClosed ? [`You marked a posting like this closed ${fmtDay(likeClosed.date)}; check the company page`] : [])];
+    const checked = j.check?.date ? (j.check.open ? ` · <span class="vis-meta">open as of ${esc(fmtDay(j.check.date))} (${esc(j.check.via)})</span>` : "") : "";
     const real = (u) => { const v = safeUrl(u); try { return v && new URL(v).pathname.length > 1 ? v : ""; } catch { return ""; } };
     const href = real(j.url) || real(j.baUrl);
-    return `<article class="job${dismissed ? " closed" : ""}" data-ref="${esc(j.refnr)}">
+    return `<article class="job${dismissed || closedByYou ? " closed" : ""}" data-ref="${esc(j.refnr)}">
       <header class="app-head">
         <div><h3>${href ? `<a href="${esc(href)}" target="_blank" rel="noopener">${esc(j.title)}</a>` : esc(j.title)}${isNew ? ` <span class="job-new">New</span>` : ""}</h3>
           <p class="app-role">${esc(j.company)}${j.place ? ` · ${esc(j.place)}` : ""}${j.posted ? ` · <span class="vis-meta">${age > 60 ? `first posted ${esc(fmtDay(j.posted))}` : `posted ${age === 0 ? "today" : age === 1 ? "yesterday" : age + " days ago"}`}</span>` : ""}
-          ${real(j.url) && real(j.baUrl) ? ` · <a class="vis-meta" href="${esc(j.baUrl)}" target="_blank" rel="noopener">agency listing</a>` : ""}</p></div>
+          ${real(j.url) && real(j.baUrl) ? ` · <a class="vis-meta" href="${esc(j.baUrl)}" target="_blank" rel="noopener">agency listing</a>` : ""}${checked}</p></div>
         <span class="job-score" title="Fit score from your preferences and skills">${j.score}</span>
       </header>
-      <p class="job-why">${(j.why || []).map((w) => `<span class="job-chip">${esc(w)}</span>`).join("")}${(j.tags || []).map(tag).join("")}</p>
+      <p class="job-why">${(j.why || []).map((w) => `<span class="job-chip">${esc(w)}</span>`).join("")}${tags.map(tag).join("")}</p>
       ${j.skills?.length ? `<p class="app-meta">Your skills in it: ${j.skills.map(esc).join(", ")}${j.skillCount > j.skills.length ? ` and ${j.skillCount - j.skills.length} more` : ""}</p>` : ""}
       ${j.description ? `<details class="app-notes"><summary>Job description${j.from ? ` <span class="vis-meta">(full text from ${esc(j.from)})</span>` : ` <span class="vis-meta">(as listed by the agency; may be shortened)</span>`}</summary><div class="job-desc">${esc(j.description)}</div></details>` : ""}
       <div class="app-actions">
@@ -691,6 +702,7 @@
         <button class="btn ghost small" data-act="track" type="button">Add to Applications</button>
         <button class="btn ghost small" data-act="save" type="button">${saved ? "Saved ✓" : "Save"}</button>
         <button class="btn ghost small" data-act="dismiss" type="button">${dismissed ? "Restore" : "Not for me"}</button>
+        <button class="btn ghost small" data-act="closed" type="button" title="${closedByYou ? "Put it back in your list" : "The posting is gone: say so, so it leaves your list (this doesn't count as not liking it)"}">${closedByYou ? "Reopen" : "Job closed"}</button>
       </div>
     </article>`;
   }
@@ -711,14 +723,15 @@
     const lastLooked = s.lastLooked;
     const isNew = (j) => !lastLooked || (j.found || "") > lastLooked.slice(0, 10);
     const saveState = async (mutate, quiet) => {
-      try { const r = await readJobState(); mutate(r.data); await ghPut("jobs/state.json", JSON.stringify(r.data, null, 1) + "\n", r.sha, "Jobs: " + (quiet || "updated")); Object.assign(s, r.data); if (!quiet) st("Saved."); }
-      catch (e) { st(e.message); }
+      try { const r = await readJobState(); mutate(r.data); await ghPut("jobs/state.json", JSON.stringify(r.data, null, 1) + "\n", r.sha, "Jobs: " + (quiet || "updated")); Object.assign(s, r.data); if (!quiet) st("Saved."); return true; }
+      catch (e) { st(e.message); return false; }
     };
     const render = () => {
-      const counts = { review: jobs.filter((j) => !s.dismissed.includes(j.refnr)).length, saved: jobs.filter((j) => s.saved.includes(j.refnr)).length, dismissed: jobs.filter((j) => s.dismissed.includes(j.refnr)).length, all: jobs.length };
+      const isClosed = (j) => s.closed.some((c) => c.refnr === j.refnr);
+      const counts = { review: jobs.filter((j) => !s.dismissed.includes(j.refnr) && !isClosed(j)).length, saved: jobs.filter((j) => s.saved.includes(j.refnr)).length, dismissed: jobs.filter((j) => s.dismissed.includes(j.refnr)).length, closed: jobs.filter(isClosed).length, all: jobs.length };
       $("#jobs-filters").innerHTML = JOB_FILTERS.map(([k, label]) => `<button class="btn ghost small" type="button" data-filter="${k}"${jobsView.filter === k ? ' aria-pressed="true"' : ""}>${label} <span class="vis-meta">${counts[k]}</span></button>`).join("")
         + `<label class="job-hide"><input type="checkbox" id="jobs-hide-german"${jobsView.hideGerman ? " checked" : ""}> Hide roles that require German</label>`;
-      let list = jobs.filter((j) => jobsView.filter === "all" ? true : jobsView.filter === "saved" ? s.saved.includes(j.refnr) : jobsView.filter === "dismissed" ? s.dismissed.includes(j.refnr) : !s.dismissed.includes(j.refnr));
+      let list = jobs.filter((j) => jobsView.filter === "all" ? true : jobsView.filter === "saved" ? s.saved.includes(j.refnr) : jobsView.filter === "dismissed" ? s.dismissed.includes(j.refnr) : jobsView.filter === "closed" ? isClosed(j) : !s.dismissed.includes(j.refnr) && !isClosed(j));
       if (jobsView.hideGerman) list = list.filter((j) => !(j.tags || []).includes("German required"));
       body.innerHTML = list.length ? list.map((j) => jobCard(j, s, isNew(j))).join("") : `<p class="help">Nothing here.</p>`;
       $$("#jobs-filters [data-filter]").forEach((b) => b.addEventListener("click", () => { jobsView.filter = b.dataset.filter; render(); }));
@@ -731,6 +744,13 @@
         el.querySelector('[data-act="dismiss"]').addEventListener("click", () => saveState((d) => {
           d.dismissed = d.dismissed.includes(j.refnr) ? d.dismissed.filter((r) => r !== j.refnr) : [...d.dismissed, j.refnr];
         }).then(render));
+        el.querySelector('[data-act="closed"]').addEventListener("click", () => {
+          const was = s.closed.some((c) => c.refnr === j.refnr);
+          saveState((d) => {
+            d.closed = d.closed.filter((c) => c.refnr !== j.refnr);
+            if (!was) d.closed.push({ refnr: j.refnr, date: todayIso(), company: j.company, title: j.title });
+          }, `${was ? "reopened" : "closed"} ${j.refnr}`).then((ok) => { if (ok) { render(); st(was ? "Back in your list." : "Marked closed. It's under Closed now."); } });
+        });
         el.querySelector('[data-act="write"]').addEventListener("click", async () => {
           await enterStudio();
           $("#jd").value = `${j.title}\n${j.company}${j.place ? ", " + j.place : ""}\n\n${j.description || ""}`.trim();
@@ -751,7 +771,7 @@
         });
       });
     };
-    const newCount = jobs.filter((j) => isNew(j) && !s.dismissed.includes(j.refnr)).length;
+    const newCount = jobs.filter((j) => isNew(j) && !s.dismissed.includes(j.refnr) && !s.closed.some((c) => c.refnr === j.refnr)).length;
     const german = jobs.filter((j) => (j.tags || []).includes("German required")).length;
     $("#jobs-summary").innerHTML = `<p class="apps-counts"><span><b>${newCount}</b> new since you last looked</span><span><b>${jobs.length}</b> in the list</span><span><b>${german}</b> require German</span></p>
       <p class="help">Updated ${esc(fmtDay((inbox.updated || "").slice(0, 10)))} from the Federal Employment Agency's job database. Ranked by role type (knowledge and ontology engineering first), place (Munich, then Berlin, then remote), your skills in the posting, seniority and German. Change what it looks for in <code>jobs/preferences.json</code>.</p>`;
